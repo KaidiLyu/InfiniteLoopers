@@ -1,39 +1,31 @@
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
-import { useFonts } from 'expo-font';
-import { Stack } from 'expo-router';
-import * as SplashScreen from 'expo-splash-screen';
-import { StatusBar } from 'expo-status-bar';
-import { useEffect } from 'react';
-import 'react-native-reanimated';
-
-import { useColorScheme } from '@/hooks/useColorScheme';
-
-// Prevent the splash screen from auto-hiding before asset loading is complete.
-SplashScreen.preventAutoHideAsync();
+import { Stack } from "expo-router";
+import { useFonts } from "expo-font";
+import { Platform } from "react-native";
+import { PlatformContext } from "../contexts/PlatformContext";
 
 export default function RootLayout() {
-  const colorScheme = useColorScheme();
-  const [loaded] = useFonts({
-    SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
+  useFonts({
+    myfont: require("./../assets/fonts/myfont-Regular.ttf"),
+    "myfont-medium": require("./../assets/fonts/myfont-Medium.ttf"),
+    "myfont-bold": require("./../assets/fonts/myfont-Bold.ttf"),
   });
 
-  useEffect(() => {
-    if (loaded) {
-      SplashScreen.hideAsync();
-    }
-  }, [loaded]);
-
-  if (!loaded) {
-    return null;
-  }
+  const platformValue = {
+    platform: Platform.OS,
+    isWeb: Platform.OS === "web",
+    isIOS: Platform.OS === "ios",
+    isAndroid: Platform.OS === "android",
+    isMacos: Platform.OS === "macos",
+  };
 
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="+not-found" />
+    <PlatformContext.Provider value={platformValue}>
+      <Stack screenOptions={{ headerShown: false }}>
+        {/* <Stack screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="index" />
+        </Stack> */}
+        <Stack.Screen name="(tabs)" />
       </Stack>
-      <StatusBar style="auto" />
-    </ThemeProvider>
+    </PlatformContext.Provider>
   );
 }

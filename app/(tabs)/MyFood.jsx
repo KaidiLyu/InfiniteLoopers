@@ -277,8 +277,7 @@ export default function MyFood() {
           />
         </TouchableOpacity>
         <View style={{ flexDirection: "row", gap: 15 }}>
-          <TouchableOpacity
-            onPress={() => router.push("/search-info/SearchFood")}>
+          <TouchableOpacity onPress={() => router.push("/SearchFood")}>
             <AntDesign name="pluscircle" size={32} color="black" />
           </TouchableOpacity>
         </View>

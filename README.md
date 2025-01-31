@@ -48,3 +48,26 @@ Join our community of developers creating universal apps.
 
 - [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
 - [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+
+## Testing
+
+### Running Tests
+To run all tests:
+```bash
+npm test
+```
+
+To run tests in watch mode:
+```bash
+npm run test:watch
+```
+
+To generate coverage report:
+```bash
+npm run test:coverage
+```
+
+### Test Files Location
+All test files are located in the `tests` directory:
+- Unit tests: `tests/unit/`
+- UI/Behavioral tests: `tests/ui/`

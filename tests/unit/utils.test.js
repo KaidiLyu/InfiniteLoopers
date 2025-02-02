@@ -1,4 +1,4 @@
-// 测试一个简单的工具函数
+// A simple test tool function
 const validateEmail = (email) => {
   const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   return re.test(email);

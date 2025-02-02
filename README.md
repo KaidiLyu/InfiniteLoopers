@@ -108,8 +108,6 @@ All test files are stored in the `tests` directory. The primary test files inclu
   - `auth.test.ts`
 - **Behavioral Tests:** Located in `tests/ui/`
   - `Button.test.jsx`
-  - `SearchFood.test.jsx`
-  - `SignIn.test.jsx`
 
 To run specific tests, use the filename pattern with Jest:
 ```bash

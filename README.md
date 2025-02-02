@@ -116,20 +116,7 @@ To run specific tests, use the filename pattern with Jest:
 npm test -- tests/unit/utils.test.js
 npm test -- tests/ui/Button.test.jsx
 ```
-
-### Testing Video Submission
-
-To complete the testing submission, do the following:
-
-1. Record a video demonstrating test execution:
-   - Run `npm test` in your terminal.
-   - Show passing tests in the terminal.
-   - Optionally, explain the test results in the video.
-
-2. Create an **Issue** in the GitHub repository:
-   - Title: `Testing Video`
-   - Attach the recorded video (or provide a link).
-```
+ach the recorded video (————).
 
 ## Authors
 

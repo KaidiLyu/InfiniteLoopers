@@ -129,13 +129,6 @@ To complete the testing submission, do the following:
 2. Create an **Issue** in the GitHub repository:
    - Title: `Testing Video`
    - Attach the recorded video (or provide a link).
-
-### Tagging the Commit
-
-After finalizing and committing your test implementation, create a git tag:
-```bash
-git tag v0.2
-git push --tags
 ```
 
 ## Authors

@@ -1,73 +1,149 @@
-# Welcome to your Expo app 👋
+# InfiniteLoopers Nutritional Search App
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+The InfiniteLoopers Nutritional Search App is an AI-powered mobile application that allows users to search for food items and receive nutritional information. Using advanced image recognition and natural language processing, the app provides users with comprehensive nutritional data to make informed choices. For more details, refer to our [wiki pages](https://github.com/SCCapstone/InfiniteLoopers/wiki).
 
-## Get started
+This Readme is designed for developers joining the team, with all the necessary instructions to install, compile, run, and test the application. This document is also useful for re-installing everything if you need to start fresh, as well as for teachers assessing the project.
 
-1. Install dependencies
+## External Requirements
 
+To build and run this project, you need to install the following:
+
+-   [Node.js](https://nodejs.org/en/) - Use the following commands to install:
+    ```bash
+    # macOS
+    brew install node
+    # Windows (PowerShell)
+    choco install nodejs
+    ```
+-   [Expo CLI](https://expo.dev/) - Install with:
+    ```bash
+    npm install -g expo-cli
+    ```
+
+Note: The instructions above are for macOS and Windows users. Additional dependencies are listed in the `package.json` file and will be installed during the setup process.
+
+## Setup
+
+After cloning the repository, follow these one-time setup steps:
+
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/SCCapstone/InfiniteLoopers.git
+   cd InfiniteLoopers
+   ```
+
+2. Install project dependencies:
    ```bash
    npm install
    ```
 
-2. Start the app
+3. Set up any required configuration files (e.g., `.env` files if sensitive data like API keys is required). Instructions for configuration can be found in our [wiki](https://github.com/SCCapstone/InfiniteLoopers/wiki).
 
+## Running
+
+To run the app locally:
+
+1. Start the Expo development server:
    ```bash
-    npx expo start
+   expo start
+   ```
+2. Open the app in your preferred simulator:
+   - For Android: Use an Android emulator or Expo Go on a physical Android device.
+   - For iOS (macOS only): Use the iOS simulator or Expo Go on a physical iPhone.
+
+## Deployment
+
+To deploy the mobile app:
+
+1. **Build a release version** for production:
+   ```bash
+   expo build:android   # For Android APK
+   expo build:ios       # For iOS IPA (requires macOS and Apple Developer account)
+   ```
+2. Follow the Expo deployment instructions to distribute the app to end-users. [Expo documentation](https://docs.expo.dev/)
+
+## Code Style Guide
+
+To maintain a consistent code style across the team, we are following the [Google JavaScript Style Guide](https://google.github.io/styleguide/jsguide.html).
+
+We recommend using an automatic code formatter to ensure consistency without extra effort. Use [Prettier](https://prettier.io/) or any code formatter supported by your IDE. To install Prettier, run the following command:
+   ```bash
+   npm install --save-dev prettier
    ```
 
-In the output, you'll find options to open the app in a
+### Setting Up Prettier
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
-
-```bash
-npm run reset-project
-```
-
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
-
-## Learn more
-
-To learn more about developing your project with Expo, look at the following resources:
-
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+1. Configure Prettier to format your code automatically on save.
+2. For VS Code users, you can add the following settings to `settings.json`:
+   ```json
+   {
+      "editor.formatOnSave": true,
+      "prettier.singleQuote": true,
+      "prettier.trailingComma": "all"
+   }
+   ```
 
 ## Testing
 
 ### Running Tests
-To run all tests:
+
+The project includes unit and behavioral tests located in the `tests` folder. To run the tests, follow these steps:
+
+1. Install the testing dependencies:
+   ```bash
+   npm install --save-dev jest @testing-library/react-native
+   ```
+2. Run all tests:
+   ```bash
+   npm test
+   ```
+
+### Test Directory
+
+All test files are stored in the `tests` directory. The primary test files include:
+
+- **Unit Tests:** Located in `tests/unit/`
+  - `utils.test.js`
+  - `Colors.test.ts`
+  - `auth.test.ts`
+- **Behavioral Tests:** Located in `tests/ui/`
+  - `Button.test.jsx`
+  - `SearchFood.test.jsx`
+  - `SignIn.test.jsx`
+
+To run specific tests, use the filename pattern with Jest:
 ```bash
-npm test
+npm test -- tests/unit/utils.test.js
+npm test -- tests/ui/Button.test.jsx
 ```
 
-To run tests in watch mode:
+### Testing Video Submission
+
+To complete the testing submission, do the following:
+
+1. Record a video demonstrating test execution:
+   - Run `npm test` in your terminal.
+   - Show passing tests in the terminal.
+   - Optionally, explain the test results in the video.
+
+2. Create an **Issue** in the GitHub repository:
+   - Title: `Testing Video`
+   - Attach the recorded video (or provide a link).
+
+### Tagging the Commit
+
+After finalizing and committing your test implementation, create a git tag:
 ```bash
-npm run test:watch
+git tag v0.2
+git push --tags
 ```
 
-To generate coverage report:
-```bash
-npm run test:coverage
-```
+## Authors
 
-### Test Files Location
-All test files are located in the `tests` directory:
-- Unit tests: `tests/unit/`
-- UI/Behavioral tests: `tests/ui/`
+- Kaidi Lyu - [klyu@email.sc.edu](mailto:klyu@email.sc.edu)
+- Yingdong Feng - [yingdong@email.sc.edu](mailto:yingdong@email.sc.edu)
+- Kiran Chhetri - [chhetrik@email.sc.edu](mailto:chhetrik@email.sc.edu)
+- Andrew Dhillon - [dhillons@email.sc.edu](mailto:dhillons@email.sc.edu)
+- Logan Munn - [ljmunn@email.sc.edu](mailto:ljmunn@email.sc.edu)
+- [InfiniteLoopersMerge]
+

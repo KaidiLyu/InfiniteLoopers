@@ -1,7 +1,7 @@
 import 'react-native-gesture-handler/jestSetup';
 
 // Mock the Firebase modules
-jest.mock('../../configs/FirebaseConfig', () => ({
+jest.mock('../configs/FirebaseConfig', () => ({
   auth: {
     currentUser: {
       email: 'test@test.com'
@@ -29,4 +29,10 @@ jest.mock('expo-router', () => ({
 
 jest.mock('@react-native-async-storage/async-storage', () =>
   require('@react-native-async-storage/async-storage/jest/async-storage-mock')
+);
+
+// Mock Image component
+jest.mock('react-native/Libraries/Image/Image', () => ({
+  resolveAssetSource: () => ({ uri: 'test-uri' }),
+})); 
 ); 

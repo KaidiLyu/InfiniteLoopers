@@ -35,4 +35,3 @@ jest.mock('@react-native-async-storage/async-storage', () =>
 jest.mock('react-native/Libraries/Image/Image', () => ({
   resolveAssetSource: () => ({ uri: 'test-uri' }),
 })); 
-); 

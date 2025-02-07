@@ -114,7 +114,7 @@ To run specific tests, use the filename pattern with Jest:
 npm test -- tests/unit/utils.test.js
 npm test -- tests/ui/Button.test.jsx
 ```
-ach the recorded video (————).
+Watch the recorded video (https://youtu.be/AZkT26fnDVc).
 
 ## Authors
 

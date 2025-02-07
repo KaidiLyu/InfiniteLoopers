@@ -122,9 +122,4 @@ ach the recorded video (————).
 - Yingdong Feng - [yingdong@email.sc.edu](mailto:yingdong@email.sc.edu)
 - Kiran Chhetri - [chhetrik@email.sc.edu](mailto:chhetrik@email.sc.edu)
 - Andrew Dhillon - [dhillons@email.sc.edu](mailto:dhillons@email.sc.edu)
-<<<<<<< HEAD
 - Logan Munn - [ljmunn@email.sc.edu](mailto:ljmunn@email.sc.edu)
-=======
-- Logan Munn - [ljmunn@email.sc.edu](mailto:ljmunn@email.sc.edu)
-
->>>>>>> 8e0d8be33a1a9aaca3bd0a26fbcf197fb586e314

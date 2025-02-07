@@ -123,5 +123,3 @@ ach the recorded video (————).
 - Kiran Chhetri - [chhetrik@email.sc.edu](mailto:chhetrik@email.sc.edu)
 - Andrew Dhillon - [dhillons@email.sc.edu](mailto:dhillons@email.sc.edu)
 - Logan Munn - [ljmunn@email.sc.edu](mailto:ljmunn@email.sc.edu)
-- [InfiniteLoopersMerge]
-

@@ -29,8 +29,12 @@ return(
       </Text>
       <AntDesign name="right" size={20} color={Colors.WHITE} style={styles.icon} />
       </TouchableOpacity>
-    
     ))}
+    <TouchableOpacity style={styles.profileButton} onPress={() => router.push('app/(tabs)/Profile')}>
+      <Text style={styles.profileButtonText}>
+        Back
+      </Text>
+    </TouchableOpacity>
   </View>
 );
 

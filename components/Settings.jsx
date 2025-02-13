@@ -61,4 +61,18 @@ const styles = StyleSheet.create({
   icon:{
     alignSelf: 'center',
   },
+  profileButton:{
+    backgroundColor: Colors.BLACK,
+    padding: 15,
+    marginVertical: 10,
+    borderRadius: 10,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  profileButtonText:{
+    fontSize: 18,
+    fontFamily: 'myfont-medium',
+    color: Colors.WHITE,
+  },
 });

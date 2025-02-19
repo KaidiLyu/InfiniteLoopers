@@ -1,8 +1,8 @@
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import React from 'react';
-import { Colors } from '../constants/Colors';
-import { useRouter } from 'expo-router';
-import AntDesign from '@expo/vector-icons/AntDesign';
+import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import React from "react";
+import { Colors } from "../constants/Colors";
+import { useRouter } from "expo-router";
+import AntDesign from "@expo/vector-icons/AntDesign";
 
 export default function Settings() {
   const router = useRouter();

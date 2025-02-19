@@ -121,6 +121,9 @@ export default function Profile() {
           size={24}
           color = {Colors.WHITE}
           />
+          <Text style={styles.settingsText}>
+            Settings
+          </Text>
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.signOutButton} onPress={handleSignOut}>
@@ -249,12 +252,6 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     marginTop: 10
   },
-  settingsText: {
-    color: Colors.WHITE,
-    fontFamily: "myfont-bold",
-    fontSize: 16,
-    marginLeft: 10,
-  },
   signOutButton: {
     backgroundColor: "#FF3B30",
     flexDirection: "row",
@@ -270,4 +267,10 @@ const styles = StyleSheet.create({
     fontSize: 16,
     marginLeft: 10,
   },
+  settingsText:{
+    color: Colors.WHITE,
+    fontFamily: "myfont-bold",
+    fontSize: 16,
+    marginLeft: 10,
+  }
 });

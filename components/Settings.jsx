@@ -10,10 +10,6 @@ export default function Settings() {
 
 const SettingsList = [
   { name: 'Personal Information', screen: 'PersonalInfo' },
-  { name: 'Notifications', screen: 'Notifs'},
-  { name: 'Privacy Policy', screen: 'PrivacyPolicy'},
-  { name: 'FAQs', screen: 'Questions'},
-  { name: 'Delete Account', screen: 'DeleteAccount'},
 ];
 
 return(

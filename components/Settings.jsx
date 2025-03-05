@@ -6,33 +6,35 @@ import AntDesign from "@expo/vector-icons/AntDesign";
 
 export default function Settings() {
   const router = useRouter();
-}
 
-const SettingsList = [
-  { name: 'Personal Information', screen: 'PersonalInfo' },
-];
+  const SettingsList = [
+    { name: "Personal Information", screen: "/PersonalInfo" },
+  ];
 
-return(
-  <View style={styles.container}>
-    {SettingsList.map((option, index) => (
+  return (
+    <View style={styles.container}>
+      {SettingsList.map((option, index) => (
+        <TouchableOpacity
+          key={index}
+          style={styles.button}
+          onPress={() => router.push(option.screen)}>
+          <Text style={styles.buttonText}>{option.name}</Text>
+          <AntDesign
+            name="right"
+            size={20}
+            color={Colors.WHITE}
+            style={styles.icon}
+          />
+        </TouchableOpacity>
+      ))}
       <TouchableOpacity
-      key = {index}
-      style={styles.button}
-      onPress={() => router.push(option.screen)}
-      >
-      <Text style={styles.buttonText}>
-        {option.name}
-      </Text>
-      <AntDesign name="right" size={20} color={Colors.WHITE} style={styles.icon} />
+        style={styles.profileButton}
+        onPress={() => router.push("/(tabs)/Profile")}>
+        <Text style={styles.profileButtonText}>Back</Text>
       </TouchableOpacity>
-    ))}
-    <TouchableOpacity style={styles.profileButton} onPress={() => router.push('app/(tabs)/Profile')}>
-      <Text style={styles.profileButtonText}>
-        Back
-      </Text>
-    </TouchableOpacity>
-  </View>
-);
+    </View>
+  );
+}
 
 const styles = StyleSheet.create({
   container: {
@@ -45,30 +47,30 @@ const styles = StyleSheet.create({
     padding: 15,
     marginVertical: 10,
     borderRadius: 10,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
   },
   buttonText: {
     fontSize: 18,
-    fontFamily: 'myfont-medium',
+    fontFamily: "myfont-medium",
     color: Colors.WHITE,
   },
-  icon:{
-    alignSelf: 'center',
+  icon: {
+    alignSelf: "center",
   },
-  profileButton:{
+  profileButton: {
     backgroundColor: Colors.BLACK,
     padding: 15,
     marginVertical: 10,
     borderRadius: 10,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
   },
-  profileButtonText:{
+  profileButtonText: {
     fontSize: 18,
-    fontFamily: 'myfont-medium',
+    fontFamily: "myfont-medium",
     color: Colors.WHITE,
   },
 });

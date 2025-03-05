@@ -63,8 +63,8 @@ export default function Profile() {
   };
 
   const toSettings = () => {
-    router.push("components/Settings");
-  }
+    router.push("/settings");
+  };
 
   if (!user) {
     return (
@@ -116,14 +116,8 @@ export default function Profile() {
         </View>
 
         <TouchableOpacity style={styles.settingsButton} onPress={toSettings}>
-          <MaterialCommunityIcons
-          name="cog"
-          size={24}
-          color = {Colors.WHITE}
-          />
-          <Text style={styles.settingsText}>
-            Settings
-          </Text>
+          <MaterialCommunityIcons name="cog" size={24} color={Colors.WHITE} />
+          <Text style={styles.settingsText}>Settings</Text>
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.signOutButton} onPress={handleSignOut}>
@@ -250,7 +244,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     padding: 15,
     borderRadius: 10,
-    marginTop: 10
+    marginTop: 10,
   },
   signOutButton: {
     backgroundColor: "#FF3B30",
@@ -267,10 +261,10 @@ const styles = StyleSheet.create({
     fontSize: 16,
     marginLeft: 10,
   },
-  settingsText:{
+  settingsText: {
     color: Colors.WHITE,
     fontFamily: "myfont-bold",
     fontSize: 16,
     marginLeft: 10,
-  }
+  },
 });

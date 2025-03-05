@@ -25,6 +25,8 @@ export default function RootLayout() {
         <Stack.Screen name="index" />
         </Stack> */}
         <Stack.Screen name="(tabs)" />
+        <Stack.Screen name="settings" />
+        <Stack.Screen name="PersonalInfo" />
       </Stack>
     </PlatformContext.Provider>
   );

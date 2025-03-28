@@ -1,0 +1,1600 @@
+/**
+ * InfiniteLoopers - AI-Powered Nutritional Search App
+ * 主要样式表 - 定义网站的所有视觉风格和布局
+ * Main stylesheet - Defines all visual styles and layouts for the website
+ */
+
+/* 基础样式 Base Styles */
+:root {
+    /* 全局颜色变量定义 - Global color variable definitions */
+    --background: #000000;        /* 背景色 - Background color */
+    --foreground: #ffffff;        /* 前景色/文本色 - Foreground/text color */
+    --card: #111111;              /* 卡片背景色 - Card background color */
+    --card-foreground: #ffffff;   /* 卡片文本色 - Card text color */
+    --border: #333333;            /* 边框色 - Border color */
+    --input: #333333;             /* 输入框背景色 - Input background color */
+    --primary: #22d3ee;           /* 主要强调色 - Primary accent color */
+    --primary-foreground: #000000; /* 主要强调色上的文本色 - Text on primary color */
+    --secondary: #10b981;         /* 次要强调色 - Secondary accent color */
+    --secondary-foreground: #ffffff; /* 次要强调色上的文本色 - Text on secondary color */
+    --accent: #1e293b;            /* 强调背景色 - Accent background color */
+    --accent-foreground: #ffffff; /* 强调背景色上的文本色 - Text on accent background */
+    --destructive: #ef4444;       /* 警告/错误色 - Warning/error color */
+    --destructive-foreground: #ffffff; /* 警告色上的文本色 - Text on warning color */
+    --ring: #22d3ee;              /* 聚焦轮廓色 - Focus ring color */
+    --radius: 0.5rem;             /* 默认圆角半径 - Default border radius */
+  
+    /* 自定义颜色 - Custom Colors */
+    --cyan-400: #22d3ee;
+    --cyan-500: #06b6d4;
+    --cyan-600: #0891b2;
+    --cyan-700: #0e7490;
+    --emerald-400: #34d399;
+    --emerald-500: #10b981;
+    --emerald-600: #059669;
+    --emerald-700: #047857;
+    --blue-500: #3b82f6;
+    --blue-700: #1d4ed8;
+    --purple-500: #a855f7;
+    --purple-700: #7e22ce;
+    --gray-300: #d1d5db;
+    --gray-400: #9ca3af;
+    --gray-500: #6b7280;
+    --gray-700: #374151;
+    --gray-800: #1f2937;
+    --gray-900: #111827;
+  }
+  
+  /* 重置浏览器默认样式 - Reset browser default styles */
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  
+  /* 启用平滑滚动 - Enable smooth scrolling */
+  html {
+    scroll-behavior: smooth;
+  }
+  
+  /* 基本页面样式 - Basic page styles */
+  body {
+    font-family: "Inter", sans-serif;
+    background-color: var(--background);
+    color: var(--foreground);
+    line-height: 1.5;
+  }
+  
+  /* 容器限制宽度并居中 - Container width limit and centering */
+  .container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1rem;
+  }
+  
+  /* 链接样式 - Link styles */
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+  
+  /* 图片最大宽度限制 - Image max-width limitation */
+  img {
+    max-width: 100%;
+    height: auto;
+  }
+  
+  /* 排版 Typography */
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    margin-bottom: 0.5em;
+    font-weight: 700;
+    line-height: 1.2;
+  }
+  
+  /* 渐变文本效果 - Gradient text effect */
+  .gradient-text {
+    background: linear-gradient(to right, var(--cyan-400), var(--emerald-400));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  
+  /* 按钮样式 Buttons */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius);
+    font-weight: 500;
+    padding: 0.5rem 1rem;
+    transition: all 0.2s ease; /* 平滑过渡效果 - Smooth transition effect */
+    cursor: pointer;
+    border: none;
+    font-size: 0.875rem;
+  }
+  
+  /* 主要按钮样式 - Primary button style */
+  .btn-primary {
+    background: linear-gradient(to right, var(--cyan-500), var(--emerald-500));
+    color: white;
+  }
+  
+  /* 主要按钮悬停效果 - Primary button hover effect */
+  .btn-primary:hover {
+    background: linear-gradient(to right, var(--cyan-600), var(--emerald-600));
+  }
+  
+  /* 次要按钮样式 - Secondary button style */
+  .btn-secondary {
+    background-color: transparent;
+    border: 1px solid var(--gray-700);
+    color: white;
+  }
+  
+  /* 次要按钮悬停效果 - Secondary button hover effect */
+  .btn-secondary:hover {
+    background-color: var(--gray-800);
+  }
+  
+  /* 轮廓按钮样式 - Outline button style */
+  .btn-outline {
+    background-color: transparent;
+    border: 1px solid var(--gray-700);
+    color: white;
+  }
+  
+  /* 轮廓按钮悬停效果 - Outline button hover effect */
+  .btn-outline:hover {
+    background-color: var(--gray-800);
+  }
+  
+  /* 全宽按钮 - Full-width button */
+  .btn-full {
+    width: 100%;
+  }
+  
+  /* 导航栏 Navbar */
+  .navbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 50; /* 确保导航栏位于其他元素之上 - Ensure navbar stays above other elements */
+    background-color: rgba(0, 0, 0, 0.7); /* 半透明背景 - Semi-transparent background */
+    backdrop-filter: blur(10px); /* 背景模糊效果 - Background blur effect */
+    border-bottom: 1px solid var(--gray-800);
+  }
+  
+  /* 导航栏内容布局 - Navbar content layout */
+  .navbar-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 4rem;
+  }
+  
+  /* Logo样式 - Logo style */
+  .logo {
+    font-size: 1.25rem;
+    font-weight: 700;
+  }
+  
+  /* 桌面导航菜单（默认隐藏，在大屏幕上显示） - Desktop navigation (hidden by default, shown on larger screens) */
+  .desktop-nav {
+    display: none;
+  }
+  
+  /* 导航链接样式 - Navigation link style */
+  .nav-link {
+    background: none;
+    border: none;
+    color: var(--gray-300);
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: color 0.2s ease;
+  }
+  
+  /* 导航链接悬停效果 - Navigation link hover effect */
+  .nav-link:hover {
+    color: white;
+  }
+  
+  /* 导航动作区域（默认隐藏，在大屏幕上显示） - Navigation actions area (hidden by default, shown on larger screens) */
+  .nav-actions {
+    display: none;
+  }
+  
+  /* 移动菜单按钮区域 - Mobile menu button area */
+  .mobile-menu-btn {
+    display: flex;
+    align-items: center;
+  }
+  
+  /* 菜单切换按钮 - Menu toggle button */
+  .menu-toggle {
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
+    padding: 0.5rem;
+  }
+  
+  /* 语言切换按钮 - Language toggle buttons */
+  .btn-language,
+  .btn-language-mobile {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 9999px;
+    margin-right: 0.5rem;
+  }
+  
+  /* 语言按钮悬停效果 - Language button hover effect */
+  .btn-language:hover,
+  .btn-language-mobile:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+  }
+  
+  /* 语言指示文本 - Language indicator text */
+  .language-indicator {
+    margin-left: 0.5rem;
+  }
+  
+  /* 移动菜单（默认隐藏） - Mobile menu (hidden by default) */
+  .mobile-menu {
+    display: none;
+    background-color: var(--gray-900);
+    border-bottom: 1px solid var(--gray-800);
+  }
+  
+  /* 移动菜单激活状态 - Mobile menu active state */
+  .mobile-menu.active {
+    display: block;
+  }
+  
+  /* 移动菜单内容布局 - Mobile menu content layout */
+  .mobile-menu-content {
+    display: flex;
+    flex-direction: column;
+    padding: 1rem;
+    gap: 1rem;
+  }
+  
+  /* 移动版导航链接 - Mobile navigation link */
+  .nav-link-mobile {
+    background: none;
+    border: none;
+    color: var(--gray-300);
+    font-size: 0.875rem;
+    text-align: left;
+    padding: 0.5rem 0;
+    cursor: pointer;
+  }
+  
+  /* 英雄区域 Hero Section */
+  .hero {
+    position: relative;
+    height: 100vh; /* 全屏高度 - Full screen height */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 0 1rem;
+    overflow: hidden;
+  }
+  
+  /* 英雄区域背景 - Hero background */
+  .hero-bg {
+    position: absolute;
+    inset: 0; /* 填满容器 - Fill container */
+    z-index: 0;
+  }
+  
+  /* 英雄区域叠加层（用于调整背景亮度） - Hero overlay (for adjusting background brightness) */
+  .hero-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to right, black, black);
+    opacity: 0.8;
+  }
+  
+  /* 英雄区域发光效果 - Hero glow effect */
+  .hero-glow {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 800px;
+    height: 800px;
+    border-radius: 50%;
+    background: linear-gradient(to right, var(--cyan-500), var(--emerald-500));
+    opacity: 0.2;
+    filter: blur(100px); /* 模糊效果创建发光 - Blur effect creates glow */
+  }
+  
+  /* 英雄区域内容 - Hero content */
+  .hero-content {
+    position: relative;
+    z-index: 10; /* 确保内容位于背景上方 - Ensure content stays above background */
+    max-width: 64rem;
+    margin: 0 auto;
+  }
+  
+  /* 英雄区域标题 - Hero title */
+  .hero-title {
+    font-size: 2.5rem;
+    margin-bottom: 1.5rem;
+  }
+  
+  /* 英雄区域副标题 - Hero subtitle */
+  .hero-subtitle {
+    font-size: 1.125rem;
+    margin-bottom: 2rem;
+    color: var(--gray-300);
+    max-width: 32rem;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  
+  /* 英雄区域按钮组 - Hero buttons group */
+  .hero-buttons {
+    display: flex;
+    flex-direction: column; /* 在移动设备上垂直堆叠 - Stack vertically on mobile */
+    gap: 1rem;
+    justify-content: center;
+    margin-bottom: 2rem;
+  }
+  
+  /* 滚动指示器 - Scroll indicator */
+  .scroll-indicator {
+    position: absolute;
+    bottom: 2.5rem;
+    left: 50%;
+    transform: translateX(-50%);
+    animation: bounce 2s infinite; /* 应用弹跳动画 - Apply bounce animation */
+  }
+  
+  /* 滚动按钮 - Scroll button */
+  .btn-scroll {
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
+    border-radius: 9999px;
+    padding: 0.5rem;
+    transition: background-color 0.2s ease;
+  }
+  
+  /* 滚动按钮悬停效果 - Scroll button hover effect */
+  .btn-scroll:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+  }
+  
+  /* 弹跳动画定义 - Bounce animation definition */
+  @keyframes bounce {
+    0%,
+    20%,
+    50%,
+    80%,
+    100% {
+      transform: translateY(0);
+    }
+    40% {
+      transform: translateY(-10px);
+    }
+    60% {
+      transform: translateY(-5px);
+    }
+  }
+  
+  /* 功能特点区域 Features Section */
+  .features {
+    padding: 5rem 0;
+    background: linear-gradient(to right, black, var(--gray-900));
+  }
+  
+  /* 区域标题 - Section title */
+  .section-title {
+    font-size: 2rem;
+    text-align: center;
+    margin-bottom: 3rem;
+  }
+  
+  /* 功能卡片网格布局 - Features card grid layout */
+  .features-grid {
+    display: grid;
+    grid-template-columns: 1fr; /* 在移动设备上单列 - Single column on mobile */
+    gap: 2rem;
+  }
+  
+  /* 功能卡片样式 - Feature card style */
+  .feature-card {
+    background-color: rgba(17, 24, 39, 0.5); /* 半透明背景 - Semi-transparent background */
+    border: 1px solid var(--gray-800);
+    border-radius: var(--radius);
+    padding: 1.5rem;
+    transition: all 0.3s ease; /* 平滑过渡效果 - Smooth transition effect */
+  }
+  
+  /* 功能卡片悬停效果 - Feature card hover effect */
+  .feature-card:hover {
+    transform: translateY(-0.25rem); /* 上移效果 - Move up effect */
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); /* 悬停时添加阴影 - Add shadow on hover */
+  }
+  
+  /* 功能图标容器 - Feature icon container */
+  .feature-icon {
+    height: 3rem;
+    width: 3rem;
+    border-radius: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1.5rem;
+  }
+  
+  /* 青色图标背景 - Cyan icon background */
+  .feature-icon.cyan {
+    background: linear-gradient(to bottom right, var(--cyan-500), var(--cyan-700));
+  }
+  
+  /* 绿色图标背景 - Emerald icon background */
+  .feature-icon.emerald {
+    background: linear-gradient(to bottom right, var(--emerald-500), var(--emerald-700));
+  }
+  
+  /* 蓝色图标背景 - Blue icon background */
+  .feature-icon.blue {
+    background: linear-gradient(to bottom right, var(--blue-500), var(--blue-700));
+  }
+  
+  /* 图标样式 - Icon style */
+  .feature-icon i {
+    color: white;
+    font-size: 1.5rem;
+  }
+  
+  /* 功能标题 - Feature title */
+  .feature-title {
+    font-size: 1.25rem;
+    margin-bottom: 1rem;
+    color: white;
+  }
+  
+  /* 功能描述 - Feature description */
+  .feature-description {
+    color: var(--gray-400);
+  }
+  
+  /* 视频区域 Video Section */
+  .video-section {
+    padding: 5rem 0;
+    background-color: black;
+  }
+  
+  /* 区域副标题 - Section subtitle */
+  .section-subtitle {
+    text-align: center;
+    color: var(--gray-400);
+    margin-bottom: 3rem;
+    max-width: 32rem;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  
+  /* 视频容器 - Video container */
+  .video-container {
+    max-width: 48rem;
+    margin: 0 auto;
+    border-radius: var(--radius);
+    overflow: hidden;
+    background-color: var(--gray-900);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04); /* 阴影效果 - Shadow effect */
+  }
+  
+  /* 视频包装器（用于维持16:9比例） - Video wrapper (for maintaining 16:9 aspect ratio) */
+  .video-wrapper {
+    position: relative;
+    padding-bottom: 56.25%; /* 16:9比例 - 16:9 Aspect Ratio */
+    height: 0;
+    overflow: hidden;
+  }
+  
+  /* 视频元素 - Video element */
+  .video-wrapper video {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  
+  /* 视频覆盖层（播放按钮的背景） - Video overlay (background for play button) */
+  .video-overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(0, 0, 0, 0.5); /* 半透明背景 - Semi-transparent background */
+  }
+  
+  /* 视频播放按钮 - Video play button */
+  .video-play-btn {
+    width: 4rem;
+    height: 4rem;
+    border-radius: 9999px;
+    background: linear-gradient(to right, var(--cyan-500), var(--emerald-500));
+    border: none;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+  }
+  
+  /* 视频播放按钮悬停效果 - Video play button hover effect */
+  .video-play-btn:hover {
+    transform: scale(1.1); /* 放大效果 - Scale up effect */
+    background: linear-gradient(to right, var(--cyan-600), var(--emerald-600));
+  }
+  
+  /* 播放按钮图标 - Play button icon */
+  .video-play-btn i {
+    font-size: 1.5rem;
+    margin-left: 0.25rem; /* 轻微偏移使图标视觉居中 - Slight offset for visual centering */
+  }
+  
+  /* 视频信息区域 - Video info area */
+  .video-info {
+    padding: 1rem;
+    border-top: 1px solid var(--gray-800);
+  }
+  
+  /* 视频标题 - Video title */
+  .video-info-title {
+    font-size: 1.125rem;
+    color: white;
+    margin-bottom: 0.25rem;
+  }
+  
+  /* 视频描述 - Video description */
+  .video-info-description {
+    font-size: 0.875rem;
+    color: var(--gray-400);
+  }
+  
+  /* 工作原理区域 How It Works Section */
+  .how-it-works {
+    padding: 5rem 0;
+    background-color: black;
+  }
+  
+  /* 步骤容器 - Steps container */
+  .steps-container {
+    max-width: 48rem;
+    margin: 0 auto;
+  }
+  
+  /* 单个步骤项 - Individual step item */
+  .step {
+    position: relative;
+    padding-left: 3rem;
+    padding-bottom: 3rem;
+    border-left: 1px solid var(--gray-800); /* 创建时间线效果 - Creates timeline effect */
+  }
+  
+  /* 最后一个步骤项无底部间距 - Last step has no bottom padding */
+  .step:last-child {
+    padding-bottom: 0;
+  }
+  
+  /* 右侧步骤（交错布局） - Right-side step (alternating layout) */
+  .step-right {
+    margin-top: 6rem;
+  }
+  
+  /* 步骤数字标记 - Step number marker */
+  .step-number {
+    position: absolute;
+    left: 0;
+    top: 0;
+    transform: translateX(-50%); /* 居中于时间线 - Centers on timeline */
+    height: 2rem;
+    width: 2rem;
+    border-radius: 9999px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    color: white;
+  }
+  
+  /* 青色步骤数字背景 - Cyan step number background */
+  .step-number.cyan {
+    background: linear-gradient(to bottom right, var(--cyan-500), var(--cyan-700));
+  }
+  
+  /* 绿色步骤数字背景 - Emerald step number background */
+  .step-number.emerald {
+    background: linear-gradient(to bottom right, var(--emerald-500), var(--emerald-700));
+  }
+  
+  /* 蓝色步骤数字背景 - Blue step number background */
+  .step-number.blue {
+    background: linear-gradient(to bottom right, var(--blue-500), var(--blue-700));
+  }
+  
+  /* 紫色步骤数字背景 - Purple step number background */
+  .step-number.purple {
+    background: linear-gradient(to bottom right, var(--purple-500), var(--purple-700));
+  }
+  
+  /* 步骤标题 - Step title */
+  .step-title {
+    font-size: 1.25rem;
+    margin-bottom: 0.5rem;
+    color: white;
+  }
+  
+  /* 步骤描述 - Step description */
+  .step-description {
+    color: var(--gray-400);
+  }
+  
+  /* 步骤图标 - Step icon */
+  .step-icon {
+    position: absolute;
+    left: 0;
+    top: 100%;
+    transform: translateX(-50%); /* 居中于时间线 - Centers on timeline */
+    height: 2rem;
+    width: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  /* 步骤图标样式 - Step icon style */
+  .step-icon i {
+    font-size: 1.5rem;
+  }
+  
+  /* 团队区域 Team Section */
+  .team-section {
+    padding: 5rem 0;
+    background: linear-gradient(to right, var(--gray-900), black);
+  }
+  
+  /* 团队成员网格布局 - Team grid layout */
+  .team-grid {
+    display: grid;
+    grid-template-columns: 1fr; /* 在移动设备上单列 - Single column on mobile */
+    gap: 1.5rem;
+  }
+  
+  /* 团队成员卡片 - Team member card */
+  .team-card {
+    background-color: rgba(17, 24, 39, 0.5); /* 半透明背景 - Semi-transparent background */
+    border: 1px solid var(--gray-800);
+    border-radius: var(--radius);
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    transition: all 0.3s ease; /* 平滑过渡效果 - Smooth transition effect */
+  }
+  
+  /* 团队成员卡片悬停效果 - Team card hover effect */
+  .team-card:hover {
+    transform: translateY(-0.25rem); /* 上移效果 - Move up effect */
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); /* 悬停时添加阴影 - Add shadow on hover */
+  }
+  
+  /* 团队成员头像 - Team member avatar */
+  .team-avatar {
+    width: 6rem;
+    height: 6rem;
+    border-radius: 9999px;
+    border: 2px solid var(--gray-700);
+    overflow: hidden;
+    margin-bottom: 1rem;
+  }
+  
+  /* 团队成员姓名 - Team member name */
+  .team-name {
+    font-size: 1.125rem;
+    color: white;
+  }
+  
+  /* 团队成员角色 - Team member role */
+  .team-role {
+    font-size: 0.875rem;
+    color: var(--gray-400);
+    margin-bottom: 0.5rem;
+  }
+  
+  /* 团队成员邮箱 - Team member email */
+  .team-email {
+    font-size: 0.75rem;
+    color: var(--gray-500);
+  }
+  
+  /* 团队成员社交媒体链接 - Team member social links */
+  .team-social {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 1rem;
+  }
+  
+  /* 社交媒体链接样式 - Social link style */
+  .social-link {
+    color: var(--gray-400);
+    transition: color 0.2s ease;
+  }
+  
+  /* 社交媒体链接悬停效果 - Social link hover effect */
+  .social-link:hover {
+    color: white;
+  }
+  
+  /* 行动召唤区域 CTA Section */
+  .cta-section {
+    padding: 5rem 0;
+    background: linear-gradient(to right, var(--gray-900), black);
+    text-align: center;
+  }
+  
+  /* 页脚 Footer */
+  .footer {
+    background-color: var(--gray-900);
+    border-top: 1px solid var(--gray-800);
+    padding: 3rem 0;
+  }
+  
+  /* 页脚网格布局 - Footer grid layout */
+  .footer-grid {
+    display: grid;
+    grid-template-columns: 1fr; /* 在移动设备上单列 - Single column on mobile */
+    gap: 2rem;
+  }
+  
+  /* 页脚标题 - Footer title */
+  .footer-title {
+    font-size: 1.25rem;
+    margin-bottom: 1rem;
+  }
+  
+  /* 页脚描述 - Footer description */
+  .footer-description {
+    font-size: 0.875rem;
+    color: var(--gray-400);
+  }
+  
+  /* 页脚小标题 - Footer heading */
+  .footer-heading {
+    font-size: 1.125rem;
+    color: white;
+    margin-bottom: 1rem;
+  }
+  
+  /* 页脚链接列表 - Footer links list */
+  .footer-links {
+    list-style: none;
+  }
+  
+  /* 页脚链接项 - Footer link item */
+  .footer-link {
+    display: block;
+    font-size: 0.875rem;
+    color: var(--gray-400);
+    margin-bottom: 0.5rem;
+    transition: color 0.2s ease;
+  }
+  
+  /* 页脚链接悬停效果 - Footer link hover effect */
+  .footer-link:hover {
+    color: white;
+  }
+  
+  /* 页脚信息列表 - Footer info list */
+  .footer-info {
+    list-style: none;
+  }
+  
+  /* 页脚信息项 - Footer info item */
+  .footer-info-item {
+    font-size: 0.875rem;
+    color: var(--gray-400);
+    margin-bottom: 0.5rem;
+  }
+  
+  /* 页脚社交媒体链接区域 - Footer social links area */
+  .footer-social {
+    display: flex;
+    gap: 1rem;
+  }
+  
+  /* 页脚底部区域 - Footer bottom area */
+  .footer-bottom {
+    margin-top: 3rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--gray-800);
+    text-align: center;
+  }
+  
+  /* 版权信息 - Copyright text */
+  .copyright {
+    font-size: 0.875rem;
+    color: var(--gray-500);
+  }
+  
+  /* 模态框 Modal */
+  .modal {
+    display: none;
+    position: fixed;
+    z-index: 100; /* 确保模态框在最上层 - Ensure modal appears on top */
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.5); /* 半透明背景 - Semi-transparent background */
+    backdrop-filter: blur(5px); /* 背景模糊效果 - Background blur effect */
+  }
+  
+  /* 激活的模态框 - Active modal */
+  .modal.active {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  /* 模态框内容 - Modal content */
+  .modal-content {
+    background-color: var(--gray-900);
+    border-radius: var(--radius);
+    border: 1px solid var(--gray-800);
+    width: 90%;
+    max-width: 28rem;
+    animation: modalFadeIn 0.3s; /* 模态框淡入动画 - Modal fade-in animation */
+  }
+  
+  /* 模态框淡入动画定义 - Modal fade-in animation definition */
+  @keyframes modalFadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(-20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  /* 模态框头部 - Modal header */
+  .modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    border-bottom: 1px solid var(--gray-800);
+  }
+  
+  /* 模态框标题 - Modal title */
+  .modal-title {
+    font-size: 1.25rem;
+    color: white;
+  }
+  
+  /* 模态框关闭按钮 - Modal close button */
+  .modal-close {
+    background: none;
+    border: none;
+    color: var(--gray-400);
+    font-size: 1.5rem;
+    cursor: pointer;
+    line-height: 1;
+  }
+  
+  /* 模态框主体内容 - Modal body content */
+  .modal-body {
+    padding: 1.5rem;
+  }
+  
+  /* 登录表单 - Login form */
+  .login-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  /* 表单组 - Form group */
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  /* 表单标签 - Form label */
+  .form-group label {
+    font-size: 0.875rem;
+    color: white;
+  }
+  
+  /* 表单输入框 - Form input */
+  .form-group input {
+    padding: 0.5rem;
+    border-radius: var(--radius);
+    background-color: var(--gray-800);
+    border: 1px solid var(--gray-700);
+    color: white;
+  }
+  
+  /* 二维码容器 QR Code */
+  .qr-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 1.5rem;
+  }
+  
+  /* 二维码图像容器 - QR code image container */
+  .qr-code {
+    background-color: white;
+    padding: 1rem;
+    border-radius: var(--radius);
+    margin-bottom: 1rem;
+  }
+  
+  /* 二维码描述文本 - QR code description */
+  .qr-description {
+    font-size: 0.875rem;
+    color: var(--gray-400);
+    text-align: center;
+  }
+  
+  /* 标签页组件 Tabs */
+  .download-tabs,
+  .info-tabs {
+    width: 100%;
+  }
+  
+  /* 标签页头部 - Tabs header */
+  .tabs-header {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+  }
+  
+  /* 信息标签页头部（三个标签） - Info tabs header (three tabs) */
+  .info-tabs .tabs-header {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  
+  /* 标签按钮 - Tab button */
+  .tab-btn {
+    background-color: transparent;
+    border: 1px solid var(--gray-800);
+    border-radius: var(--radius);
+    padding: 0.5rem;
+    color: var(--gray-400);
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  
+  /* 激活的标签按钮 - Active tab button */
+  .tab-btn.active {
+    background-color: var(--gray-800);
+    color: white;
+    border-color: var(--gray-700);
+  }
+  
+  /* 标签内容面板 - Tab pane */
+  .tab-pane {
+    display: none;
+  }
+  
+  /* 激活的标签内容面板 - Active tab pane */
+  .tab-pane.active {
+    display: block;
+  }
+  
+  /* 了解更多页面 Learn More Page */
+  .learn-more-page {
+    padding-top: 5rem; /* 为固定导航栏留出空间 - Space for fixed navbar */
+  }
+  
+  /* 了解更多区域 - Learn more section */
+  .learn-more-section {
+    padding: 5rem 0;
+  }
+  
+  /* 返回链接 - Back link */
+  .back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--gray-300);
+    margin-bottom: 2rem;
+    transition: color 0.2s ease;
+  }
+  
+  /* 返回链接悬停效果 - Back link hover effect */
+  .back-link:hover {
+    color: white;
+  }
+  
+  /* 页面标题 - Page title */
+  .page-title {
+    font-size: 2.5rem;
+    margin-bottom: 2rem;
+  }
+  
+  /* 了解更多内容网格布局 - Learn more grid layout */
+  .learn-more-grid {
+    display: grid;
+    grid-template-columns: 1fr; /* 在移动设备上单列 - Single column on mobile */
+    gap: 3rem;
+    margin-bottom: 4rem;
+  }
+  
+  /* 了解更多内容区域 - Learn more content area */
+  .learn-more-content {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+  
+  /* 了解更多描述文本 - Learn more description */
+  .learn-more-description {
+    font-size: 1.125rem;
+    color: var(--gray-300);
+  }
+  
+  /* 了解更多图像容器 - Learn more image container */
+  .learn-more-image {
+    background-color: var(--gray-900);
+    padding: 2rem;
+    border-radius: var(--radius);
+  }
+  
+  /* 标签页内容标题 - Tab content title */
+  .tab-title {
+    font-size: 1.5rem;
+    color: var(--cyan-400);
+    margin-bottom: 1rem;
+  }
+  
+  /* 功能列表 - Feature list */
+  .feature-list {
+    list-style-type: disc;
+    padding-left: 1.5rem;
+    color: var(--gray-300);
+  }
+  
+  /* 功能列表项 - Feature list item */
+  .feature-list li {
+    margin-bottom: 0.75rem;
+  }
+  
+  /* 技术信息区域 - Tech info area */
+  .tech-info {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    color: var(--gray-300);
+  }
+  
+  /* 团队信息区域 - Team info area */
+  .team-info {
+    color: var(--gray-300);
+  }
+  
+  /* 小型团队网格 - Small team grid */
+  .team-grid-small {
+    display: grid;
+    grid-template-columns: 1fr; /* 在移动设备上单列 - Single column on mobile */
+    gap: 1rem;
+    margin-top: 1rem;
+  }
+  
+  /* 团队成员项 - Team member item */
+  .team-member {
+    background-color: rgba(31, 41, 55, 0.5);
+    padding: 1rem;
+    border-radius: var(--radius);
+  }
+  
+  /* 团队成员姓名 - Team member name */
+  .team-member h4 {
+    font-weight: 700;
+    margin-bottom: 0.25rem;
+  }
+  
+  /* 团队成员信息 - Team member info */
+  .team-member p {
+    font-size: 0.875rem;
+    color: var(--gray-400);
+  }
+  
+  /* 响应式设计 Media Queries */
+  @media (min-width: 640px) {
+    /* 小屏幕样式（如平板） - Small screen styles (e.g. tablets) */
+    .hero-title {
+      font-size: 3rem;
+    }
+  
+    .hero-subtitle {
+      font-size: 1.25rem;
+    }
+  
+    .hero-buttons {
+      flex-direction: row; /* 在较大屏幕上水平排列按钮 - Horizontal button layout on larger screens */
+    }
+  
+    .features-grid {
+      grid-template-columns: repeat(2, 1fr); /* 两列网格 - Two-column grid */
+    }
+  
+    .team-grid {
+      grid-template-columns: repeat(2, 1fr); /* 两列网格 - Two-column grid */
+    }
+  
+    .team-grid-small {
+      grid-template-columns: repeat(2, 1fr); /* 两列网格 - Two-column grid */
+    }
+  
+    .footer-grid {
+      grid-template-columns: repeat(2, 1fr); /* 两列网格 - Two-column grid */
+    }
+  }
+  
+  @media (min-width: 768px) {
+    /* 中等屏幕样式（如小型笔记本） - Medium screen styles (e.g. small laptops) */
+    .desktop-nav {
+      display: flex; /* 显示桌面导航 - Show desktop navigation */
+      gap: 2rem;
+    }
+  
+    .nav-actions {
+      display: flex; /* 显示导航操作区域 - Show navigation actions */
+      align-items: center;
+      gap: 1rem;
+    }
+  
+    .mobile-menu-btn {
+      display: none; /* 隐藏移动菜单按钮 - Hide mobile menu button */
+    }
+  
+    .hero-title {
+      font-size: 4rem;
+    }
+  
+    .features-grid {
+      grid-template-columns: repeat(3, 1fr); /* 三列网格 - Three-column grid */
+    }
+  
+    .learn-more-grid {
+      grid-template-columns: 1fr 1fr; /* 两列布局 - Two-column layout */
+      align-items: center;
+    }
+  
+    .footer-grid {
+      grid-template-columns: repeat(4, 1fr); /* 四列网格 - Four-column grid */
+    }
+  }
+  
+  @media (min-width: 1024px) {
+    /* 大屏幕样式（如桌面电脑） - Large screen styles (e.g. desktops) */
+    .team-grid {
+      grid-template-columns: repeat(5, 1fr); /* 五列网格，每列一个团队成员 - Five-column grid, one member per column */
+    }
+  
+    .team-grid-small {
+      grid-template-columns: repeat(3, 1fr); /* 三列网格 - Three-column grid */
+    }
+  }
+  
+  /* 手机模拟界面 Phone Mockup */
+  .phone-mockup {
+    width: 300px;
+    height: 600px;
+    background-color: #111;
+    border-radius: 2rem;
+    border: 8px solid #333; /* 手机边框 - Phone frame */
+    overflow: hidden;
+    position: relative;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); /* 立体阴影效果 - 3D shadow effect */
+  }
+  
+  /* 手机顶部状态栏 - Phone header/status bar */
+  .phone-header {
+    height: 30px;
+    background-color: #000;
+    position: relative;
+  }
+  
+  /* 手机顶部凹槽 - Phone notch */
+  .phone-notch {
+    position: absolute;
+    width: 120px;
+    height: 25px;
+    background-color: #000;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    border-bottom-left-radius: 1rem;
+    border-bottom-right-radius: 1rem;
+    z-index: 10;
+  }
+  
+  /* 手机屏幕区域 - Phone screen area */
+  .phone-screen {
+    height: calc(100% - 60px);
+    background-color: #000;
+    overflow-y: auto;
+    position: relative;
+  }
+  
+  /* 手机底部按钮 - Phone home button */
+  .phone-home-button {
+    height: 30px;
+    background-color: #000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  /* 手机底部横条 - Phone home indicator */
+  .phone-home-button:after {
+    content: "";
+    width: 40%;
+    height: 4px;
+    background-color: #333;
+    border-radius: 4px;
+  }
+  
+  /* 应用界面样式 App UI */
+  /* 应用头部 - App header */
+  .app-header {
+    padding: 1rem;
+    background: linear-gradient(to right, var(--gray-900), black);
+    border-bottom: 1px solid var(--gray-800);
+  }
+  
+  /* 应用Logo - App logo */
+  .app-logo {
+    font-size: 1rem;
+    font-weight: 700;
+    text-align: center;
+  }
+  
+  /* 应用搜索区域 - App search area */
+  .app-search {
+    padding: 1rem;
+  }
+  
+  /* 搜索栏 - Search bar */
+  .search-bar {
+    display: flex;
+    align-items: center;
+    background-color: var(--gray-800);
+    border-radius: 2rem;
+    padding: 0.5rem 1rem;
+    margin-bottom: 1rem;
+  }
+  
+  /* 搜索图标 - Search icon */
+  .search-bar i {
+    color: var(--gray-400);
+    margin-right: 0.5rem;
+  }
+  
+  /* 搜索输入框 - Search input */
+  .search-bar input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    color: white;
+    font-size: 0.875rem;
+    outline: none;
+  }
+  
+  /* 搜索按钮 - Search button */
+  .search-bar button {
+    background: linear-gradient(to right, var(--cyan-500), var(--emerald-500));
+    border: none;
+    color: white;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+  }
+  
+  /* 搜索建议区域 - Search suggestions */
+  .search-suggestions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  
+  /* 建议标签 - Suggestion pill */
+  .suggestion-pill {
+    background-color: var(--gray-800);
+    border: none;
+    color: white;
+    padding: 0.25rem 0.75rem;
+    border-radius: 1rem;
+    font-size: 0.75rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  
+  /* 建议标签悬停效果 - Suggestion pill hover effect */
+  .suggestion-pill:hover {
+    background-color: var(--gray-700);
+  }
+  
+  /* 应用结果区域 - App results area */
+  .app-results {
+    padding: 1rem;
+  }
+  
+  /* 结果占位符（初始状态） - Result placeholder (initial state) */
+  .result-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 200px;
+    color: var(--gray-500);
+    text-align: center;
+  }
+  
+  /* 占位符图标 - Placeholder icon */
+  .result-placeholder i {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+  }
+  
+  /* 结果卡片 - Result card */
+  .result-card {
+    background-color: var(--gray-900);
+    border-radius: var(--radius);
+    overflow: hidden;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  }
+  
+  /* 结果卡片头部 - Result card header */
+  .result-header {
+    display: flex;
+    padding: 1rem;
+    border-bottom: 1px solid var(--gray-800);
+  }
+  
+  /* 食物图像 - Food image */
+  .food-image {
+    width: 60px;
+    height: 60px;
+    border-radius: var(--radius);
+    background-color: var(--gray-800);
+    margin-right: 1rem;
+    background-size: cover;
+    background-position: center;
+  }
+  
+  /* 食物信息标题 - Food info title */
+  .food-info h3 {
+    font-size: 1.125rem;
+    margin-bottom: 0.25rem;
+  }
+  
+  /* 食物信息描述 - Food info description */
+  .food-info p {
+    font-size: 0.75rem;
+    color: var(--gray-400);
+  }
+  
+  /* 营养摘要 - Nutrition summary */
+  .nutrition-summary {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    padding: 1rem;
+    border-bottom: 1px solid var(--gray-800);
+  }
+  
+  /* 营养项 - Nutrition item */
+  .nutrition-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+  
+  /* 营养数值 - Nutrition value */
+  .nutrition-value {
+    font-size: 1rem;
+    font-weight: 700;
+    color: white;
+  }
+  
+  /* 营养标签 - Nutrition label */
+  .nutrition-label {
+    font-size: 0.625rem;
+    color: var(--gray-400);
+  }
+  
+  /* 营养详情区域 - Nutrition details */
+  .nutrition-details {
+    padding: 1rem;
+  }
+  
+  /* 营养详情标题 - Nutrition details heading */
+  .nutrition-details h4 {
+    font-size: 0.875rem;
+    margin-bottom: 0.75rem;
+    color: var(--gray-300);
+  }
+  
+  /* 营养条容器 - Nutrition bar container */
+  .nutrition-bar-container {
+    margin-bottom: 1.5rem;
+  }
+  
+  /* 营养条 - Nutrition bar */
+  .nutrition-bar {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.5rem;
+  }
+  
+  /* 条形图标签 - Bar label */
+  .bar-label {
+    width: 50px;
+    font-size: 0.75rem;
+    color: var(--gray-400);
+  }
+  
+  /* 条形图轨道 - Bar track */
+  .bar-track {
+    flex: 1;
+    height: 8px;
+    background-color: var(--gray-800);
+    border-radius: 4px;
+    overflow: hidden;
+    margin: 0 0.5rem;
+  }
+  
+  /* 条形图填充 - Bar fill */
+  .bar-fill {
+    height: 100%;
+    border-radius: 4px;
+    transition: width 0.5s ease;
+  }
+  
+  /* 第一个条形图填充颜色 - First bar fill color */
+  .bar-fill:nth-child(1) {
+    background: linear-gradient(to right, var(--cyan-500), var(--cyan-700));
+  }
+  
+  /* 蛋白质条形图 - Protein bar */
+  #protein-bar {
+    background: linear-gradient(to right, var(--cyan-500), var(--cyan-700));
+  }
+  
+  /* 碳水化合物条形图 - Carbs bar */
+  #carbs-bar {
+    background: linear-gradient(to right, var(--emerald-500), var(--emerald-700));
+  }
+  
+  /* 脂肪条形图 - Fat bar */
+  #fat-bar {
+    background: linear-gradient(to right, var(--blue-500), var(--blue-700));
+  }
+  
+  /* 条形图数值 - Bar value */
+  .bar-value {
+    width: 40px;
+    font-size: 0.75rem;
+    text-align: right;
+    color: var(--gray-300);
+  }
+  
+  /* 维生素和矿物质区域 - Vitamins and minerals */
+  .vitamins-minerals {
+    margin-top: 1rem;
+  }
+  
+  /* 维生素网格 - Vitamin grid */
+  .vitamin-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.5rem;
+  }
+  
+  /* 维生素项 - Vitamin item */
+  .vitamin-item {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.75rem;
+    padding: 0.25rem 0;
+  }
+  
+  /* 维生素名称 - Vitamin name */
+  .vitamin-name {
+    color: var(--gray-400);
+  }
+  
+  /* 维生素数值 - Vitamin value */
+  .vitamin-value {
+    color: var(--gray-300);
+  }
+  
+  /* 演示信息区域 - Demo info */
+  .demo-info {
+    max-width: 500px;
+    padding: 1.5rem;
+    background-color: var(--gray-900);
+    border-radius: var(--radius);
+    border: 1px solid var(--gray-800);
+  }
+  
+  /* 演示信息标题 - Demo info heading */
+  .demo-info h3 {
+    font-size: 1.25rem;
+    margin-bottom: 1rem;
+    color: var(--cyan-400);
+  }
+  
+  /* 演示信息段落 - Demo info paragraph */
+  .demo-info p {
+    margin-bottom: 1rem;
+    color: var(--gray-300);
+  }
+  
+  /* 演示信息列表 - Demo info list */
+  .demo-info ul {
+    margin-bottom: 1rem;
+    padding-left: 1.5rem;
+    color: var(--gray-300);
+  }
+  
+  /* 演示信息列表项 - Demo info list item */
+  .demo-info li {
+    margin-bottom: 0.5rem;
+  }
+  
+  /* 演示容器在较大屏幕上的布局 - Demo container layout on larger screens */
+  @media (min-width: 768px) {
+    .demo-container {
+      flex-direction: row;
+      align-items: flex-start;
+      justify-content: center;
+    }
+    
+    .phone-mockup {
+      margin-right: 2rem;
+    }
+  }
+  
+  

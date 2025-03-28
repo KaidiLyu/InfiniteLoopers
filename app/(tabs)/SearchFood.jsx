@@ -58,6 +58,12 @@ export default function SearchFood() {
     }
     setTitle(title);
     setFormattedResults([]);
+    setFinalTitle("");
+    setSelectedResult("");
+    setSelectedResultName("");
+    setSelectedResultImage("");
+
+    textInputRef.current?.clear();
 
     setTimeout(() => {
       textInputRef.current?.focus();
@@ -70,6 +76,7 @@ export default function SearchFood() {
       return;
     }
     console.log("text: ", text);
+    setFormattedResults([]);
     if (text.length >= 3) {
       try {
         if (title === "Ingredients") {

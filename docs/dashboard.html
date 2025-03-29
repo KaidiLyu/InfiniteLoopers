@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <!-- Document Meta Information -->
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard - InfiniteLoopers Nutritional Search App</title>
+  
+  <!-- Stylesheet References -->
+  <link rel="stylesheet" href="styles.css">
+  <!-- Google Fonts Reference -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Lucide Icons Library Reference -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lucide-icons@0.284.0/font/lucide.min.css">
+</head>
+<body class="dark">
+  <!-- Navbar -->
+  <nav class="navbar">
+    <div class="container">
+      <div class="navbar-content">
+        <!-- Logo Link -->
+        <a href="dashboard.html" class="logo">
+          <span class="gradient-text">InfiniteLoopers</span>
+        </a>
+
+        <!-- Desktop Navigation -->
+        <div class="desktop-nav">
+          <button class="nav-link active">
+            <span class="nav-text" data-i18n="dashboard">Dashboard</span>
+          </button>
+          <button class="nav-link">
+            <span class="nav-text" data-i18n="history">History</span>
+          </button>
+          <button class="nav-link">
+            <span class="nav-text" data-i18n="favorites">Favorites</span>
+          </button>
+          <button class="nav-link">
+            <span class="nav-text" data-i18n="settings">Settings</span>
+          </button>
+        </div>
+
+        <!-- Nav Actions (User Profile and Language Toggle) -->
+        <div class="nav-actions">
+          <!-- Language Toggle Button -->
+          <button class="btn-language">
+            <i class="lucide lucide-globe"></i>
+            <span class="language-indicator">EN</span>
+          </button>
+
+          <!-- User Profile Button -->
+          <div class="user-profile">
+            <button class="btn-user">
+              <div class="user-avatar">
+                <img src="https://placehold.co/40x40/333333/FFFFFF/png" alt="User Avatar">
+              </div>
+              <span class="user-name">John Doe</span>
+              <i class="lucide lucide-chevron-down"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Mobile Menu Button -->
+        <div class="mobile-menu-btn">
+          <!-- Mobile Language Toggle Button -->
+          <button class="btn-language-mobile">
+            <i class="lucide lucide-globe"></i>
+          </button>
+          <!-- Mobile Menu Toggle Button -->
+          <button class="menu-toggle">
+            <i class="lucide lucide-menu"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mobile Menu (Hidden by Default) -->
+    <div class="mobile-menu">
+      <div class="mobile-menu-content">
+        <!-- Mobile Navigation Links -->
+        <button class="nav-link-mobile active">
+          <span data-i18n="dashboard">Dashboard</span>
+        </button>
+        <button class="nav-link-mobile">
+          <span data-i18n="history">History</span>
+        </button>
+        <button class="nav-link-mobile">
+          <span data-i18n="favorites">Favorites</span>
+        </button>
+        <button class="nav-link-mobile">
+          <span data-i18n="settings">Settings</span>
+        </button>
+        
+        <!-- Mobile User Profile -->
+        <div class="mobile-user-profile">
+          <div class="user-avatar">
+            <img src="https://placehold.co/40x40/333333/FFFFFF/png" alt="User Avatar">
+          </div>
+          <div class="user-info">
+            <span class="user-name">John Doe</span>
+            <span class="user-email">john.doe@example.com</span>
+          </div>
+        </div>
+        
+        <!-- Mobile Logout Button -->
+        <button class="btn btn-outline btn-full">
+          <i class="lucide lucide-log-out"></i>
+          <span data-i18n="logout">Logout</span>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Content Area -->
+  <main class="dashboard-page">
+    <!-- Dashboard Header -->
+    <section class="dashboard-header">
+      <div class="container">
+        <div class="dashboard-welcome">
+          <h1 class="welcome-title">Welcome back, <span class="gradient-text">John</span></h1>
+          <p class="welcome-subtitle">Track your nutrition and discover new foods</p>
+        </div>
+        
+        <!-- Quick Stats -->
+        <div class="quick-stats">
+          <div class="stat-card">
+            <div class="stat-icon cyan">
+              <i class="lucide lucide-activity"></i>
+            </div>
+            <div class="stat-info">
+              <span class="stat-value">1,842</span>
+              <span class="stat-label">Calories Today</span>
+            </div>
+          </div>
+          
+          <div class="stat-card">
+            <div class="stat-icon emerald">
+              <i class="lucide lucide-utensils"></i>
+            </div>
+            <div class="stat-info">
+              <span class="stat-value">4</span>
+              <span class="stat-label">Meals Today</span>
+            </div>
+          </div>
+          
+          <div class="stat-card">
+            <div class="stat-icon blue">
+              <i class="lucide lucide-droplets"></i>
+            </div>
+            <div class="stat-info">
+              <span class="stat-value">1.2L</span>
+              <span class="stat-label">Water Intake</span>
+            </div>
+          </div>
+          
+          <div class="stat-card">
+            <div class="stat-icon purple">
+              <i class="lucide lucide-target"></i>
+            </div>
+            <div class="stat-info">
+              <span class="stat-value">68%</span>
+              <span class="stat-label">Daily Goal</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Search Section -->
+    <section class="search-section">
+      <div class="container">
+        <div class="search-container">
+          <h2 class="section-title">Find Nutritional Information</h2>
+          
+          <!-- Search Tabs -->
+          <div class="search-tabs">
+            <div class="tabs-header">
+              <button class="tab-btn active" data-tab="text">
+                <i class="lucide lucide-search"></i>
+                <span>Text Search</span>
+              </button>
+              <button class="tab-btn" data-tab="camera">
+                <i class="lucide lucide-camera"></i>
+                <span>Camera</span>
+              </button>
+            </div>
+            
+            <div class="tabs-content">
+              <!-- Text Search Tab -->
+              <div class="tab-pane active" id="text-tab">
+                <div class="search-bar">
+                  <i class="lucide lucide-search"></i>
+                  <input type="text" placeholder="Search for any food..." aria-label="Search for food">
+                  <button class="search-button">
+                    <i class="lucide lucide-arrow-right"></i>
+                  </button>
+                </div>
+                
+                <!-- Recent Searches -->
+                <div class="recent-searches">
+                  <h3>Recent Searches</h3>
+                  <div class="search-pills">
+                    <button class="search-pill">Greek Yogurt</button>
+                    <button class="search-pill">Avocado Toast</button>
+                    <button class="search-pill">Grilled Chicken</button>
+                    <button class="search-pill">Quinoa Salad</button>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Camera Tab -->
+              <div class="tab-pane" id="camera-tab">
+                <div class="camera-placeholder">
+                  <div class="camera-icon">
+                    <i class="lucide lucide-camera"></i>
+                  </div>
+                  <p>Take a photo of your food to analyze its nutritional content</p>
+                  <button class="btn btn-primary">
+                    <i class="lucide lucide-camera"></i>
+                    <span>Open Camera</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Nutrition Summary Section -->
+    <section class="nutrition-summary-section">
+      <div class="container">
+        <div class="section-header">
+          <h2 class="section-title">Today's Nutrition</h2>
+          <button class="btn btn-outline btn-sm">
+            <i class="lucide lucide-calendar"></i>
+            <span>View Calendar</span>
+          </button>
+        </div>
+        
+        <!-- Nutrition Progress -->
+        <div class="nutrition-progress">
+          <!-- Macronutrients -->
+          <div class="macro-card">
+            <h3>Macronutrients</h3>
+            
+            <!-- Protein -->
+            <div class="nutrition-bar">
+              <div class="bar-label">Protein</div>
+              <div class="bar-track">
+                <div class="bar-fill" id="protein-bar" style="width: 75%;"></div>
+              </div>
+              <div class="bar-value">75g / 100g</div>
+            </div>
+            
+            <!-- Carbs -->
+            <div class="nutrition-bar">
+              <div class="bar-label">Carbs</div>
+              <div class="bar-track">
+                <div class="bar-fill" id="carbs-bar" style="width: 60%;"></div>
+              </div>
+              <div class="bar-value">180g / 300g</div>
+            </div>
+            
+            <!-- Fat -->
+            <div class="nutrition-bar">
+              <div class="bar-label">Fat</div>
+              <div class="bar-track">
+                <div class="bar-fill" id="fat-bar" style="width: 45%;"></div>
+              </div>
+              <div class="bar-value">35g / 78g</div>
+            </div>
+          </div>
+          
+          <!-- Calorie Breakdown -->
+          <div class="calorie-card">
+            <h3>Calorie Breakdown</h3>
+            <div class="calorie-chart">
+              <div class="chart-placeholder">
+                <div class="chart-circle">
+                  <div class="chart-inner">
+                    <span class="chart-value">1,842</span>
+                    <span class="chart-label">calories</span>
+                  </div>
+                </div>
+                <div class="chart-legend">
+                  <div class="legend-item">
+                    <span class="legend-color" style="background: linear-gradient(to right, var(--cyan-500), var(--cyan-700));"></span>
+                    <span class="legend-text">Protein (30%)</span>
+                  </div>
+                  <div class="legend-item">
+                    <span class="legend-color" style="background: linear-gradient(to right, var(--emerald-500), var(--emerald-700));"></span>
+                    <span class="legend-text">Carbs (45%)</span>
+                  </div>
+                  <div class="legend-item">
+                    <span class="legend-color" style="background: linear-gradient(to right, var(--blue-500), var(--blue-700));"></span>
+                    <span class="legend-text">Fat (25%)</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Recent Foods Section -->
+    <section class="recent-foods-section">
+      <div class="container">
+        <div class="section-header">
+          <h2 class="section-title">Recent Foods</h2>
+          <button class="btn btn-outline btn-sm">
+            <span>View All</span>
+            <i class="lucide lucide-chevron-right"></i>
+          </button>
+        </div>
+        
+        <div class="food-cards">
+          <!-- Food Card 1 -->
+          <div class="food-card">
+            <div class="food-image" style="background-color: var(--gray-800);">
+              <img src="https://placehold.co/100x100/333333/FFFFFF/png" alt="Greek Yogurt with Berries">
+            </div>
+            <div class="food-info">
+              <h4>Greek Yogurt with Berries</h4>
+              <p class="food-time">Today, 8:30 AM</p>
+              <div class="food-nutrition">
+                <span class="nutrition-tag">240 cal</span>
+                <span class="nutrition-tag">18g protein</span>
+                <span class="nutrition-tag">12g carbs</span>
+              </div>
+            </div>
+            <button class="btn-icon">
+              <i class="lucide lucide-more-vertical"></i>
+            </button>
+          </div>
+          
+          <!-- Food Card 2 -->
+          <div class="food-card">
+            <div class="food-image" style="background-color: var(--gray-800);">
+              <img src="https://placehold.co/100x100/333333/FFFFFF/png" alt="Grilled Chicken Salad">
+            </div>
+            <div class="food-info">
+              <h4>Grilled Chicken Salad</h4>
+              <p class="food-time">Today, 12:15 PM</p>
+              <div class="food-nutrition">
+                <span class="nutrition-tag">320 cal</span>
+                <span class="nutrition-tag">28g protein</span>
+                <span class="nutrition-tag">15g carbs</span>
+              </div>
+            </div>
+            <button class="btn-icon">
+              <i class="lucide lucide-more-vertical"></i>
+            </button>
+          </div>
+          
+          <!-- Food Card 3 -->
+          <div class="food-card">
+            <div class="food-image" style="background-color: var(--gray-800);">
+              <img src="https://placehold.co/100x100/333333/FFFFFF/png" alt="Protein Smoothie">
+            </div>
+            <div class="food-info">
+              <h4>Protein Smoothie</h4>
+              <p class="food-time">Today, 3:45 PM</p>
+              <div class="food-nutrition">
+                <span class="nutrition-tag">280 cal</span>
+                <span class="nutrition-tag">24g protein</span>
+                <span class="nutrition-tag">30g carbs</span>
+              </div>
+            </div>
+            <button class="btn-icon">
+              <i class="lucide lucide-more-vertical"></i>
+            </button>
+          </div>
+          
+          <!-- Food Card 4 -->
+          <div class="food-card">
+            <div class="food-image" style="background-color: var(--gray-800);">
+              <img src="https://placehold.co/100x100/333333/FFFFFF/png" alt="Salmon with Vegetables">
+            </div>
+            <div class="food-info">
+              <h4>Salmon with Vegetables</h4>
+              <p class="food-time">Today, 7:00 PM</p>
+              <div class="food-nutrition">
+                <span class="nutrition-tag">420 cal</span>
+                <span class="nutrition-tag">32g protein</span>
+                <span class="nutrition-tag">18g carbs</span>
+              </div>
+            </div>
+            <button class="btn-icon">
+              <i class="lucide lucide-more-vertical"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Recommendations Section -->
+    <section class="recommendations-section">
+      <div class="container">
+        <h2 class="section-title">Recommended for You</h2>
+        
+        <div class="recommendation-cards">
+          <!-- Recommendation Card 1 -->
+          <div class="recommendation-card">
+            <div class="recommendation-icon cyan">
+              <i class="lucide lucide-salad"></i>
+            </div>
+            <h3>Complete Your Protein Goal</h3>
+            <p>You're 25g away from your daily protein goal. Try these high-protein options.</p>
+            <button class="btn btn-outline btn-sm">View Suggestions</button>
+          </div>
+          
+          <!-- Recommendation Card 2 -->
+          <div class="recommendation-card">
+            <div class="recommendation-icon emerald">
+              <i class="lucide lucide-droplet"></i>
+            </div>
+            <h3>Hydration Reminder</h3>
+            <p>You've reached 60% of your daily water intake goal. Remember to drink more water.</p>
+            <button class="btn btn-outline btn-sm">Track Water</button>
+          </div>
+          
+          <!-- Recommendation Card 3 -->
+          <div class="recommendation-card">
+            <div class="recommendation-icon blue">
+              <i class="lucide lucide-heart"></i>
+            </div>
+            <h3>Weekly Nutrition Report</h3>
+            <p>Your weekly nutrition report is ready. See how you've been doing this week.</p>
+            <button class="btn btn-outline btn-sm">View Report</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Add Food Button (Fixed) -->
+    <div class="add-food-button">
+      <button class="btn-floating">
+        <i class="lucide lucide-plus"></i>
+      </button>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <!-- Footer Grid Layout -->
+      <div class="footer-grid">
+        <!-- Footer Column 1: Brand Info -->
+        <div class="footer-col">
+          <h3 class="footer-title gradient-text">InfiniteLoopers</h3>
+          <p class="footer-description">AI-powered nutritional search app for making informed dietary choices.</p>
+        </div>
+        <!-- Footer Column 2: Links -->
+        <div class="footer-col">
+          <h4 class="footer-heading">Links</h4>
+          <ul class="footer-links">
+            <li><a href="dashboard.html" class="footer-link">Dashboard</a></li>
+            <li><a href="#" class="footer-link">Help Center</a></li>
+            <li><a href="https://github.com/SCCapstone/InfiniteLoopers" target="_blank" rel="noopener noreferrer" class="footer-link">GitHub</a></li>
+          </ul>
+        </div>
+        <!-- Footer Column 3: Contact -->
+        <div class="footer-col">
+          <h4 class="footer-heading">Contact</h4>
+          <ul class="footer-info">
+            <li class="footer-info-item">Email: <a href="mailto:support@infiniteloopers.com">support@infiniteloopers.com</a></li>
+            <li class="footer-info-item">Phone: (123) 456-7890</li>
+          </ul>
+        </div>
+        <!-- Footer Column 4: Social Media -->
+        <div class="footer-col">
+          <h4 class="footer-heading">Follow Us</h4>
+          <div class="footer-social">
+            <a href="#" class="social-link">
+              <i class="lucide lucide-facebook"></i>
+            </a>
+            <a href="#" class="social-link">
+              <i class="lucide lucide-twitter"></i>
+            </a>
+            <a href="#" class="social-link">
+              <i class="lucide lucide-instagram"></i>
+            </a>
+            <a href="#" class="social-link">
+              <i class="lucide lucide-youtube"></i>
+            </a>
+            <a href="https://github.com/SCCapstone/InfiniteLoopers" target="_blank" rel="noopener noreferrer" class="social-link">
+              <i class="lucide lucide-github"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+      <!-- Footer Bottom: Copyright -->
+      <div class="footer-bottom">
+        <p class="copyright" data-i18n="copyright">© 2025 InfiniteLoopers. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- JavaScript Script Reference -->
+  <script src="script.js"></script>
+  
+  <!-- Additional Dashboard JavaScript -->
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      // Tab functionality for search tabs
+      const searchTabButtons = document.querySelectorAll('.search-tabs .tab-btn');
+      
+      searchTabButtons.forEach(button => {
+        button.addEventListener('click', function() {
+          const tabId = this.getAttribute('data-tab');
+          const tabContainer = this.closest('.search-tabs');
+          
+          if (tabContainer) {
+            // Deactivate all tabs
+            const allTabs = tabContainer.querySelectorAll('.tab-pane');
+            const allButtons = tabContainer.querySelectorAll('.tab-btn');
+            
+            allTabs.forEach(tab => tab.classList.remove('active'));
+            allButtons.forEach(btn => btn.classList.remove('active'));
+            
+            // Activate selected tab
+            this.classList.add('active');
+            const selectedTab = document.getElementById(`${tabId}-tab`);
+            if (selectedTab) {
+              selectedTab.classList.add('active');
+            }
+          }
+        });
+      });
+      
+      // User dropdown functionality (can be expanded)
+      const userButton = document.querySelector('.btn-user');
+      if (userButton) {
+        userButton.addEventListener('click', function() {
+          // Toggle user dropdown menu (to be implemented)
+          console.log('User dropdown clicked');
+        });
+      }
+      
+      // Add food button functionality
+      const addFoodButton = document.querySelector('.btn-floating');
+      if (addFoodButton) {
+        addFoodButton.addEventListener('click', function() {
+          // Open add food modal or page (to be implemented)
+          console.log('Add food button clicked');
+        });
+      }
+    });
+  </script>
+</body>
+</html>

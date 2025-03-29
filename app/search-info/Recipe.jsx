@@ -2,13 +2,9 @@ import {
   View,
   Text,
   Image,
-  Button,
   TouchableOpacity,
   Alert,
   StyleSheet,
-  Modal,
-  PanResponder,
-  Animated,
 } from "react-native";
 import React, { useEffect } from "react";
 import {
@@ -17,27 +13,33 @@ import {
   useRouter,
   useLocalSearchParams,
 } from "expo-router";
-import { Feather, FontAwesome6 } from "@expo/vector-icons";
+import { FontAwesome6 } from "@expo/vector-icons";
 import { Colors } from "../../constants/Colors";
-import { getRecipe } from "../api/GetRecipe";
+import { getNutritionLabel } from "../api/NutritionLabelRecipe";
+import ResponsiveImageView from "react-native-responsive-image-view";
+import Entypo from "@expo/vector-icons/Entypo";
+import { Feather } from "@expo/vector-icons";
 import { deleteDoc, doc } from "firebase/firestore";
 import { db } from "../../configs/FirebaseConfig";
 
-export default function Recipe() {
+export default function NutritionInfo() {
   const router = useRouter();
   const navigation = useNavigation();
   const { title, id, name, image } = useLocalSearchParams();
   const [loading, setLoading] = React.useState(false);
   const [savedImagePath, setSavedImagePath] = React.useState(null);
   const [isImageViewVisible, setIsImageViewVisible] = React.useState(false);
-  const [scale] = React.useState(new Animated.Value(1));
-  const [translateX] = React.useState(new Animated.Value(0));
-  const [translateY] = React.useState(new Animated.Value(0));
 
   useEffect(() => {
     navigation.setOptions({
       headerShown: false,
     });
+    console.log("--------------------------------");
+    console.log("title", title);
+    console.log("id", id);
+    console.log("name", name);
+    console.log("image", image);
+    console.log("--------------------------------");
     nutritionLabel();
   }, []);
 
@@ -45,19 +47,18 @@ export default function Recipe() {
     try {
       setLoading(true);
       console.log("Getting nutrition label for recipe id:", id);
-      const filePath = await getRecipe(id);
-      console.log("filePath: ", filePath);
+      const filePath = await getNutritionLabel(id);
+      console.log("filePath", filePath);
       setSavedImagePath(filePath);
     } catch (error) {
-      console.error("Error getting recipe:", error);
-      return;
+      console.error("Error getting nutrition label:", error);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleDelete = async () => {
-    Alert.alert("Delete Recipe", `Are you sure you want to delete ${name}?`, [
+  const handleDelete = () => {
+    Alert.alert("Delete Item", `Are you sure you want to delete ${name}?`, [
       {
         text: "Cancel",
         style: "cancel",
@@ -67,140 +68,66 @@ export default function Recipe() {
         style: "destructive",
         onPress: async () => {
           try {
-            await deleteDoc(doc(db, "Recipes", id));
-            Alert.alert("Success", "Recipe deleted successfully");
+            await deleteDoc(doc(db, title, id));
+            router.back();
+            Alert.alert("Success", "Item deleted successfully");
             router.push({
-              pathname: "/MyFood",
+              pathname: "/(tabs)/MyFood",
               params: { refresh: Date.now() },
             });
           } catch (error) {
-            console.error("Error deleting recipe:", error);
-            Alert.alert("Error", "Failed to delete recipe");
+            console.error("Error deleting item:", error);
+            Alert.alert("Error", "Failed to delete item");
           }
         },
       },
     ]);
   };
 
-  const panResponder = React.useRef(
-    PanResponder.create({
-      onStartShouldSetPanResponder: () => true,
-      onPanResponderMove: (evt, gestureState) => {
-        if (evt.nativeEvent.changedTouches.length === 2) {
-          const touch1 = evt.nativeEvent.changedTouches[0];
-          const touch2 = evt.nativeEvent.changedTouches[1];
-          const distance = Math.sqrt(
-            Math.pow(touch2.pageX - touch1.pageX, 2) +
-              Math.pow(touch2.pageY - touch1.pageY, 2)
-          );
-
-          const newScale = distance / 200;
-          scale.setValue(Math.max(1, Math.min(3, newScale)));
-        } else {
-          translateX.setValue(gestureState.dx);
-          translateY.setValue(gestureState.dy);
-        }
-      },
-      onPanResponderRelease: () => {
-        Animated.parallel([
-          Animated.spring(scale, {
-            toValue: 1,
-            useNativeDriver: true,
-          }),
-          Animated.spring(translateX, {
-            toValue: 0,
-            useNativeDriver: true,
-          }),
-          Animated.spring(translateY, {
-            toValue: 0,
-            useNativeDriver: true,
-          }),
-        ]).start();
-      },
-    })
-  ).current;
-
   return (
-    <View
-      style={{
-        flex: 1,
-        backgroundColor: Colors.WHITE,
-      }}>
+    <View style={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()}>
           <FontAwesome6 name="circle-arrow-left" size={30} color="black" />
         </TouchableOpacity>
-        <Text style={styles.headerText}>Recipe</Text>
+        <Text style={styles.headerText} numberOfLines={1}>
+          Nutrition label
+        </Text>
         <TouchableOpacity onPress={handleDelete} style={styles.deleteButton}>
           <Feather name="trash-2" size={24} color="black" />
         </TouchableOpacity>
       </View>
-      <View style={{ flex: 1 }}>
-        <View style={{ marginTop: 20 }}>
-          {/* <Text
-            style={{
-              fontSize: 24,
-              fontFamily: "myfont-bold",
-              textAlign: "center",
-              textDecorationLine: "underline",
-            }}>
-            {name}
-          </Text> */}
-          {/* <Image
+
+      <View style={styles.contentContainer}>
+        <View style={styles.titleSection}>
+          <Text style={styles.itemName}>{name}</Text>
+          <Image
             source={{
               uri:
                 title === "Recipes"
                   ? image
                   : `https://spoonacular.com/cdn/ingredients_100x100/${image}`,
             }}
-            style={{
-              width: 100,
-              height: 100,
-              alignSelf: "center",
-              borderRadius: 50,
-              borderWidth: 1,
-              marginTop: "5%",
-            }}
-          /> */}
+            style={styles.itemImage}
+          />
         </View>
 
         {savedImagePath &&
           (loading ? (
             <Image
               source={require("../../assets/picture/loading-gif.gif")}
-              style={{
-                width: 100,
-                height: 100,
-                alignSelf: "center",
-                marginTop: 20,
-              }}
+              style={styles.loadingImage}
             />
           ) : (
             <>
               <TouchableOpacity
                 onPress={() => setIsImageViewVisible(true)}
-                style={{
-                  width: "100%",
-                  height: 400,
-                  marginTop: 20,
-                }}>
+                style={styles.nutritionImageContainer}>
                 <Image
                   source={{ uri: savedImagePath }}
-                  style={{
-                    width: "130%",
-                    height: "130%",
-                    resizeMode: "contain",
-                    alignSelf: "center",
-                  }}
+                  style={styles.nutritionImage}
                 />
-                {/* <Text
-                  style={{
-                    textAlign: "center",
-                    color: Colors.GRAY,
-                    fontFamily: "myfont",
-                  }}>
-                  Tap to zoom
-                </Text> */}
+                <Text style={styles.zoomHint}></Text>
               </TouchableOpacity>
 
               <Image
@@ -209,12 +136,27 @@ export default function Recipe() {
               />
             </>
           ))}
+
+        <TouchableOpacity
+          onPress={() => {
+            router.push({
+              pathname: "/search-info/Recipe",
+              params: { title, id, name, image },
+            });
+          }}
+          style={styles.recipeButton}>
+          <Text style={styles.recipeButtonText}>Get This Recipe!</Text>
+        </TouchableOpacity>
       </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: Colors.WHITE,
+  },
   header: {
     flexDirection: "row",
     alignItems: "center",
@@ -224,34 +166,76 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: Colors.GRAY,
   },
+  headerText: {
+    flex: 1,
+    fontSize: 20,
+    fontFamily: "myfont-bold",
+    textAlign: "center",
+    marginHorizontal: 10,
+  },
   deleteButton: {
     padding: 5,
   },
-  headerText: {
+  contentContainer: {
+    flex: 1,
+    padding: 20,
+  },
+  titleSection: {
+    alignItems: "center",
+    marginBottom: 20,
+  },
+  titleLabel: {
+    fontSize: 22,
+    fontFamily: "myfont-bold",
+    textAlign: "center",
+  },
+  itemName: {
     fontSize: 24,
     fontFamily: "myfont-bold",
+    textAlign: "center",
+    textDecorationLine: "underline",
+    marginVertical: 10,
   },
-  modalContainer: {
-    flex: 1,
-    backgroundColor: "rgba(0, 0, 0, 0.9)",
-    justifyContent: "center",
-    alignItems: "center",
+  itemImage: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    borderWidth: 1,
+    marginTop: 20,
   },
-  closeButton: {
-    position: "absolute",
-    top: 40,
-    right: 20,
-    zIndex: 1,
-    padding: 10,
+  loadingImage: {
+    width: 100,
+    height: 100,
+    alignSelf: "center",
+    marginTop: 20,
   },
-  zoomableImageContainer: {
+  nutritionImageContainer: {
+    width: "100%",
+    height: 400,
+    marginVertical: 20,
+  },
+  nutritionImage: {
     width: "100%",
     height: "100%",
-    justifyContent: "center",
-    alignItems: "center",
+    resizeMode: "contain",
   },
-  zoomableImage: {
-    width: "100%",
-    height: "100%",
+  zoomHint: {
+    textAlign: "center",
+    color: Colors.GRAY,
+    fontFamily: "myfont",
+    marginTop: 5,
+  },
+  recipeButton: {
+    backgroundColor: "#2E7D32",
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: 16,
+    marginTop: 20,
+  },
+  recipeButtonText: {
+    color: Colors.WHITE,
+    fontFamily: "myfont-bold",
+    textAlign: "center",
+    fontSize: 28,
   },
 });

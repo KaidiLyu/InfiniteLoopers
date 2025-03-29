@@ -5,12 +5,8 @@ import {
   TouchableOpacity,
   Alert,
   StyleSheet,
-  ScrollView,
-  Dimensions,
-  PanResponder,
-  Animated,
 } from "react-native";
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect } from "react";
 import {
   Link,
   useNavigation,
@@ -20,81 +16,30 @@ import {
 import { FontAwesome6 } from "@expo/vector-icons";
 import { Colors } from "../../constants/Colors";
 import { getNutritionLabel } from "../api/NutritionLabelRecipe";
+import ResponsiveImageView from "react-native-responsive-image-view";
+import Entypo from "@expo/vector-icons/Entypo";
 import { Feather } from "@expo/vector-icons";
 import { deleteDoc, doc } from "firebase/firestore";
 import { db } from "../../configs/FirebaseConfig";
-
-const windowWidth = Dimensions.get("window").width;
-const windowHeight = Dimensions.get("window").height;
 
 export default function NutritionInfo() {
   const router = useRouter();
   const navigation = useNavigation();
   const { title, id, name, image } = useLocalSearchParams();
-  const [loading, setLoading] = useState(false);
-  const [savedImagePath, setSavedImagePath] = useState(null);
-
-  // Zoom & Pan states
-  const scale = useRef(new Animated.Value(1)).current;
-  const translateX = useRef(new Animated.Value(0)).current;
-  const translateY = useRef(new Animated.Value(0)).current;
-  const lastScale = useRef(1);
-  const lastTranslateX = useRef(0);
-  const lastTranslateY = useRef(0);
-
-  // Create a PanResponder to handle gestures
-  const panResponder = useRef(
-    PanResponder.create({
-      onStartShouldSetPanResponder: () => true,
-      onPanResponderGrant: () => {
-        lastScale.current = scale._value;
-        lastTranslateX.current = translateX._value;
-        lastTranslateY.current = translateY._value;
-      },
-      onPanResponderMove: (event, gestureState) => {
-        // Handle dragging
-        translateX.setValue(lastTranslateX.current + gestureState.dx);
-        translateY.setValue(lastTranslateY.current + gestureState.dy);
-
-        // Handle pinch-to-zoom with two fingers
-        if (event.nativeEvent.changedTouches.length === 2) {
-          const touch1 = event.nativeEvent.changedTouches[0];
-          const touch2 = event.nativeEvent.changedTouches[1];
-
-          // Calculate distance between two fingers
-          const distance = Math.sqrt(
-            Math.pow(touch2.pageX - touch1.pageX, 2) +
-              Math.pow(touch2.pageY - touch1.pageY, 2)
-          );
-
-          // Calculate scale based on distance
-          const newScale = Math.max(0.5, Math.min(3, distance / 150));
-          scale.setValue(newScale);
-        }
-      },
-      onPanResponderRelease: () => {
-        // If scale is less than 1, spring back to 1
-        if (scale._value < 1) {
-          Animated.spring(scale, {
-            toValue: 1,
-            useNativeDriver: true,
-          }).start();
-          lastScale.current = 1;
-        } else {
-          lastScale.current = scale._value;
-        }
-
-        // Update last position
-        lastTranslateX.current = translateX._value;
-        lastTranslateY.current = translateY._value;
-      },
-    })
-  ).current;
+  const [loading, setLoading] = React.useState(false);
+  const [savedImagePath, setSavedImagePath] = React.useState(null);
+  const [isImageViewVisible, setIsImageViewVisible] = React.useState(false);
 
   useEffect(() => {
     navigation.setOptions({
       headerShown: false,
     });
+    console.log("--------------------------------");
+    console.log("title", title);
+    console.log("id", id);
+    console.log("name", name);
+    console.log("image", image);
+    console.log("--------------------------------");
     nutritionLabel();
   }, []);
 
@@ -139,18 +84,6 @@ export default function NutritionInfo() {
     ]);
   };
 
-  // Reset zoom & pan
-  const resetZoomPan = () => {
-    Animated.parallel([
-      Animated.spring(scale, { toValue: 1, useNativeDriver: true }),
-      Animated.spring(translateX, { toValue: 0, useNativeDriver: true }),
-      Animated.spring(translateY, { toValue: 0, useNativeDriver: true }),
-    ]).start();
-    lastScale.current = 1;
-    lastTranslateX.current = 0;
-    lastTranslateY.current = 0;
-  };
-
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -165,13 +98,7 @@ export default function NutritionInfo() {
         </TouchableOpacity>
       </View>
 
-      <ScrollView
-        style={styles.scrollView}
-        contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={true}
-        bounces={true}
-        scrollEnabled={true}
-      >
+      <View style={styles.contentContainer}>
         <View style={styles.titleSection}>
           <Text style={styles.itemName}>{name}</Text>
           <Image
@@ -185,45 +112,30 @@ export default function NutritionInfo() {
           />
         </View>
 
-        {loading ? (
-          <View style={styles.loadingContainer}>
+        {savedImagePath &&
+          (loading ? (
             <Image
               source={require("../../assets/picture/loading-gif.gif")}
               style={styles.loadingImage}
             />
-          </View>
-        ) : savedImagePath ? (
-          <View style={styles.imageViewerContainer}>
-            <TouchableOpacity style={styles.resetButton} onPress={resetZoomPan}>
-              <Feather name="refresh-cw" size={22} color="white" />
-              <Text style={styles.resetText}>Reset</Text>
-            </TouchableOpacity>
+          ) : (
+            <>
+              <TouchableOpacity
+                onPress={() => setIsImageViewVisible(true)}
+                style={styles.nutritionImageContainer}>
+                <Image
+                  source={{ uri: savedImagePath }}
+                  style={styles.nutritionImage}
+                />
+                <Text style={styles.zoomHint}></Text>
+              </TouchableOpacity>
 
-            <Text style={styles.interactHint}>
-              Drag and pinch to zoom the full nutrition label
-            </Text>
-
-            <View
-              style={styles.nutritionImageWrapper}
-              {...panResponder.panHandlers}
-            >
-              <Animated.Image
+              <Image
                 source={{ uri: savedImagePath }}
-                style={[
-                  styles.nutritionImage,
-                  {
-                    transform: [{ translateX }, { translateY }, { scale }],
-                  },
-                ]}
-                resizeMode="contain"
+                visible={isImageViewVisible}
               />
-            </View>
-          </View>
-        ) : (
-          <View style={styles.errorContainer}>
-            <Text style={styles.errorText}>Unable to load nutrition info</Text>
-          </View>
-        )}
+            </>
+          ))}
 
         <TouchableOpacity
           onPress={() => {
@@ -232,11 +144,10 @@ export default function NutritionInfo() {
               params: { title, id, name, image },
             });
           }}
-          style={styles.recipeButton}
-        >
+          style={styles.recipeButton}>
           <Text style={styles.recipeButtonText}>Get This Recipe!</Text>
         </TouchableOpacity>
-      </ScrollView>
+      </View>
     </View>
   );
 }
@@ -265,16 +176,18 @@ const styles = StyleSheet.create({
   deleteButton: {
     padding: 5,
   },
-  scrollView: {
+  contentContainer: {
     flex: 1,
-  },
-  scrollContent: {
     padding: 20,
-    paddingBottom: 40,
   },
   titleSection: {
     alignItems: "center",
     marginBottom: 20,
+  },
+  titleLabel: {
+    fontSize: 22,
+    fontFamily: "myfont-bold",
+    textAlign: "center",
   },
   itemName: {
     fontSize: 24,
@@ -290,73 +203,27 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     marginTop: 20,
   },
-  loadingContainer: {
-    justifyContent: "center",
-    alignItems: "center",
-    marginVertical: 30,
-  },
   loadingImage: {
     width: 100,
     height: 100,
+    alignSelf: "center",
+    marginTop: 20,
   },
-  imageViewerContainer: {
+  nutritionImageContainer: {
     width: "100%",
-    height: 800,
+    height: 400,
     marginVertical: 20,
-    alignItems: "center",
-    justifyContent: "center",
-    position: "relative",
-  },
-  nutritionImageWrapper: {
-    width: "100%",
-    height: "100%",
-    overflow: "hidden",
-    backgroundColor: "#f9f9f9",
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: "#ddd",
   },
   nutritionImage: {
     width: "100%",
     height: "100%",
+    resizeMode: "contain",
   },
-  resetButton: {
-    position: "absolute",
-    top: 10,
-    right: 10,
-    backgroundColor: "rgba(0,0,0,0.6)",
-    borderRadius: 20,
-    padding: 8,
-    zIndex: 10,
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  resetText: {
-    color: "white",
-    marginLeft: 5,
+  zoomHint: {
+    textAlign: "center",
+    color: Colors.GRAY,
     fontFamily: "myfont",
-    fontSize: 14,
-  },
-  interactHint: {
-    position: "absolute",
-    top: 10,
-    left: 10,
-    backgroundColor: "rgba(0,0,0,0.6)",
-    color: "white",
-    padding: 8,
-    borderRadius: 20,
-    zIndex: 10,
-    fontFamily: "myfont",
-    fontSize: 14,
-  },
-  errorContainer: {
-    padding: 20,
-    alignItems: "center",
-  },
-  errorText: {
-    fontSize: 16,
-    color: "red",
-    fontFamily: "myfont",
+    marginTop: 5,
   },
   recipeButton: {
     backgroundColor: "#2E7D32",

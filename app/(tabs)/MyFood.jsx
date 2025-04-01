@@ -199,7 +199,7 @@ export default function MyFood() {
         [section]: !prev[section],
       };
       
-      // 更新动画高度
+      // Update animation height
       const newHeight = newState[section] ? 
         (Object.values(newState).filter(Boolean).length === 1 ? 500 : 300) : 
         80;
@@ -210,7 +210,7 @@ export default function MyFood() {
     });
   };
 
-  // 在Recipes和Ingredients的Animated.View中使用动画样式
+  // Using animation styles in Animated.View for Recipes and Ingredients
   const recipesAnimatedStyle = getAnimatedStyle("Recipes");
   const ingredientsAnimatedStyle = getAnimatedStyle("Ingredients");
 

@@ -6,7 +6,7 @@ import {
   ActivityIndicator,
   Alert,
 } from "react-native";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { Colors } from "../../constants/Colors";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import CreateNewFoodCard from "../../components/MyFood/CreateNewFoodCard";
@@ -30,7 +30,11 @@ import {
 import { auth, db } from "../../configs/FirebaseConfig";
 import MyFoodCards from "../../components/MyFood/MyFoodCards";
 import { Feather } from "@expo/vector-icons";
-import Animated from "react-native-reanimated";
+import Animated, { 
+  withSpring, 
+  useAnimatedStyle, 
+  useSharedValue 
+} from "react-native-reanimated";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 
 export default function MyFood() {
@@ -51,6 +55,22 @@ export default function MyFood() {
   const navigation = useNavigation();
 
   const user = auth.currentUser;
+
+  const animatedHeights = {
+    Recipes: useSharedValue(80),
+    Ingredients: useSharedValue(80),
+  };
+
+  const getAnimatedStyle = useCallback((section) => {
+    return useAnimatedStyle(() => {
+      return {
+        height: withSpring(animatedHeights[section].value, {
+          damping: 15,
+          stiffness: 100,
+        }),
+      };
+    });
+  }, []);
 
   useEffect(() => {
     user && getAllFood();
@@ -173,11 +193,26 @@ export default function MyFood() {
   };
 
   const toggleSection = (section) => {
-    setExpandedSections((prev) => ({
-      ...prev,
-      [section]: !prev[section],
-    }));
+    setExpandedSections((prev) => {
+      const newState = {
+        ...prev,
+        [section]: !prev[section],
+      };
+      
+      // 更新动画高度
+      const newHeight = newState[section] ? 
+        (Object.values(newState).filter(Boolean).length === 1 ? 500 : 300) : 
+        80;
+      
+      animatedHeights[section].value = newHeight;
+      
+      return newState;
+    });
   };
+
+  // 在Recipes和Ingredients的Animated.View中使用动画样式
+  const recipesAnimatedStyle = getAnimatedStyle("Recipes");
+  const ingredientsAnimatedStyle = getAnimatedStyle("Ingredients");
 
   const getContainerHeight = (section) => {
     const expandedCount =
@@ -301,7 +336,7 @@ export default function MyFood() {
             <Animated.View
               style={[
                 styles.container,
-                { height: getContainerHeight("Recipes") },
+                recipesAnimatedStyle,
               ]}>
               <View style={styles.headerContainer}>
                 <View style={styles.titleContainer}>
@@ -352,26 +387,20 @@ export default function MyFood() {
             <Animated.View
               style={[
                 styles.container,
-                { height: getContainerHeight("Ingredients") },
+                ingredientsAnimatedStyle,
               ]}>
               <View style={styles.headerContainer}>
                 <View style={styles.titleContainer}>
                   <Text style={styles.title}>Ingredients</Text>
-                  <TouchableOpacity
-                    onPress={() => toggleSection("Ingredients")}>
+                  <TouchableOpacity onPress={() => toggleSection("Ingredients")}>
                     <AntDesign
-                      name={
-                        expandedSections.Ingredients
-                          ? "caretdown"
-                          : "caretright"
-                      }
+                      name={expandedSections.Ingredients ? "caretdown" : "caretright"}
                       size={20}
                       color="black"
                     />
                   </TouchableOpacity>
                 </View>
-                <TouchableOpacity
-                  onPress={() => deleteAllFromSection("Ingredients")}>
+                <TouchableOpacity onPress={() => deleteAllFromSection("Ingredients")}>
                   <Feather name="trash-2" size={24} color="red" />
                 </TouchableOpacity>
               </View>
@@ -459,20 +488,21 @@ export default function MyFood() {
 
 const styles = StyleSheet.create({
   container: {
-    borderWidth: 1,
-    borderColor: Colors.BLACK,
-    padding: 20,
-    borderRadius: 20,
-    overflow: "hidden",
-    marginBottom: 10,
-    minHeight: 80,
+    backgroundColor: Colors.WHITE,
+    borderRadius: 15,
+    marginBottom: 15,
+    padding: 15,
+    shadowColor: Colors.BLACK,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
   },
   headerContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
     marginBottom: 10,
-    paddingTop: 5,
   },
   titleContainer: {
     flexDirection: "row",
@@ -480,7 +510,7 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   title: {
-    fontSize: 20,
+    fontSize: 24,
     fontFamily: "myfont-bold",
   },
 });

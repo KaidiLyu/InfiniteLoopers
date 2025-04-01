@@ -101,12 +101,13 @@ export default function MyFoodCards({ title, data, isExpanded, onDelete }) {
       data={data}
       renderItem={renderItem}
       keyExtractor={(item) => item.id}
-      numColumns={3}
+      numColumns={2}
       scrollEnabled={true}
-      initialNumToRender={isExpanded ? data.length : 3}
-      maxToRenderPerBatch={isExpanded ? data.length : 3}
-      windowSize={isExpanded ? data.length : 3}
+      initialNumToRender={isExpanded ? data.length : 2}
+      maxToRenderPerBatch={isExpanded ? data.length : 2}
+      windowSize={isExpanded ? data.length : 2}
       style={{ height: "100%" }}
+      contentContainerStyle={{ paddingHorizontal: 10 }}
     />
   );
 }
@@ -114,12 +115,15 @@ export default function MyFoodCards({ title, data, isExpanded, onDelete }) {
 const styles = StyleSheet.create({
   cardContainer: {
     position: "relative",
-    marginRight: 10,
-    marginBottom: 10,
+    flex: 1,
+    margin: 8,
+    maxWidth: "50%",
+    alignItems: "center",
   },
   card: {
-    width: 100,
+    width: "100%",
     alignItems: "center",
+    padding: 5,
   },
   deleteButton: {
     position: "absolute",
@@ -133,16 +137,17 @@ const styles = StyleSheet.create({
     borderColor: Colors.BLACK,
   },
   image: {
-    width: 80,
-    height: 80,
+    width: 120,
+    height: 120,
     borderRadius: 30,
     borderWidth: 1,
     marginBottom: 5,
   },
   text: {
     fontFamily: "myfont",
-    fontSize: 12,
+    fontSize: 14,
     textAlign: "center",
     width: "100%",
+    marginTop: 5,
   },
 });

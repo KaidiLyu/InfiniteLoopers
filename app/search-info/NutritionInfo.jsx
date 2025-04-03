@@ -96,7 +96,7 @@ export default function NutritionInfo() {
       headerShown: false,
     });
     nutritionLabel();
-  }, []);
+  }, [id]);
 
   const nutritionLabel = async () => {
     try {
@@ -228,7 +228,7 @@ export default function NutritionInfo() {
             <Text style={styles.errorText}>Unable to load nutritional information</Text>
           </View>
         )}
-
+        {savedImagePath && !loading && (
         <TouchableOpacity
           onPress={() => {
             router.push({
@@ -239,6 +239,7 @@ export default function NutritionInfo() {
           style={styles.recipeButton}>
           <Text style={styles.recipeButtonText}>Get This Recipe!</Text>
         </TouchableOpacity>
+        )}
       </ScrollView>
     </View>
   );

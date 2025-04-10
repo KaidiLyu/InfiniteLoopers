@@ -6,113 +6,108 @@ import {
   Alert,
   StyleSheet,
   ScrollView,
-  Dimensions,
-  PanResponder,
-  Animated,
+  ActivityIndicator,
+  Linking,
+  Platform,
 } from "react-native";
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState } from "react";
+import { useNavigation, useRouter, useLocalSearchParams } from "expo-router";
 import {
-  Link,
-  useNavigation,
-  useRouter,
-  useLocalSearchParams,
-} from "expo-router";
-import { FontAwesome6 } from "@expo/vector-icons";
+  FontAwesome6,
+  Feather,
+  MaterialCommunityIcons,
+} from "@expo/vector-icons";
 import { Colors } from "../../constants/Colors";
-import { getNutritionLabel } from "../api/NutritionLabelRecipe";
-import { Feather } from "@expo/vector-icons";
 import { deleteDoc, doc } from "firebase/firestore";
-import { db } from "../../configs/FirebaseConfig";
+import { db, auth } from "../../configs/FirebaseConfig";
 
-const windowWidth = Dimensions.get('window').width;
-const windowHeight = Dimensions.get('window').height;
+const NutrientRow = ({ label, value, unit, indent = false }) => {
+  if (value === undefined || value === null) return null;
+  return (
+    <View style={[styles.nutrientRow, indent && styles.indent]}>
+      <Text style={styles.nutrientLabel}>{label}:</Text>
+      <Text style={styles.nutrientValue}>
+        {value} {unit}
+      </Text>
+    </View>
+  );
+};
 
 export default function NutritionInfo() {
   const router = useRouter();
   const navigation = useNavigation();
-  const { title, id, name, image } = useLocalSearchParams();
-  const [loading, setLoading] = useState(false);
-  const [savedImagePath, setSavedImagePath] = useState(null);
-  
-  // Zoom and pan states
-  const scale = useRef(new Animated.Value(1)).current;
-  const translateX = useRef(new Animated.Value(0)).current;
-  const translateY = useRef(new Animated.Value(0)).current;
-  const lastScale = useRef(1);
-  const lastTranslateX = useRef(0);
-  const lastTranslateY = useRef(0);
+  const params = useLocalSearchParams();
+  const { source, id, title, name, image, apiResult } = params;
 
-  // Create a PanResponder to handle the gesture
-  const panResponder = useRef(
-    PanResponder.create({
-      onStartShouldSetPanResponder: () => true,
-      onPanResponderGrant: () => {
-        lastScale.current = scale._value;
-        lastTranslateX.current = translateX._value;
-        lastTranslateY.current = translateY._value;
-      },
-      onPanResponderMove: (event, gestureState) => {
-        // Handling dragging
-        translateX.setValue(lastTranslateX.current + gestureState.dx);
-        translateY.setValue(lastTranslateY.current + gestureState.dy);
-        
-        // Handling pinch-to-zoom
-        if (event.nativeEvent.changedTouches.length === 2) {
-          const touch1 = event.nativeEvent.changedTouches[0];
-          const touch2 = event.nativeEvent.changedTouches[1];
-          
-          // Calculate the distance between two fingers
-          const distance = Math.sqrt(
-            Math.pow(touch2.pageX - touch1.pageX, 2) +
-            Math.pow(touch2.pageY - touch1.pageY, 2)
-          );
-          
-          // Calculate the scale based on the distance
-          const newScale = Math.max(0.5, Math.min(3, distance / 150));
-          scale.setValue(newScale);
-        }
-      },
-      onPanResponderRelease: () => {
-        // If the scale is less than 1, bounce back to 1
-        if (scale._value < 1) {
-          Animated.spring(scale, {
-            toValue: 1,
-            useNativeDriver: true,
-          }).start();
-          lastScale.current = 1;
-        } else {
-          lastScale.current = scale._value;
-        }
-        
-        // Update the last position value
-        lastTranslateX.current = translateX._value;
-        lastTranslateY.current = translateY._value;
-      }
-    })
-  ).current;
+  const [loading, setLoading] = useState(false);
+  const [itemData, setItemData] = useState(null);
+  const [error, setError] = useState(null);
+  const user = auth.currentUser;
 
   useEffect(() => {
     navigation.setOptions({
       headerShown: false,
     });
-    nutritionLabel();
-  }, [id]);
 
-  const nutritionLabel = async () => {
-    try {
-      setLoading(true);
-      console.log("Getting nutrition label for recipe id:", id);
-      const filePath = await getNutritionLabel(id);
-      console.log("filePath", filePath);
-      setSavedImagePath(filePath);
-    } catch (error) {
-      console.error("Error getting nutrition label:", error);
-    } finally {
-      setLoading(false);
+    if (source === "barcode" && apiResult) {
+      try {
+        const parsedResult = JSON.parse(apiResult);
+        setItemData(parsedResult);
+      } catch (e) {
+        console.error("Failed to parse barcode API result:", e);
+        setError("Error displaying scanned item data.");
+      }
+    } else if (source === "itemSearch" && apiResult) {
+      try {
+        console.log("Item Search Data (from params):", apiResult);
+        setItemData({
+          food_name: name,
+          photo: { thumb: image },
+          nf_calories: params.calories || "N/A",
+          nf_protein: params.protein || "N/A",
+          nf_total_fat: params.fat || "N/A",
+          nf_total_carbohydrate: params.carbs || "N/A",
+        });
+      } catch (e) {
+        console.error("Failed to process item search data:", e);
+        setError("Error displaying item data.");
+      }
+    } else {
+      console.warn(
+        "NutritionInfo loaded with unexpected source or missing data:",
+        params
+      );
+      setError("Could not load nutrition information.");
     }
-  };
+  }, [params]);
 
   const handleDelete = () => {
+    let collectionName = null;
+    let docIdToDelete = id;
+
+    if (source === "barcode" || source === "itemSearch") {
+      if (title === "Scanned Product") {
+        collectionName = "scannedItems";
+        Alert.alert(
+          "Deletion Not Implemented",
+          "Deletion for scanned items needs adjustment."
+        );
+        return;
+      } else if (title === "Ingredients") {
+        collectionName = "ingredientsLog";
+      } else if (title === "Products") {
+        collectionName = "productsLog";
+      }
+    } else {
+      Alert.alert("Error", "Cannot determine item type to delete.");
+      return;
+    }
+
+    if (!collectionName) {
+      Alert.alert("Error", "Cannot determine item type to delete.");
+      return;
+    }
+
     Alert.alert("Delete Item", `Are you sure you want to delete ${name}?`, [
       {
         text: "Cancel",
@@ -122,34 +117,74 @@ export default function NutritionInfo() {
         text: "Delete",
         style: "destructive",
         onPress: async () => {
+          setLoading(true);
           try {
-            await deleteDoc(doc(db, title, id));
-            router.back();
+            console.log(`Deleting doc: ${collectionName}/${docIdToDelete}`);
+            await deleteDoc(doc(db, collectionName, docIdToDelete));
+            setLoading(false);
             Alert.alert("Success", "Item deleted successfully");
-            router.push({
-              pathname: "/(tabs)/MyFood",
+            router.replace({
+              pathname: "/(tabs)/SearchFood",
               params: { refresh: Date.now() },
             });
           } catch (error) {
+            setLoading(false);
             console.error("Error deleting item:", error);
-            Alert.alert("Error", "Failed to delete item");
+            Alert.alert("Error", "Failed to delete item.");
           }
         },
       },
     ]);
   };
 
-  // Reset zoom and pan
-  const resetZoomPan = () => {
-    Animated.parallel([
-      Animated.spring(scale, { toValue: 1, useNativeDriver: true }),
-      Animated.spring(translateX, { toValue: 0, useNativeDriver: true }),
-      Animated.spring(translateY, { toValue: 0, useNativeDriver: true }),
-    ]).start();
-    lastScale.current = 1;
-    lastTranslateX.current = 0;
-    lastTranslateY.current = 0;
-  };
+  if (loading) {
+    return (
+      <View style={styles.centerContainer}>
+        <ActivityIndicator size="large" color={Colors.BLACK} />
+      </View>
+    );
+  }
+
+  if (error || !itemData) {
+    return (
+      <View style={styles.container}>
+        {/* Keep header for back button */}
+        <View style={styles.header}>
+          <TouchableOpacity onPress={() => router.back()}>
+            <FontAwesome6 name="circle-arrow-left" size={30} color="black" />
+          </TouchableOpacity>
+          <Text style={styles.headerText} numberOfLines={1}>
+            Error
+          </Text>
+          <View style={{ width: 30 }} /> {/* Spacer */}
+        </View>
+        <View style={styles.centerContainer}>
+          <Text style={styles.errorText}>
+            {error || "Item data could not be loaded."}
+          </Text>
+        </View>
+      </View>
+    );
+  }
+
+  const itemName = itemData.food_name || name || "Unknown Item";
+  const itemImageUri = itemData.photo?.thumb || image;
+  const calories = itemData.nf_calories;
+  const protein = itemData.nf_protein;
+  const totalFat = itemData.nf_total_fat;
+  const satFat = itemData.nf_saturated_fat;
+  const cholesterol = itemData.nf_cholesterol;
+  const sodium = itemData.nf_sodium;
+  const carbs = itemData.nf_total_carbohydrate;
+  const fiber = itemData.nf_dietary_fiber;
+  const sugars = itemData.nf_sugars;
+  const potassium = itemData.nf_potassium;
+  const servingQty = itemData.serving_qty || 1;
+  const servingUnit = itemData.serving_unit || "serving";
+  const servingWeight = itemData.serving_weight_grams;
+
+  const brandName = itemData.brand_name;
+  const sourceLink = itemData.metadata?.source_url;
 
   return (
     <View style={styles.container}>
@@ -158,87 +193,116 @@ export default function NutritionInfo() {
           <FontAwesome6 name="circle-arrow-left" size={30} color="black" />
         </TouchableOpacity>
         <Text style={styles.headerText} numberOfLines={1}>
-          Nutrition label
+          {brandName || title}
         </Text>
         <TouchableOpacity onPress={handleDelete} style={styles.deleteButton}>
           <Feather name="trash-2" size={24} color="black" />
         </TouchableOpacity>
       </View>
 
-      <ScrollView 
+      <ScrollView
         style={styles.scrollView}
-        contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={true}
-        bounces={true}
-        scrollEnabled={true}
-      >
+        contentContainerStyle={styles.scrollContent}>
         <View style={styles.titleSection}>
-          <Text style={styles.itemName}>{name}</Text>
-          <Image
-            source={{
-              uri:
-                title === "Recipes"
-                  ? image
-                  : `https://spoonacular.com/cdn/ingredients_100x100/${image}`,
-            }}
-            style={styles.itemImage}
-          />
-        </View>
-
-        {loading ? (
-          <View style={styles.loadingContainer}>
-            <Image
-              source={require("../../assets/picture/loading-gif.gif")}
-              style={styles.loadingImage}
-            />
-          </View>
-        ) : savedImagePath ? (
-          <View style={styles.imageViewerContainer}>
-            <TouchableOpacity 
-              style={styles.resetButton} 
-              onPress={resetZoomPan}
-            >
-              <Feather name="refresh-cw" size={22} color="white" />
-              <Text style={styles.resetText}>Reset</Text>
-            </TouchableOpacity>
-            
-            <Text style={styles.interactHint}>
-              Drag and zoom to view the complete nutrition table
-            </Text>
-            
-            <View style={styles.nutritionImageWrapper} {...panResponder.panHandlers}>
-              <Animated.Image
-                source={{ uri: savedImagePath }}
-                style={[
-                  styles.nutritionImage,
-                  {
-                    transform: [
-                      { translateX },
-                      { translateY },
-                      { scale }
-                    ]
-                  }
-                ]}
-                resizeMode="contain"
+          <Text style={styles.itemName}>{itemName}</Text>
+          {itemImageUri ? (
+            <Image source={{ uri: itemImageUri }} style={styles.itemImage} />
+          ) : (
+            <View style={styles.imagePlaceholder}>
+              <MaterialCommunityIcons
+                name="food-variant"
+                size={50}
+                color={Colors.GRAY}
               />
             </View>
-          </View>
-        ) : (
-          <View style={styles.errorContainer}>
-            <Text style={styles.errorText}>Unable to load nutritional information</Text>
-          </View>
+          )}
+        </View>
+
+        <View style={styles.nutritionSection}>
+          <Text style={styles.sectionTitle}>Nutrition Facts</Text>
+          <Text style={styles.servingSize}>
+            Serving Size: {servingQty} {servingUnit}
+            {servingWeight && ` (${servingWeight.toFixed(0)}g)`}
+          </Text>
+          <View style={styles.separator} />
+
+          <NutrientRow label="Calories" value={calories?.toFixed(0)} unit="" />
+          <View style={styles.separatorThin} />
+
+          <NutrientRow
+            label="Total Fat"
+            value={totalFat?.toFixed(1)}
+            unit="g"
+          />
+          <NutrientRow
+            label="Saturated Fat"
+            value={satFat?.toFixed(1)}
+            unit="g"
+            indent
+          />
+          {/* Add Trans Fat if available */}
+          <NutrientRow
+            label="Cholesterol"
+            value={cholesterol?.toFixed(0)}
+            unit="mg"
+          />
+          <NutrientRow label="Sodium" value={sodium?.toFixed(0)} unit="mg" />
+          <NutrientRow
+            label="Total Carbohydrate"
+            value={carbs?.toFixed(1)}
+            unit="g"
+          />
+          <NutrientRow
+            label="Dietary Fiber"
+            value={fiber?.toFixed(1)}
+            unit="g"
+            indent
+          />
+          <NutrientRow
+            label="Total Sugars"
+            value={sugars?.toFixed(1)}
+            unit="g"
+            indent
+          />
+          {/* Add Added Sugars if available */}
+          <NutrientRow label="Protein" value={protein?.toFixed(1)} unit="g" />
+          <View style={styles.separatorThin} />
+
+          {/* Add Vitamins/Minerals if available */}
+          <NutrientRow
+            label="Potassium"
+            value={potassium?.toFixed(0)}
+            unit="mg"
+          />
+          {/* <NutrientRow label="Vitamin D" value={...} unit="mcg" /> */}
+          {/* <NutrientRow label="Calcium" value={...} unit="mg" /> */}
+          {/* <NutrientRow label="Iron" value={...} unit="mg" /> */}
+        </View>
+
+        {sourceLink && (
+          <TouchableOpacity
+            onPress={() => Linking.openURL(sourceLink)}
+            style={styles.sourceLinkButton}>
+            <MaterialCommunityIcons
+              name="link-variant"
+              size={18}
+              color={Colors.BLUE}
+            />
+            <Text style={styles.sourceLinkText}> View Source</Text>
+          </TouchableOpacity>
         )}
-        {savedImagePath && !loading && (
-        <TouchableOpacity
-          onPress={() => {
-            router.push({
-              pathname: "/search-info/Recipe",
-              params: { title, id, name, image },
-            });
-          }}
-          style={styles.recipeButton}>
-          <Text style={styles.recipeButtonText}>Get This Recipe!</Text>
-        </TouchableOpacity>
+
+        {/* Add Nutritionix attribution if data came from them */}
+        {(source === "barcode" || source === "natural") && (
+          <Text style={styles.attributionText}>
+            Nutrition data powered by Nutritionix
+          </Text>
+        )}
+        {/* (less likely here now) */}
+        {source === "itemSearch" && (
+          <Text style={styles.attributionText}>
+            Data possibly from Spoonacular
+          </Text>
         )}
       </ScrollView>
     </View>
@@ -250,20 +314,29 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: Colors.WHITE,
   },
+  centerContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 20,
+    backgroundColor: Colors.WHITE,
+  },
   header: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    padding: 20,
-    paddingTop: 50,
+    paddingTop: Platform.OS === "ios" ? 50 : 40,
+    paddingBottom: 10,
+    paddingHorizontal: 15,
+    backgroundColor: Colors.WHITE,
     borderBottomWidth: 1,
-    borderBottomColor: Colors.GRAY,
+    borderBottomColor: Colors.LIGHT_GRAY,
   },
   headerText: {
     flex: 1,
-    fontSize: 20,
-    fontFamily: "myfont-bold",
     textAlign: "center",
+    fontSize: 18,
+    fontFamily: "myfont-bold",
     marginHorizontal: 10,
   },
   deleteButton: {
@@ -273,106 +346,110 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   scrollContent: {
-    padding: 20,
-    paddingBottom: 40,
+    padding: 15,
+    paddingBottom: 30,
   },
   titleSection: {
     alignItems: "center",
     marginBottom: 20,
+    paddingBottom: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: Colors.LIGHT_GRAY,
   },
   itemName: {
-    fontSize: 24,
+    fontSize: 22,
     fontFamily: "myfont-bold",
     textAlign: "center",
-    textDecorationLine: "underline",
-    marginVertical: 10,
+    marginBottom: 15,
   },
   itemImage: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
+    width: 120,
+    height: 120,
+    borderRadius: 60,
     borderWidth: 1,
-    marginTop: 20,
+    borderColor: Colors.LIGHT_GRAY,
   },
-  loadingContainer: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginVertical: 30,
+  imagePlaceholder: {
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    backgroundColor: Colors.EXTRA_LIGHT_GRAY,
+    justifyContent: "center",
+    alignItems: "center",
   },
-  loadingImage: {
-    width: 100,
-    height: 100,
-  },
-  imageViewerContainer: {
-    width: "100%",
-    height: 800,
-    marginVertical: 20,
-    alignItems: 'center',
-    justifyContent: 'center',
-    position: 'relative',
-  },
-  nutritionImageWrapper: {
-    width: '100%',
-    height: '100%',
-    overflow: 'hidden',
-    backgroundColor: '#f9f9f9',
-    borderRadius: 10,
+  nutritionSection: {
+    marginBottom: 20,
+    padding: 15,
+    backgroundColor: Colors.LIGHT_GRAY_BACKGROUND,
+    borderRadius: 8,
     borderWidth: 1,
-    borderColor: '#ddd',
+    borderColor: Colors.LIGHT_GRAY,
   },
-  nutritionImage: {
-    width: '100%',
-    height: '100%',
+  sectionTitle: {
+    fontSize: 20,
+    fontFamily: "myfont-bold",
+    marginBottom: 10,
   },
-  resetButton: {
-    position: 'absolute', 
-    top: 10, 
-    right: 10, 
-    backgroundColor: 'rgba(0,0,0,0.6)',
-    borderRadius: 20,
-    padding: 8,
-    zIndex: 10,
-    flexDirection: 'row',
-    alignItems: 'center',
+  servingSize: {
+    fontSize: 14,
+    fontFamily: "myfont",
+    color: Colors.DARK_GRAY,
+    marginBottom: 8,
   },
-  resetText: {
-    color: 'white',
+  separator: {
+    height: 10,
+    backgroundColor: Colors.BLACK,
+    marginVertical: 5,
+  },
+  separatorThin: {
+    height: 1,
+    backgroundColor: Colors.LIGHT_GRAY,
+    marginVertical: 5,
+  },
+  nutrientRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    paddingVertical: 4,
+    marginVertical: 1,
+  },
+  indent: {
+    marginLeft: 15,
+  },
+  nutrientLabel: {
+    fontFamily: "myfont",
+    fontSize: 15,
+    flexShrink: 1, // Allow label to shrink if needed
+    marginRight: 5,
+  },
+  nutrientValue: {
+    fontFamily: "myfont-medium",
+    fontSize: 15,
+    textAlign: "right",
+  },
+  sourceLinkButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    marginTop: 15,
+    padding: 10,
+  },
+  sourceLinkText: {
+    fontFamily: "myfont",
+    fontSize: 14,
+    color: Colors.BLUE,
     marginLeft: 5,
-    fontFamily: 'myfont',
-    fontSize: 14,
-  },
-  interactHint: {
-    position: 'absolute',
-    top: 10,
-    left: 10,
-    backgroundColor: 'rgba(0,0,0,0.6)',
-    color: 'white',
-    padding: 8,
-    borderRadius: 20,
-    zIndex: 10,
-    fontFamily: 'myfont',
-    fontSize: 14,
-  },
-  errorContainer: {
-    padding: 20,
-    alignItems: 'center',
   },
   errorText: {
-    fontSize: 16,
-    color: 'red',
-    fontFamily: "myfont",
-  },
-  recipeButton: {
-    backgroundColor: "#2E7D32",
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-    borderRadius: 16,
-    marginTop: 20,
-  },
-  recipeButtonText: {
-    color: Colors.WHITE,
-    fontFamily: "myfont-bold",
+    color: "red",
     textAlign: "center",
-    fontSize: 28,
+    fontFamily: "myfont",
+    fontSize: 16,
+  },
+  attributionText: {
+    fontSize: 12,
+    color: Colors.GRAY,
+    textAlign: "center",
+    marginTop: 20,
+    fontFamily: "myfont",
   },
 });

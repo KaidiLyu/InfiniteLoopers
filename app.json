@@ -9,7 +9,17 @@
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.infiniteloopers.infiniteloopers",
+      "googleServicesFile": "./google-services.json",
+      "plugins": [
+        [
+          "expo-camera",
+          {
+            "cameraPermission": "Allow $(PRODUCT_NAME) to access your camera for scanning barcodes."
+          }
+        ]
+      ]
     },
     "android": {
       "adaptiveIcon": {

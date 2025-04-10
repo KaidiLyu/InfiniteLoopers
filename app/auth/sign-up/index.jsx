@@ -56,7 +56,7 @@ export default function SignUp() {
           displayName: name,
         }).then(() => {
           console.log("Display name set successfully");
-          router.replace("/MyFood");
+          router.replace("/SearchFood");
         });
       })
       .catch((error) => {

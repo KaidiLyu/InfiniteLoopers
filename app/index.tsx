@@ -11,7 +11,7 @@ export default function Index() {
       style={{
         flex: 1,
       }}>
-      {user ? <Redirect href={"/MyFood"} /> : <Login />}
+      {user ? <Redirect href={"/SearchFood"} /> : <Login />}
     </View>
   );
 }

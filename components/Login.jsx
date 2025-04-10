@@ -1,89 +1,35 @@
 import { View, Text, Image, StyleSheet, TouchableOpacity } from "react-native";
 import React from "react";
 import { Colors } from "../constants/Colors";
-import { Link, useRouter } from "expo-router";
+import { useRouter } from "expo-router";
 import AntDesign from "@expo/vector-icons/AntDesign";
 
 export default function Login() {
   const router = useRouter();
-
   return (
-    <View
-      style={{
-        backgroundColor: Colors.WHITE,
-        height: "100%",
-      }}>
+    <View style={styles.wrapper}>
       <Image
-        source={require("../assets/picture/Grilled Salmon with Veggies.jpg")} //place holder until we get acual image
-        style={{
-          width: "100%",
-          height: "50%",
-        }}
+        source={require("../assets/picture/Grilled Salmon with Veggies.jpg")}
+        style={styles.heroImage}
       />
-      <View style={styles.container}>
-        <Text
-          style={{
-            fontSize: 30,
-            fontFamily: "myfont-bold",
-            textAlign: "center",
-          }}>
-          AI{" "}
-          <Text
-            style={{
-              fontFamily: "myfont-bold",
-              color: Colors.BUTTON_GREEN,
-              textDecorationLine: "underline",
-            }}>
-            Nutritional
-          </Text>{" "}
-          Search
+      <View style={styles.card}>
+        <Text style={styles.title}>
+          AI <Text style={styles.highlight}>Nutritional</Text> Search
         </Text>
-
-        <Text
-          style={{
-            fontSize: 20,
-            fontFamily: "myfont",
-            textAlign: "center",
-            marginTop: 20,
-            marginBottom: 20,
-            color: Colors.GRAY,
-          }}>
-          Create and find personalized nutritional info for your daily meals
-          with included recipes and recommendations. All with the help of our
-          personalized AI tool.
+        <Text style={styles.description}>
+          Create, find, and save personalized nutritional info for your daily
+          meals with a calorie and nutrition tracker to keep you the very best
+          you can be.
         </Text>
-
         <TouchableOpacity
-          onPress={() => router.push("auth/sign-in")}
-          style={{
-            backgroundColor: Colors.BLACK,
-            padding: 20,
-            borderRadius: 10,
-            borderWidth: 1,
-            marginTop: "10%",
-            borderRadius: 20,
-            flexDirection: "row",
-            justifyContent: "center",
-            alignItems: "center",
-          }}>
-          <Text
-            style={{
-              fontSize: 18,
-              fontFamily: "myfont-medium",
-              color: Colors.WHITE,
-              textAlign: "center",
-              flex: 1,
-            }}>
-            Continue
-          </Text>
+          style={styles.continueButton}
+          onPress={() => router.push("auth/sign-in")}>
+          <Text style={styles.continueButtonText}>Continue</Text>
           <AntDesign
             name="forward"
             size={24}
-            color="white"
-            style={{
-              position: "absolute",
-              right: 20,
-            }}
+            color="#fff"
+            style={styles.continueIcon}
           />
         </TouchableOpacity>
       </View>
@@ -92,20 +38,65 @@ export default function Login() {
 }
 
 const styles = StyleSheet.create({
-  container: {
+  wrapper: {
+    flex: 1,
+    backgroundColor: Colors.WHITE,
+  },
+  heroImage: {
+    width: "100%",
+    height: "50%",
+  },
+  card: {
+    flex: 1,
     backgroundColor: Colors.WHITE,
     marginTop: -40,
-    padding: 20,
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    borderWidth: 3,
-    height: "100%",
+    borderTopLeftRadius: 30,
+    borderTopRightRadius: 30,
+    padding: 30,
+    borderWidth: 2,
+    borderColor: Colors.BLACK,
+    shadowColor: Colors.BLACK,
+    shadowOffset: { width: 0, height: -3 },
+    shadowOpacity: 0.2,
+    shadowRadius: 5,
+    elevation: 5,
   },
-  // button: {
-  //   backgroundColor: Colors.BLACK,
-  //   padding: 10,
-  //   borderRadius: 10,
-  //   marginTop: "30%",
-  //   borderRadius: 20,
-  // },
+  title: {
+    fontSize: 32,
+    fontFamily: "myfont-bold",
+    textAlign: "center",
+    color: Colors.BLACK,
+  },
+  highlight: {
+    color: Colors.BUTTON_GREEN,
+    textDecorationLine: "underline",
+  },
+  description: {
+    fontSize: 18,
+    fontFamily: "myfont",
+    maxWidth: "80%",
+    textAlign: "center",
+    alignSelf: "center",
+    color: Colors.GRAY,
+    marginVertical: 20,
+  },
+  continueButton: {
+    backgroundColor: Colors.BLACK,
+    paddingVertical: 20,
+    borderRadius: 25,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    marginTop: 20,
+    position: "relative",
+  },
+  continueButtonText: {
+    fontSize: 20,
+    fontFamily: "myfont-medium",
+    color: Colors.WHITE,
+  },
+  continueIcon: {
+    position: "absolute",
+    right: 20,
+  },
 });

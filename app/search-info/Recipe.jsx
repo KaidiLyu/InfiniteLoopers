@@ -72,7 +72,7 @@ export default function NutritionInfo() {
             router.back();
             Alert.alert("Success", "Item deleted successfully");
             router.push({
-              pathname: "/(tabs)/MyFood",
+              pathname: "/(tabs)/SearchFood",
               params: { refresh: Date.now() },
             });
           } catch (error) {

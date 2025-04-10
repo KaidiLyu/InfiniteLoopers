@@ -1,10 +1,19 @@
-import { View, Text, StyleSheet, Image, TouchableOpacity } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  Image,
+  TouchableOpacity,
+  Alert,
+} from "react-native";
 import React, { useEffect, useState } from "react";
+import * as ImagePicker from "expo-image-picker";
 import { auth, db } from "../../configs/FirebaseConfig";
 import { Colors } from "../../constants/Colors";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { collection, query, where, getDocs } from "firebase/firestore";
+import { updateProfile } from "firebase/auth";
 
 export default function Profile() {
   const [user, setUser] = useState(null);
@@ -16,6 +25,17 @@ export default function Profile() {
   const router = useRouter();
 
   useEffect(() => {
+    (async () => {
+      const { status } =
+        await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (status !== "granted") {
+        Alert.alert(
+          "Permission required",
+          "Camera roll permissions are needed to update your profile picture."
+        );
+      }
+    })();
+
     const currentUser = auth.currentUser;
     setUser(currentUser);
     if (currentUser) {
@@ -25,24 +45,15 @@ export default function Profile() {
 
   const fetchUserStats = async (userId) => {
     try {
-      const savedFoodsQuery = query(
-        collection(db, "savedFoods"),
-        where("userId", "==", userId)
+      const savedFoodsSnapshot = await getDocs(
+        query(collection(db, "goalsMet"), where("userId", "==", userId))
       );
-      const savedFoodsSnapshot = await getDocs(savedFoodsQuery);
-
-      const recipesQuery = query(
-        collection(db, "recipes"),
-        where("userId", "==", userId)
+      const recipesSnapshot = await getDocs(
+        query(collection(db, "daysLogged"), where("userId", "==", userId))
       );
-      const recipesSnapshot = await getDocs(recipesQuery);
-
-      const productsQuery = query(
-        collection(db, "products"),
-        where("userId", "==", userId)
+      const productsSnapshot = await getDocs(
+        query(collection(db, "mealsSaved"), where("userId", "==", userId))
       );
-      const productsSnapshot = await getDocs(productsQuery);
-
       setStats({
         savedFoods: savedFoodsSnapshot.size,
         recipes: recipesSnapshot.size,
@@ -50,6 +61,26 @@ export default function Profile() {
       });
     } catch (error) {
       console.error("Error fetching user stats:", error);
+    }
+  };
+
+  const pickImage = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaType,
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 1,
+    });
+
+    if (!result.cancelled) {
+      updateProfile(auth.currentUser, { photoURL: result.uri })
+        .then(() => {
+          setUser({ ...user, photoURL: result.uri });
+        })
+        .catch((error) => {
+          console.error("Error updating profile picture", error);
+          Alert.alert("Error updating profile picture");
+        });
     }
   };
 
@@ -81,19 +112,24 @@ export default function Profile() {
       </View>
 
       <View style={styles.profileCard}>
-        <View style={styles.avatarContainer}>
-          {user.photoURL ? (
-            <Image source={{ uri: user.photoURL }} style={styles.avatar} />
-          ) : (
-            <View style={styles.avatarPlaceholder}>
-              <MaterialCommunityIcons
-                name="account"
-                size={60}
-                color={Colors.GRAY}
-              />
-            </View>
-          )}
-        </View>
+        <TouchableOpacity style={styles.avatarWrapper} onPress={pickImage}>
+          <View style={styles.avatarContainer}>
+            {user.photoURL ? (
+              <Image source={{ uri: user.photoURL }} style={styles.avatar} />
+            ) : (
+              <View style={styles.avatarPlaceholder}>
+                <MaterialCommunityIcons
+                  name="account"
+                  size={60}
+                  color={Colors.GRAY}
+                />
+              </View>
+            )}
+          </View>
+          <View style={styles.editIconContainer}>
+            <MaterialCommunityIcons name="pencil" size={20} color="#fff" />
+          </View>
+        </TouchableOpacity>
 
         <View style={styles.infoContainer}>
           <Text style={styles.name}>{user.displayName || "User"}</Text>
@@ -102,49 +138,35 @@ export default function Profile() {
 
         <View style={styles.statsContainer}>
           <View style={styles.statItem}>
-            <Text style={styles.statNumber}>{stats.savedFoods}</Text>
-            <Text style={styles.statLabel}>Saved Foods</Text>
+            <Text style={styles.statNumber}>{stats.savedFoods}x</Text>
+            <Text style={styles.statLabel}>Calorie goal met</Text>
           </View>
           <View style={styles.statItem}>
-            <Text style={styles.statNumber}>{stats.recipes + 2}</Text>
-            <Text style={styles.statLabel}>Recipes</Text>
+            <Text style={styles.statNumber}>{stats.recipes + 1} day(s)</Text>
+            <Text style={styles.statLabel}>Log in streak</Text>
           </View>
           <View style={styles.statItem}>
-            <Text style={styles.statNumber}>{stats.products}</Text>
-            <Text style={styles.statLabel}>Products</Text>
+            <Text style={styles.statNumber}>{stats.products}x</Text>
+            <Text style={styles.statLabel}>Meals saved</Text>
           </View>
         </View>
 
         <TouchableOpacity style={styles.settingsButton} onPress={toSettings}>
-          <MaterialCommunityIcons name="cog" size={24} color={Colors.WHITE} />
+          <MaterialCommunityIcons name="cog" size={24} color="#fff" />
           <Text style={styles.settingsText}>Settings</Text>
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.signOutButton} onPress={handleSignOut}>
-          <MaterialCommunityIcons
-            name="logout"
-            size={24}
-            color={Colors.WHITE}
-          />
+          <MaterialCommunityIcons name="logout" size={24} color="#fff" />
           <Text style={styles.signOutText}>Sign Out</Text>
         </TouchableOpacity>
       </View>
-      <Text
-        style={{
-          textAlign: "center",
-          color: Colors.GRAY,
-          marginTop: "60%",
-          fontSize: 12,
-        }}>
+
+      <Text style={styles.noteText}>
         Please note, responses aren't always fully accurate
       </Text>
-      <Text
-        style={{
-          textAlign: "center",
-          color: Colors.GRAY,
-          fontSize: 10,
-        }}>
-        (Powered by spoonacular. spoonacular.com/food-api)
+      <Text style={styles.poweredText}>
+        (Powered by Nutritionix @nutritionix.com)
       </Text>
     </View>
   );
@@ -158,12 +180,13 @@ const styles = StyleSheet.create({
   },
   header: {
     marginTop: 60,
-    marginBottom: 30,
+    marginBottom: 20,
   },
   title: {
-    fontSize: 28,
+    fontSize: 30,
     fontFamily: "myfont-bold",
     textAlign: "center",
+    color: Colors.BLACK,
   },
   loadingText: {
     fontSize: 18,
@@ -172,44 +195,57 @@ const styles = StyleSheet.create({
     marginTop: 50,
   },
   profileCard: {
-    backgroundColor: Colors.WHITE,
-    borderRadius: 15,
-    padding: 20,
-    shadowColor: Colors.BLACK,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
+    backgroundColor: "#f5f5f5",
+    borderRadius: 20,
+    paddingVertical: 30,
+    paddingHorizontal: 20,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.2,
+    shadowRadius: 5,
     elevation: 5,
-    borderWidth: 2,
-    borderColor: Colors.BLACK,
+  },
+  avatarWrapper: {
+    alignSelf: "center",
+    position: "relative",
   },
   avatarContainer: {
     alignItems: "center",
     marginBottom: 20,
   },
   avatar: {
-    width: 120,
-    height: 120,
-    borderRadius: 60,
+    width: 130,
+    height: 130,
+    borderRadius: 65,
   },
   avatarPlaceholder: {
-    width: 120,
-    height: 120,
-    borderRadius: 60,
-    backgroundColor: "#F0F0F0",
+    width: 130,
+    height: 130,
+    borderRadius: 65,
+    backgroundColor: "#e0e0e0",
     justifyContent: "center",
     alignItems: "center",
-    borderWidth: 2,
-    borderColor: Colors.GRAY,
+  },
+  editIconContainer: {
+    position: "absolute",
+    top: 5,
+    right: 5,
+    backgroundColor: Colors.BLACK,
+    width: 30,
+    height: 30,
+    borderRadius: 15,
+    justifyContent: "center",
+    alignItems: "center",
   },
   infoContainer: {
     alignItems: "center",
     marginBottom: 20,
   },
   name: {
-    fontSize: 24,
+    fontSize: 26,
     fontFamily: "myfont-bold",
-    marginBottom: 5,
+    color: Colors.BLACK,
+    marginBottom: 8,
   },
   email: {
     fontSize: 16,
@@ -219,18 +255,19 @@ const styles = StyleSheet.create({
   statsContainer: {
     flexDirection: "row",
     justifyContent: "space-around",
-    marginBottom: 20,
-    paddingVertical: 15,
+    paddingVertical: 20,
     borderTopWidth: 1,
     borderBottomWidth: 1,
     borderColor: Colors.GRAY,
+    marginBottom: 20,
   },
   statItem: {
     alignItems: "center",
   },
   statNumber: {
-    fontSize: 20,
+    fontSize: 22,
     fontFamily: "myfont-bold",
+    color: Colors.BLACK,
   },
   statLabel: {
     fontSize: 14,
@@ -242,29 +279,41 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    padding: 15,
-    borderRadius: 10,
-    marginTop: 10,
+    paddingVertical: 15,
+    borderRadius: 12,
+    marginBottom: 10,
+  },
+  settingsText: {
+    color: "#fff",
+    fontFamily: "myfont-bold",
+    fontSize: 16,
+    marginLeft: 10,
   },
   signOutButton: {
     backgroundColor: "#FF3B30",
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    padding: 15,
-    borderRadius: 10,
-    marginTop: 10,
+    paddingVertical: 15,
+    borderRadius: 12,
+    marginBottom: 10,
   },
   signOutText: {
-    color: Colors.WHITE,
+    color: "#fff",
     fontFamily: "myfont-bold",
     fontSize: 16,
     marginLeft: 10,
   },
-  settingsText: {
-    color: Colors.WHITE,
-    fontFamily: "myfont-bold",
-    fontSize: 16,
-    marginLeft: 10,
+  noteText: {
+    textAlign: "center",
+    color: Colors.GRAY,
+    marginTop: 40,
+    fontSize: 12,
+  },
+  poweredText: {
+    textAlign: "center",
+    color: Colors.GRAY,
+    fontSize: 10,
+    marginTop: 5,
   },
 });

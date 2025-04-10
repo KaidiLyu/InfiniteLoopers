@@ -6,31 +6,28 @@ import AntDesign from "@expo/vector-icons/AntDesign";
 
 export default function Settings() {
   const router = useRouter();
-
-  const SettingsList = [
+  const settingsOptions = [
     { name: "Personal Information", screen: "/PersonalInfo" },
   ];
 
   return (
     <View style={styles.container}>
-      {SettingsList.map((option, index) => (
-        <TouchableOpacity
-          key={index}
-          style={styles.button}
-          onPress={() => router.push(option.screen)}>
-          <Text style={styles.buttonText}>{option.name}</Text>
-          <AntDesign
-            name="right"
-            size={20}
-            color={Colors.WHITE}
-            style={styles.icon}
-          />
-        </TouchableOpacity>
-      ))}
+      <Text style={styles.header}>Settings</Text>
+      <View style={styles.card}>
+        {settingsOptions.map((option, index) => (
+          <TouchableOpacity
+            key={index}
+            style={styles.optionButton}
+            onPress={() => router.push(option.screen)}>
+            <Text style={styles.optionText}>{option.name}</Text>
+            <AntDesign name="right" size={20} color={Colors.WHITE} />
+          </TouchableOpacity>
+        ))}
+      </View>
       <TouchableOpacity
-        style={styles.profileButton}
+        style={styles.backButton}
         onPress={() => router.push("/(tabs)/Profile")}>
-        <Text style={styles.profileButtonText}>Back</Text>
+        <Text style={styles.backButtonText}>Back</Text>
       </TouchableOpacity>
     </View>
   );
@@ -38,37 +35,52 @@ export default function Settings() {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: Colors.WHITE,
     flex: 1,
-    padding: 20,
+    backgroundColor: Colors.WHITE,
+    paddingHorizontal: 20,
+    paddingTop: 60,
   },
-  button: {
+  header: {
+    fontSize: 32,
+    fontFamily: "myfont-bold",
+    color: Colors.BLACK,
+    textAlign: "center",
+    marginBottom: "35%",
+    marginTop: "10%",
+  },
+  card: {
     backgroundColor: Colors.BLACK,
-    padding: 15,
-    marginVertical: 10,
-    borderRadius: 10,
+    borderRadius: 15,
+    paddingVertical: 20,
+    paddingHorizontal: 15,
+    shadowColor: Colors.BLACK,
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.25,
+    shadowRadius: 5,
+    elevation: 5,
+    marginBottom: 30,
+  },
+  optionButton: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
+    paddingVertical: 15,
+    borderBottomColor: Colors.GRAY,
+    borderBottomWidth: 1,
   },
-  buttonText: {
+  optionText: {
     fontSize: 18,
     fontFamily: "myfont-medium",
     color: Colors.WHITE,
   },
-  icon: {
-    alignSelf: "center",
-  },
-  profileButton: {
+  backButton: {
     backgroundColor: Colors.BLACK,
-    padding: 15,
-    marginVertical: 10,
-    borderRadius: 10,
-    flexDirection: "row",
-    justifyContent: "space-between",
+    borderRadius: 15,
+    paddingVertical: 15,
     alignItems: "center",
+    justifyContent: "center",
   },
-  profileButtonText: {
+  backButtonText: {
     fontSize: 18,
     fontFamily: "myfont-medium",
     color: Colors.WHITE,

@@ -1,30 +1,56 @@
 import axios from "axios";
+import Constants from "expo-constants"; // Use expo-constants for environment variables
 
-const API_KEY = process.env.EXPO_PUBLIC_SPOONACULAR_API_KEY;
-const NUMBER = process.env.EXPO_PUBLIC_SPOONACULAR_AUTOCOMPLETE_AMOUNT;
+const API_KEY = Constants.expoConfig.extra.SPOONACULAR_API_KEY;
+const NUMBER = Constants.expoConfig.extra.SPOONACULAR_AUTOCOMPLETE_AMOUNT || 5; // Default to 5 if not set
+const RESULTS_PER_PAGE = 10; // Number of results for complex search
 
-export const autoCompleteRecipes = async (text) => {
+// Renamed original function for clarity
+export const autoCompleteRecipeTitles = async (text) => {
   const query = text;
-  console.log("query: ", query);
-
   try {
-    const now = performance.now();
+    // Use autocomplete endpoint
     const response = await axios.get(
-      `https://api.spoonacular.com/recipes/autocomplete?query=${query}&number=${NUMBER}&apiKey=${API_KEY}`
+      `https://api.spoonacular.com/recipes/autocomplete`,
+      {
+        params: {
+          query: query,
+          number: NUMBER,
+          apiKey: API_KEY,
+        },
+      }
     );
-    const then = performance.now();
-    const time = then - now;
-    let newArray = response.data.map((item) => {
-      return {
-        id: item.id,
-        name: item.title,
-        image: `https://spoonacular.com/recipeImages/${item.id}-312x231.${item.imageType}`,
-      };
-    });
-    console.log("newArray: ", newArray);
-    return { data: newArray, time };
+    let formattedData = response.data.map((item) => ({
+      id: item.id,
+      title: item.title,
+    }));
+    return { data: formattedData };
   } catch (error) {
-    console.error("Error fetching recipes:", error);
+    console.error("Error fetching recipe autocomplete:", error);
+    throw error;
+  }
+};
+
+
+export const searchRecipesComplex = async (query, options = {}) => {
+  try {
+    const response = await axios.get(
+      `https://api.spoonacular.com/recipes/complexSearch`,
+      {
+        params: {
+          query: query,
+          apiKey: API_KEY,
+          number: RESULTS_PER_PAGE,
+          addRecipeInformation: true,
+          addRecipeNutrition: true,
+          fillIngredients: true,
+          ...options,
+        },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching complex recipes:", error);
     throw error;
   }
 };

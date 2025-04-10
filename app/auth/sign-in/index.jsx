@@ -54,7 +54,7 @@ export default function SignIn() {
         // Signed in
         const user = userCredential.user;
         console.log(user);
-        router.replace("/MyFood");
+        router.replace("/SearchFood");
       })
       .catch((error) => {
         const errorCode = error.code;

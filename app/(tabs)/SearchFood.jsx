@@ -112,7 +112,7 @@ export default function SearchFood() {
     setNaturalFoodItems([]);
     try {
       const result = await getNaturalLanguageNutrition(naturalQuery);
-      console.log("resp:", result.data);
+      console.log("resp:", result);
 
       if (result?.foods) {
         setNaturalFoodItems(result.foods);
@@ -219,6 +219,7 @@ export default function SearchFood() {
       console.error("Error adding all items to tracker:", error);
       Alert.alert("Error", "Could not add all items to tracker.");
     } finally {
+      setNaturalQuery("");
       setLoading(false);
     }
   };
@@ -631,52 +632,57 @@ export default function SearchFood() {
 
   return (
     <KeyboardAvoidingView
-      style={styles.container}
+      style={styles.keyboardAvoidingContainer}
       behavior={Platform.OS === "ios" ? "padding" : "height"}>
-      <View style={styles.innerContainer}>
-        <View style={styles.modeSelectorContainer}>
-          <TouchableOpacity
-            style={[
-              styles.modeButton,
-              searchMode === "Natural" && styles.modeButtonActive,
-            ]}
-            onPress={() => setSearchMode("Natural")}>
-            <MaterialCommunityIcons
-              name="comment-text-outline"
-              size={20}
-              color={searchMode === "Natural" ? Colors.WHITE : Colors.BLACK}
-            />
-            <Text
+      <ScrollView
+        style={styles.scrollView}
+        contentContainerStyle={styles.scrollContentContainer}
+        keyboardShouldPersistTaps="handled" // Good practice
+      >
+        <View style={styles.innerContainer}>
+          <View style={styles.modeSelectorContainer}>
+            <TouchableOpacity
               style={[
-                styles.modeButtonText,
-                searchMode === "Natural" && styles.modeButtonTextActive,
-              ]}>
-              {" "}
-              Chat
-            </Text>
-          </TouchableOpacity>
+                styles.modeButton,
+                searchMode === "Natural" && styles.modeButtonActive,
+              ]}
+              onPress={() => setSearchMode("Natural")}>
+              <MaterialCommunityIcons
+                name="comment-text-outline"
+                size={20}
+                color={searchMode === "Natural" ? Colors.WHITE : Colors.BLACK}
+              />
+              <Text
+                style={[
+                  styles.modeButtonText,
+                  searchMode === "Natural" && styles.modeButtonTextActive,
+                ]}>
+                {" "}
+                Chat
+              </Text>
+            </TouchableOpacity>
 
-          <TouchableOpacity
-            style={[
-              styles.modeButton,
-              searchMode === "Camera" && styles.modeButtonActive,
-            ]}
-            onPress={() => setSearchMode("Camera")}>
-            <MaterialCommunityIcons
-              name="camera"
-              size={20}
-              color={searchMode === "Camera" ? Colors.WHITE : Colors.BLACK}
-            />
-            <Text
+            <TouchableOpacity
               style={[
-                styles.modeButtonText,
-                searchMode === "Camera" && styles.modeButtonTextActive,
-              ]}>
-              {" "}
-              AI Camera
-            </Text>
-          </TouchableOpacity>
-          {/* <TouchableOpacity
+                styles.modeButton,
+                searchMode === "Camera" && styles.modeButtonActive,
+              ]}
+              onPress={() => setSearchMode("Camera")}>
+              <MaterialCommunityIcons
+                name="camera"
+                size={20}
+                color={searchMode === "Camera" ? Colors.WHITE : Colors.BLACK}
+              />
+              <Text
+                style={[
+                  styles.modeButtonText,
+                  searchMode === "Camera" && styles.modeButtonTextActive,
+                ]}>
+                {" "}
+                AI Camera
+              </Text>
+            </TouchableOpacity>
+            {/* <TouchableOpacity
             style={[
               styles.modeButton,
               searchMode === "Item" && styles.modeButtonActive,
@@ -696,222 +702,223 @@ export default function SearchFood() {
               Item Search
             </Text>
           </TouchableOpacity> */}
-          <TouchableOpacity
-            style={[
-              styles.modeButton,
-              searchMode === "Barcode" && styles.modeButtonActive,
-            ]}
-            onPress={() => setSearchMode("Barcode")}>
-            <MaterialCommunityIcons
-              name="barcode-scan"
-              size={20}
-              color={searchMode === "Barcode" ? Colors.WHITE : Colors.BLACK}
-            />
-            <Text
-              style={[
-                styles.modeButtonText,
-                searchMode === "Barcode" && styles.modeButtonTextActive,
-              ]}>
-              {" "}
-              Scan
-            </Text>
-          </TouchableOpacity>
-        </View>
-        {/* Loading and Error Indicators */}
-        {loading && (
-          <ActivityIndicator
-            size="large"
-            color={Colors.BLACK}
-            style={styles.loader}
-          />
-        )}
-        {error && <Text style={styles.errorText}>{error}</Text>}
-        {/* == Item Search UI == */}
-        {/* == Natural Language UI == */}
-        {searchMode === "Natural" && (
-          <>
-            <Text style={styles.header}>Enter your meal</Text>
-            <TextInput
-              placeholder='type any foods e.g., "1 apple and 2 slices of toast"'
-              placeholderTextColor={Colors.GRAY}
-              style={[styles.input, styles.naturalInput]} // Larger input area
-              value={naturalQuery}
-              onChangeText={setNaturalQuery}
-              multiline
-            />
             <TouchableOpacity
-              style={styles.actionButton}
-              onPress={handleNaturalSearch}
-              disabled={loading}>
-              <Text style={styles.actionButtonText}>Find food</Text>
+              style={[
+                styles.modeButton,
+                searchMode === "Barcode" && styles.modeButtonActive,
+              ]}
+              onPress={() => setSearchMode("Barcode")}>
+              <MaterialCommunityIcons
+                name="barcode-scan"
+                size={20}
+                color={searchMode === "Barcode" ? Colors.WHITE : Colors.BLACK}
+              />
+              <Text
+                style={[
+                  styles.modeButtonText,
+                  searchMode === "Barcode" && styles.modeButtonTextActive,
+                ]}>
+                {" "}
+                Scan
+              </Text>
             </TouchableOpacity>
-
-            {/* --- Display Natural Language Results --- */}
-            {naturalFoodItems.length > 0 && (
-              <View style={styles.resultsContainer}>
-                <View style={styles.foodItemsContainer}>
-                  <View style={styles.naturalResultsHeaderRow}>
-                    <View style={{ width: 50 }} />
-                    <Text
-                      style={[
-                        styles.naturalColumnHeader,
-                        styles.naturalQtyCol,
-                      ]}>
-                      Qty
-                    </Text>
-                    <Text
-                      style={[
-                        styles.naturalColumnHeader,
-                        styles.naturalUnitCol,
-                      ]}>
-                      Unit
-                    </Text>
-                    <Text
-                      style={[
-                        styles.naturalColumnHeader,
-                        styles.naturalFoodCol,
-                      ]}>
-                      Food
-                    </Text>
-                    <Text
-                      style={[
-                        styles.naturalColumnHeader,
-                        styles.naturalCalCol,
-                      ]}>
-                      Cal
-                    </Text>
-                    <View style={{ width: 50 }} />
-                  </View>
-                  <FlatList
-                    data={naturalFoodItems}
-                    keyExtractor={(item, index) => item.food_name + index}
-                    renderItem={({ item }) => (
-                      <View style={styles.naturalItemRow}>
-                        <Image
-                          source={{ uri: item.photo?.thumb || undefined }}
-                          style={styles.naturalItemImage}
-                          defaultSource={require("../../assets/picture/food-placeholder.png")}
-                        />
-                        <Text
-                          style={[
-                            styles.naturalItemText,
-                            styles.naturalQtyCol,
-                          ]}>
-                          {item.serving_qty}
-                        </Text>
-                        <Text
-                          style={[
-                            styles.naturalItemText,
-                            styles.naturalUnitCol,
-                          ]}>
-                          {item.serving_unit}
-                        </Text>
-                        <Text
-                          style={[
-                            styles.naturalItemText,
-                            styles.naturalFoodCol,
-                          ]}>
-                          {item.food_name}
-                        </Text>
-                        <Text
-                          style={[
-                            styles.naturalItemText,
-                            styles.naturalCalCol,
-                          ]}>
-                          {item.nf_calories?.toFixed(0) ?? "N/A"}
-                        </Text>
-                        <TouchableOpacity
-                          style={styles.addTrackerButton}
-                          onPress={() => addItemToTracker(item)}
-                          disabled={loading}>
-                          <MaterialCommunityIcons
-                            name="plus-circle-outline"
-                            size={22}
-                            color={Colors.BLACK}
-                          />
-                        </TouchableOpacity>
-                      </View>
-                    )}
-                    nestedScrollEnabled={true}
-                    scrollEnabled={true}
-                    style={styles.foodItemsList}
-                  />
-                  <TouchableOpacity
-                    style={[styles.actionButton, styles.addAllButton]}
-                    onPress={addAllItemsToTracker}
-                    disabled={loading}>
-                    <MaterialCommunityIcons
-                      name="plus-box-multiple-outline"
-                      size={20}
-                      color={Colors.WHITE}
-                    />
-                    <Text style={styles.actionButtonText}>
-                      Add All to Tracker
-                    </Text>
-                  </TouchableOpacity>
-                  <Text style={styles.naturalTotalCalories}>
-                    Total Calories:{" "}
-                    {naturalFoodItems
-                      .reduce((sum, item) => sum + (item.nf_calories || 0), 0)
-                      .toFixed(0)}
-                  </Text>
-                </View>
-
-                {renderNutritionLabel()}
-              </View>
-            )}
-          </>
-        )}
-        {/* == Barcode Scanner UI == */}
-        {searchMode === "Barcode" && (
-          <>
-            <Text style={styles.header}>Scan Barcode</Text>
-            {!isScannerVisible && (
+          </View>
+          {/* Loading and Error Indicators */}
+          {loading && (
+            <ActivityIndicator
+              size="large"
+              color={Colors.BLACK}
+              style={styles.loader}
+            />
+          )}
+          {error && <Text style={styles.errorText}>{error}</Text>}
+          {/* == Item Search UI == */}
+          {/* == Natural Language UI == */}
+          {searchMode === "Natural" && (
+            <>
+              <Text style={styles.header}>Enter your meal</Text>
+              <TextInput
+                placeholder='type any foods e.g., "1 apple and 2 slices of toast"'
+                placeholderTextColor={Colors.GRAY}
+                style={[styles.input, styles.naturalInput]} // Larger input area
+                value={naturalQuery}
+                onChangeText={setNaturalQuery}
+                multiline
+              />
               <TouchableOpacity
                 style={styles.actionButton}
-                onPress={startScanner}>
-                <MaterialCommunityIcons
-                  name="barcode-scan"
-                  size={20}
-                  color={Colors.WHITE}
-                />
-                <Text style={styles.actionButtonText}> Start Scanner</Text>
+                onPress={handleNaturalSearch}
+                disabled={loading}>
+                <Text style={styles.actionButtonText}>Find food</Text>
               </TouchableOpacity>
-            )}
-            {scannedData && (
-              <Text style={styles.scannedText}>
-                Scanned: {scannedData.data} (Type: {scannedData.type})
-              </Text>
-            )}
-            <View style={styles.container}>
-              {loading && <ActivityIndicator size="large" color="#000" />}
-              {error && <Text style={styles.errorText}>{error}</Text>}
-              {productName && productImage ? (
-                <View style={styles.productContainer}>
-                  <Image
-                    source={{ uri: productImage }}
-                    style={styles.productImage}
-                  />
-                  <Text style={styles.productName}>{productName}</Text>
-                  <Text style={styles.barcodeDisclaimer}>
-                    Saving products from barcode, nutrition value, and more
-                    coming soon.
-                  </Text>
+
+              {/* --- Display Natural Language Results --- */}
+              {naturalFoodItems.length > 0 && (
+                <View style={styles.resultsContainer}>
+                  <View style={styles.foodItemsContainer}>
+                    <View style={styles.naturalResultsHeaderRow}>
+                      <View style={{ width: 50 }} />
+                      <Text
+                        style={[
+                          styles.naturalColumnHeader,
+                          styles.naturalQtyCol,
+                        ]}>
+                        Qty
+                      </Text>
+                      <Text
+                        style={[
+                          styles.naturalColumnHeader,
+                          styles.naturalUnitCol,
+                        ]}>
+                        Unit
+                      </Text>
+                      <Text
+                        style={[
+                          styles.naturalColumnHeader,
+                          styles.naturalFoodCol,
+                        ]}>
+                        Food
+                      </Text>
+                      <Text
+                        style={[
+                          styles.naturalColumnHeader,
+                          styles.naturalCalCol,
+                        ]}>
+                        Cal
+                      </Text>
+                      <View style={{ width: 50 }} />
+                    </View>
+                    <FlatList
+                      data={naturalFoodItems}
+                      keyExtractor={(item, index) => item.food_name + index}
+                      renderItem={({ item }) => (
+                        <View style={styles.naturalItemRow}>
+                          <Image
+                            source={{ uri: item.photo?.thumb || undefined }}
+                            style={styles.naturalItemImage}
+                            defaultSource={require("../../assets/picture/food-placeholder.png")}
+                          />
+                          <Text
+                            style={[
+                              styles.naturalItemText,
+                              styles.naturalQtyCol,
+                            ]}>
+                            {item.serving_qty}
+                          </Text>
+                          <Text
+                            style={[
+                              styles.naturalItemText,
+                              styles.naturalUnitCol,
+                            ]}>
+                            {item.serving_unit}
+                          </Text>
+                          <Text
+                            style={[
+                              styles.naturalItemText,
+                              styles.naturalFoodCol,
+                            ]}>
+                            {item.food_name}
+                          </Text>
+                          <Text
+                            style={[
+                              styles.naturalItemText,
+                              styles.naturalCalCol,
+                            ]}>
+                            {item.nf_calories?.toFixed(0) ?? "N/A"}
+                          </Text>
+                          <TouchableOpacity
+                            style={styles.addTrackerButton}
+                            onPress={() => addItemToTracker(item)}
+                            disabled={loading}>
+                            <MaterialCommunityIcons
+                              name="plus-circle-outline"
+                              size={22}
+                              color={Colors.BLACK}
+                            />
+                          </TouchableOpacity>
+                        </View>
+                      )}
+                      nestedScrollEnabled={true}
+                      scrollEnabled={true}
+                      style={styles.foodItemsList}
+                    />
+                    <TouchableOpacity
+                      style={[styles.actionButton, styles.addAllButton]}
+                      onPress={addAllItemsToTracker}
+                      disabled={loading}>
+                      <MaterialCommunityIcons
+                        name="plus-box-multiple-outline"
+                        size={20}
+                        color={Colors.WHITE}
+                      />
+                      <Text style={styles.actionButtonText}>
+                        Add All to Tracker
+                      </Text>
+                    </TouchableOpacity>
+                    <Text style={styles.naturalTotalCalories}>
+                      Total Calories:{" "}
+                      {naturalFoodItems
+                        .reduce((sum, item) => sum + (item.nf_calories || 0), 0)
+                        .toFixed(0)}
+                    </Text>
+                  </View>
+
+                  {renderNutritionLabel()}
                 </View>
-              ) : (
-                <Text style={styles.placeholderText}>
-                  Scan a barcode to view product details
+              )}
+            </>
+          )}
+          {/* == Barcode Scanner UI == */}
+          {searchMode === "Barcode" && (
+            <>
+              <Text style={styles.header}>Scan Barcode</Text>
+              {!isScannerVisible && (
+                <TouchableOpacity
+                  style={styles.actionButton}
+                  onPress={startScanner}>
+                  <MaterialCommunityIcons
+                    name="barcode-scan"
+                    size={20}
+                    color={Colors.WHITE}
+                  />
+                  <Text style={styles.actionButtonText}> Start Scanner</Text>
+                </TouchableOpacity>
+              )}
+              {scannedData && (
+                <Text style={styles.scannedText}>
+                  Scanned: {scannedData.data} (Type: {scannedData.type})
                 </Text>
               )}
-            </View>
-          </>
-        )}
-        {searchMode === "Camera" && (
-          <>
-            <Text style={styles.header}>Coming Soon... 👀</Text>
-          </>
-        )}
-      </View>
+              <View style={styles.container}>
+                {loading && <ActivityIndicator size="large" color="#000" />}
+                {error && <Text style={styles.errorText}>{error}</Text>}
+                {productName && productImage ? (
+                  <View style={styles.productContainer}>
+                    <Image
+                      source={{ uri: productImage }}
+                      style={styles.productImage}
+                    />
+                    <Text style={styles.productName}>{productName}</Text>
+                    <Text style={styles.barcodeDisclaimer}>
+                      Saving products from barcode, nutrition value, and more
+                      coming soon.
+                    </Text>
+                  </View>
+                ) : (
+                  <Text style={styles.placeholderText}>
+                    Scan a barcode to view product details
+                  </Text>
+                )}
+              </View>
+            </>
+          )}
+          {searchMode === "Camera" && (
+            <>
+              <Text style={styles.header}>Coming Soon... 👀</Text>
+            </>
+          )}
+        </View>
+      </ScrollView>
 
       {/* Barcode Scanner Modal */}
       <Modal
@@ -933,13 +940,23 @@ export default function SearchFood() {
 }
 
 const styles = StyleSheet.create({
-  container: {
+  keyboardAvoidingContainer: {
     flex: 1,
     backgroundColor: Colors.WHITE,
   },
-  innerContainer: {
+  scrollView: {
     flex: 1,
-    padding: 15,
+  },
+  scrollContentContainer: {
+    paddingBottom: 20,
+    paddingHorizontal: 15,
+    paddingTop: 10,
+    flexGrow: 1,
+  },
+  container: {
+    backgroundColor: Colors.WHITE,
+  },
+  innerContainer: {
     paddingTop: 80,
   },
   backButton: {

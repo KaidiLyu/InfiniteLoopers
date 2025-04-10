@@ -46,14 +46,12 @@ export default function SignIn() {
       if (isIOS) {
         Alert.alert("Please fill all fields.");
       }
-      console.log(email, password);
       return;
     }
     signInWithEmailAndPassword(auth, email, password)
       .then((userCredential) => {
         // Signed in
         const user = userCredential.user;
-        console.log(user);
         router.replace("/SearchFood");
       })
       .catch((error) => {
@@ -61,7 +59,6 @@ export default function SignIn() {
         const errorMessage = error.message;
         console.log(errorCode, errorMessage);
         console.log("-----------------");
-        console.log(email, password);
 
         if (errorCode === "auth/invalid-credential") {
           if (isAndroid) {

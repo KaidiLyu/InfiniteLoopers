@@ -163,6 +163,9 @@ export default function SignUp() {
                   value={password}
                   onChangeText={(value) => setPassword(value)}
                 />
+                <Text style={{ fontFamily: "myfont-medium", fontSize: 12, color: Colors.GRAY, marginLeft: 10, marginTop: 4}}>
+                  Password must be a minimum of 6 characters
+                </Text>
               </View>
               <View style={{ marginTop: 20 }}>
                 <Text style={{ fontFamily: "myfont-bold", marginLeft: 10 }}>

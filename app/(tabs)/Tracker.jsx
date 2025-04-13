@@ -21,6 +21,7 @@ import {
   onSnapshot,
   deleteDoc,
   doc,
+  setDoc,
 } from "firebase/firestore";
 import { MaterialCommunityIcons, Ionicons } from "@expo/vector-icons";
 import { useFocusEffect } from "expo-router";
@@ -458,14 +459,48 @@ export default function Tracker() {
           ellipsizeMode="tail">
           {item.foodName}
         </Text>
-        <Text style={styles.itemServing} numberOfLines={1} ellipsizeMode="tail">
-          {item.servingQty} {item.servingUnit}
-        </Text>
+        <View style={styles.servingContainer}>
+          <TouchableOpacity 
+            style={styles.qtyButton}
+            onPress={async () => {
+              if(item.servingQty > 1) {
+                try {
+                  await setDoc(doc(db, "dailyTracker", item.id), {
+                    ...item,
+                    servingQty: item.servingQty - 1
+                  }, { merge: true });
+                } catch (err) {
+                  console.error("Error updating quantity", err);
+                  Alert.alert("Error", "Could not update quantity");
+                }
+              }
+            }}>
+            <Text style={styles.qtyButtonText}>-</Text>
+          </TouchableOpacity>
+          <Text style={styles.itemServing}>
+            {item.servingQty || 1} {item.servingUnit}
+          </Text>
+          <TouchableOpacity 
+            style={styles.qtyButton}
+            onPress={async () => {
+              try {
+                await setDoc(doc(db, "dailyTracker", item.id), {
+                  ...item,
+                  servingQty: (item.servingQty || 1) + 1
+                }, { merge: true });
+              } catch (err) {
+                console.error("Error updating quantity", err);
+                Alert.alert("Error", "Could not update quantity");
+              }
+            }}>
+            <Text style={styles.qtyButtonText}>+</Text>
+          </TouchableOpacity>
+        </View>
         <Text style={styles.itemTime}>Added: {formatTime(item.addedAt)}</Text>
       </View>
       <View style={styles.caloriesContainer}>
         <Text style={styles.itemCalories}>
-          {item.calories?.toFixed(0) ?? "N/A"}
+          {(item.calories * (item.servingQty || 1))?.toFixed(0) ?? "N/A"}
         </Text>
         <Text style={styles.calUnitText}>Cal</Text>
       </View>
@@ -697,7 +732,7 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontFamily: "myfont-regular",
     color: Colors.DARK_GRAY,
-    marginBottom: 2,
+    marginHorizontal: 8,
   },
   itemTime: {
     fontSize: 12,
@@ -841,5 +876,22 @@ const styles = StyleSheet.create({
     alignItems: "center",
     width: 80,
     justifyContent: "flex-end",
+  },
+  servingContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 2,
+  },
+  qtyButton: {
+    width: 24,
+    height: 24,
+    alignItems: "center",
+    justifyContent: "center",
+    padding: 0,
+  },
+  qtyButtonText: {
+    fontSize: 16,
+    fontFamily: "myfont-bold",
+    color: Colors.PRIMARY,
   },
 });

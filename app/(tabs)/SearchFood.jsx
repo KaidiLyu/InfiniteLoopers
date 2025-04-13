@@ -115,7 +115,11 @@ export default function SearchFood() {
       console.log("Natural language search response:", result);
 
       if (result?.foods && result.foods.length > 0) {
-        setNaturalFoodItems(result.foods);
+        const foodsWithDefaultQty = result.foods.map(food => ({
+          ...food,
+          serving_qty: food.serving_qty || 1
+        }));
+        setNaturalFoodItems(foodsWithDefaultQty);
         console.log(`Found ${result.foods.length} food items matching your query.`);
       } else {
         console.warn("No food items found in natural language response.");
@@ -802,13 +806,41 @@ export default function SearchFood() {
                             style={styles.naturalItemImage}
                             defaultSource={require("../../assets/picture/food-placeholder.png")}
                           />
-                          <Text
-                            style={[
-                              styles.naturalItemText,
-                              styles.naturalQtyCol,
-                            ]}>
-                            {item.serving_qty}
-                          </Text>
+                          <View style={[styles.naturalQtyCol, styles.qtyContainer]}>
+                            <TouchableOpacity
+                              style={styles.qtyButton}
+                              onPress={() => {
+                                const newItems = [...naturalFoodItems];
+                                const index = newItems.findIndex(i => i === item);
+                                if (index !== -1 && newItems[index].serving_qty > 1) {
+                                  newItems[index] = {
+                                    ...newItems[index],
+                                    serving_qty: newItems[index].serving_qty - 1
+                                  };
+                                  setNaturalFoodItems(newItems);
+                                }
+                              }}>
+                              <Text style={styles.qtyButtonText}>-</Text>
+                            </TouchableOpacity>
+                            <Text style={styles.naturalItemText}>
+                              {item.serving_qty || 1}
+                            </Text>
+                            <TouchableOpacity
+                              style={styles.qtyButton}
+                              onPress={() => {
+                                const newItems = [...naturalFoodItems];
+                                const index = newItems.findIndex(i => i === item);
+                                if (index !== -1) {
+                                  newItems[index] = {
+                                    ...newItems[index],
+                                    serving_qty: (newItems[index].serving_qty || 1) + 1
+                                  };
+                                  setNaturalFoodItems(newItems);
+                                }
+                              }}>
+                              <Text style={styles.qtyButtonText}>+</Text>
+                            </TouchableOpacity>
+                          </View>
                           <Text
                             style={[
                               styles.naturalItemText,
@@ -1343,5 +1375,25 @@ const styles = StyleSheet.create({
     fontSize: 8,
     color: Colors.GRAY,
     fontStyle: "italic",
+  },
+  qtyContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    width: 65,
+  },
+  qtyButton: {
+    width: 20,
+    height: 20,
+    borderWidth: 1,
+    borderColor: Colors.LIGHT_GRAY,
+    borderRadius: 4,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  qtyButtonText: {
+    fontSize: 16,
+    fontFamily: "myfont-bold",
+    color: Colors.BLACK,
   },
 });

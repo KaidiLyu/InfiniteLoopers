@@ -112,18 +112,19 @@ export default function SearchFood() {
     setNaturalFoodItems([]);
     try {
       const result = await getNaturalLanguageNutrition(naturalQuery);
-      console.log("resp:", result);
+      console.log("Natural language search response:", result);
 
-      if (result?.foods) {
+      if (result?.foods && result.foods.length > 0) {
         setNaturalFoodItems(result.foods);
+        console.log(`Found ${result.foods.length} food items matching your query.`);
       } else {
         console.warn("No food items found in natural language response.");
-        setError("Could not parse any food items from your query.");
+        setError("没有找到符合您查询的食物项。");
         setTimeout(() => setError(null), 3000);
       }
     } catch (err) {
       console.error("Error fetching natural language nutrition:", err);
-      setError("Failed to process natural language query.");
+      setError("处理自然语言查询失败。");
       setTimeout(() => setError(null), 3000);
     } finally {
       setLoading(false);

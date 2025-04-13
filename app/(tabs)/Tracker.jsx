@@ -488,7 +488,7 @@ export default function Tracker() {
             {item.servingQty || 0} {item.servingUnit}
           </Text>
           <TouchableOpacity 
-            style={styles.qtyButton}
+            style={[styles.qtyButton, styles.qtyButtonAdd]}
             onPress={async () => {
               try {
                 await setDoc(doc(db, "dailyTracker", item.id), {
@@ -500,7 +500,7 @@ export default function Tracker() {
                 Alert.alert("Error", "Could not update quantity");
               }
             }}>
-            <Text style={styles.qtyButtonText}>+</Text>
+            <Text style={[styles.qtyButtonText, styles.qtyButtonTextAdd]}>+</Text>
           </TouchableOpacity>
         </View>
         <Text style={styles.itemTime}>Added: {formatTime(item.addedAt)}</Text>
@@ -906,5 +906,12 @@ const styles = StyleSheet.create({
   },
   qtyButtonTextDisabled: {
     color: Colors.DISABLED_TEXT,
+  },
+  qtyButtonAdd: {
+    backgroundColor: Colors.GREEN,
+    borderColor: Colors.GREEN,
+  },
+  qtyButtonTextAdd: {
+    color: Colors.WHITE,
   },
 });

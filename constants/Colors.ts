@@ -18,6 +18,7 @@ export const Colors = {
   EXTRA_LIGHT_GRAY: "#f5f5f5",
   RED: "#E53935",
   PRIMARY: "#0A7EA4",
+  GREEN: "#4CAF50",
   light: {
     text: "#11181C",
     background: "#fff",

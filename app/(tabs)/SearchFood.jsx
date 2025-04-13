@@ -115,11 +115,11 @@ export default function SearchFood() {
       console.log("Natural language search response:", result);
 
       if (result?.foods && result.foods.length > 0) {
-        const foodsWithDefaultQty = result.foods.map(food => ({
+        const foodsWithZeroQty = result.foods.map(food => ({
           ...food,
-          serving_qty: food.serving_qty || 0
+          serving_qty: 0
         }));
-        setNaturalFoodItems(foodsWithDefaultQty);
+        setNaturalFoodItems(foodsWithZeroQty);
         console.log(`Found ${result.foods.length} food items matching your query.`);
       } else {
         console.warn("No food items found in natural language response.");
@@ -153,7 +153,7 @@ export default function SearchFood() {
         userEmail: user.email,
         date: todayDate,
         foodName: item.food_name,
-        servingQty: item.serving_qty,
+        servingQty: 1,
         servingUnit: item.serving_unit,
         calories: item.nf_calories || 0,
         nf_total_fat: item.nf_total_fat || 0,
@@ -195,7 +195,7 @@ export default function SearchFood() {
           userEmail: user.email,
           date: todayDate,
           foodName: item.food_name,
-          servingQty: item.serving_qty,
+          servingQty: 1,
           servingUnit: item.serving_unit,
           calories: item.nf_calories || 0,
           nf_total_fat: item.nf_total_fat || 0,
@@ -833,7 +833,7 @@ export default function SearchFood() {
                               {item.serving_qty || 0}
                             </Text>
                             <TouchableOpacity
-                              style={styles.qtyButton}
+                              style={[styles.qtyButton, styles.qtyButtonAdd]}
                               onPress={() => {
                                 const newItems = [...naturalFoodItems];
                                 const index = newItems.findIndex(i => i === item);
@@ -845,7 +845,7 @@ export default function SearchFood() {
                                   setNaturalFoodItems(newItems);
                                 }
                               }}>
-                              <Text style={styles.qtyButtonText}>+</Text>
+                              <Text style={[styles.qtyButtonText, styles.qtyButtonTextAdd]}>+</Text>
                             </TouchableOpacity>
                           </View>
                           <Text
@@ -1409,5 +1409,12 @@ const styles = StyleSheet.create({
   },
   qtyButtonTextDisabled: {
     color: Colors.DISABLED_TEXT,
+  },
+  qtyButtonAdd: {
+    backgroundColor: Colors.GREEN,
+    borderColor: Colors.GREEN,
+  },
+  qtyButtonTextAdd: {
+    color: Colors.WHITE,
   },
 });

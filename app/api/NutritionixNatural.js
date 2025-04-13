@@ -53,7 +53,10 @@ export const getNaturalLanguageNutrition = async (query) => {
       query: query,
     });
     
-    let combinedFoods = [...(directResponse.data.foods || [])];
+    let combinedFoods = [...(directResponse.data.foods || [])].map(food => ({
+      ...food,
+      serving_qty: 0
+    }));
     
     // Add common food items to avoid duplication
     const existingNames = new Set(combinedFoods.map(food => food.food_name.toLowerCase()));
@@ -66,7 +69,12 @@ export const getNaturalLanguageNutrition = async (query) => {
             // Get detailed nutritional information for each food item
             const itemDetails = await getFoodItemNutrition(item.food_name);
             if (itemDetails.foods && itemDetails.foods.length > 0) {
-              combinedFoods.push(itemDetails.foods[0]);
+              // 设置初始数量为0
+              const foodWithZeroQty = {
+                ...itemDetails.foods[0],
+                serving_qty: 0
+              };
+              combinedFoods.push(foodWithZeroQty);
               existingNames.add(item.food_name.toLowerCase());
             }
           } catch (itemError) {

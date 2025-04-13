@@ -8,12 +8,13 @@ import {
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import * as ImagePicker from "expo-image-picker";
-import { auth, db } from "../../configs/FirebaseConfig";
+import { auth, db, storage } from "../../configs/FirebaseConfig";
 import { Colors } from "../../constants/Colors";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { collection, query, where, getDocs } from "firebase/firestore";
 import { updateProfile } from "firebase/auth";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 
 export default function Profile() {
   const [user, setUser] = useState(null);
@@ -65,22 +66,41 @@ export default function Profile() {
   };
 
   const pickImage = async () => {
-    let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaType,
-      allowsEditing: true,
-      aspect: [1, 1],
-      quality: 1,
-    });
+    try {
+      let result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [1, 1],
+        quality: 0.8,
+      });
 
-    if (!result.cancelled) {
-      updateProfile(auth.currentUser, { photoURL: result.uri })
-        .then(() => {
-          setUser({ ...user, photoURL: result.uri });
-        })
-        .catch((error) => {
-          console.error("Error updating profile picture", error);
-          Alert.alert("Error updating profile picture");
-        });
+      if (!result.canceled && result.assets && result.assets.length > 0) {
+        const selectedImageUri = result.assets[0].uri;
+        
+        // Create a unique file path for storage
+        const fileRef = ref(storage, `profileImages/${auth.currentUser.uid}/${Date.now()}.jpg`);
+        
+        // Get image data
+        const response = await fetch(selectedImageUri);
+        const blob = await response.blob();
+        
+        // Uploading to Firebase Storage
+        await uploadBytes(fileRef, blob);
+        
+        // Get the download URL
+        const downloadURL = await getDownloadURL(fileRef);
+        
+        // Update User Profile
+        await updateProfile(auth.currentUser, { photoURL: downloadURL });
+        
+        // Update local status
+        setUser({ ...user, photoURL: downloadURL });
+        
+        Alert.alert("success", "Profile picture updated");
+      }
+    } catch (error) {
+      console.error("Error updating profile picture", error);
+      Alert.alert("mistake", "Error updating profile picture");
     }
   };
 

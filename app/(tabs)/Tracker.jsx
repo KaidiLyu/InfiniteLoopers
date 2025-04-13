@@ -82,7 +82,7 @@ export default function Tracker() {
     };
 
     trackedItems.forEach((item) => {
-      const servingQty = item.servingQty || 1;
+      const servingQty = item.servingQty || 0;
       
       totalNutrition.calories += (item.calories || 0) * servingQty;
       totalNutrition.total_fat += (item.nf_total_fat || 0) * servingQty;
@@ -437,7 +437,7 @@ export default function Tracker() {
 
   const totalCalories = useMemo(() => {
     return trackedItems.reduce((sum, item) => {
-      const servingQty = item.servingQty || 1;
+      const servingQty = item.servingQty || 0;
       return sum + ((item.calories || 0) * servingQty);
     }, 0);
   }, [trackedItems]);
@@ -461,9 +461,13 @@ export default function Tracker() {
         </Text>
         <View style={styles.servingContainer}>
           <TouchableOpacity 
-            style={styles.qtyButton}
+            style={[
+              styles.qtyButton,
+              item.servingQty <= 0 ? styles.qtyButtonDisabled : null
+            ]}
+            disabled={item.servingQty <= 0}
             onPress={async () => {
-              if(item.servingQty > 1) {
+              if(item.servingQty > 0) {
                 try {
                   await setDoc(doc(db, "dailyTracker", item.id), {
                     ...item,
@@ -475,10 +479,13 @@ export default function Tracker() {
                 }
               }
             }}>
-            <Text style={styles.qtyButtonText}>-</Text>
+            <Text style={[
+              styles.qtyButtonText,
+              item.servingQty <= 0 ? styles.qtyButtonTextDisabled : null
+            ]}>-</Text>
           </TouchableOpacity>
           <Text style={styles.itemServing}>
-            {item.servingQty || 1} {item.servingUnit}
+            {item.servingQty || 0} {item.servingUnit}
           </Text>
           <TouchableOpacity 
             style={styles.qtyButton}
@@ -486,7 +493,7 @@ export default function Tracker() {
               try {
                 await setDoc(doc(db, "dailyTracker", item.id), {
                   ...item,
-                  servingQty: (item.servingQty || 1) + 1
+                  servingQty: (item.servingQty || 0) + 1
                 }, { merge: true });
               } catch (err) {
                 console.error("Error updating quantity", err);
@@ -500,7 +507,7 @@ export default function Tracker() {
       </View>
       <View style={styles.caloriesContainer}>
         <Text style={styles.itemCalories}>
-          {(item.calories * (item.servingQty || 1))?.toFixed(0) ?? "N/A"}
+          {(item.calories * (item.servingQty || 0))?.toFixed(0) ?? "N/A"}
         </Text>
         <Text style={styles.calUnitText}>Cal</Text>
       </View>
@@ -893,5 +900,11 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontFamily: "myfont-bold",
     color: Colors.PRIMARY,
+  },
+  qtyButtonDisabled: {
+    backgroundColor: Colors.DISABLED,
+  },
+  qtyButtonTextDisabled: {
+    color: Colors.DISABLED_TEXT,
   },
 });

@@ -12,6 +12,12 @@ export const Colors = {
   GRAY: "#78866B",
   DARK_GRAY: "#11181C",
   BUTTON_GREEN: "#73C913",
+  DISABLED: "#f0f0f0",
+  DISABLED_TEXT: "#c0c0c0",
+  LIGHT_GRAY: "#e0e0e0",
+  EXTRA_LIGHT_GRAY: "#f5f5f5",
+  RED: "#E53935",
+  PRIMARY: "#0A7EA4",
   light: {
     text: "#11181C",
     background: "#fff",

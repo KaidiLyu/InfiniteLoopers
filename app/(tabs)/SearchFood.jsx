@@ -117,7 +117,7 @@ export default function SearchFood() {
       if (result?.foods && result.foods.length > 0) {
         const foodsWithDefaultQty = result.foods.map(food => ({
           ...food,
-          serving_qty: food.serving_qty || 1
+          serving_qty: food.serving_qty || 0
         }));
         setNaturalFoodItems(foodsWithDefaultQty);
         console.log(`Found ${result.foods.length} food items matching your query.`);
@@ -385,10 +385,10 @@ export default function SearchFood() {
     };
 
     naturalFoodItems.forEach((item) => {
-      // Ensure serving_qty is valid, if not present it defaults to 1
-      const servingQty = item.serving_qty || 1;
+      // 确保serving_qty有效，如果不存在则默认为0
+      const servingQty = item.serving_qty || 0;
       
-      // When calculating each nutrient, multiply servingQty by
+      // 计算每个营养素时乘以servingQty
       totalNutrition.calories += (item.nf_calories || 0) * servingQty;
       totalNutrition.total_fat += (item.nf_total_fat || 0) * servingQty;
       totalNutrition.saturated_fat += (item.nf_saturated_fat || 0) * servingQty;
@@ -808,11 +808,15 @@ export default function SearchFood() {
                           />
                           <View style={[styles.naturalQtyCol, styles.qtyContainer]}>
                             <TouchableOpacity
-                              style={styles.qtyButton}
+                              style={[
+                                styles.qtyButton,
+                                item.serving_qty <= 0 ? styles.qtyButtonDisabled : null
+                              ]}
+                              disabled={item.serving_qty <= 0}
                               onPress={() => {
                                 const newItems = [...naturalFoodItems];
                                 const index = newItems.findIndex(i => i === item);
-                                if (index !== -1 && newItems[index].serving_qty > 1) {
+                                if (index !== -1 && newItems[index].serving_qty > 0) {
                                   newItems[index] = {
                                     ...newItems[index],
                                     serving_qty: newItems[index].serving_qty - 1
@@ -820,10 +824,13 @@ export default function SearchFood() {
                                   setNaturalFoodItems(newItems);
                                 }
                               }}>
-                              <Text style={styles.qtyButtonText}>-</Text>
+                              <Text style={[
+                                styles.qtyButtonText,
+                                item.serving_qty <= 0 ? styles.qtyButtonTextDisabled : null
+                              ]}>-</Text>
                             </TouchableOpacity>
                             <Text style={styles.naturalItemText}>
-                              {item.serving_qty || 1}
+                              {item.serving_qty || 0}
                             </Text>
                             <TouchableOpacity
                               style={styles.qtyButton}
@@ -833,7 +840,7 @@ export default function SearchFood() {
                                 if (index !== -1) {
                                   newItems[index] = {
                                     ...newItems[index],
-                                    serving_qty: (newItems[index].serving_qty || 1) + 1
+                                    serving_qty: (newItems[index].serving_qty || 0) + 1
                                   };
                                   setNaturalFoodItems(newItems);
                                 }
@@ -895,7 +902,7 @@ export default function SearchFood() {
                       Total Calories:{" "}
                       {naturalFoodItems
                         .reduce((sum, item) => {
-                          const servingQty = item.serving_qty || 1;
+                          const servingQty = item.serving_qty || 0;
                           return sum + ((item.nf_calories || 0) * servingQty);
                         }, 0)
                         .toFixed(0)}
@@ -1395,5 +1402,12 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontFamily: "myfont-bold",
     color: Colors.BLACK,
+  },
+  qtyButtonDisabled: {
+    borderColor: Colors.LIGHT_GRAY,
+    backgroundColor: Colors.DISABLED,
+  },
+  qtyButtonTextDisabled: {
+    color: Colors.DISABLED_TEXT,
   },
 });

@@ -381,31 +381,34 @@ export default function SearchFood() {
     };
 
     naturalFoodItems.forEach((item) => {
-      totalNutrition.calories += item.nf_calories || 0;
-
-      totalNutrition.total_fat += item.nf_total_fat || 0;
-      totalNutrition.saturated_fat += item.nf_saturated_fat || 0;
+      // Ensure serving_qty is valid, if not present it defaults to 1
+      const servingQty = item.serving_qty || 1;
+      
+      // When calculating each nutrient, multiply servingQty by
+      totalNutrition.calories += (item.nf_calories || 0) * servingQty;
+      totalNutrition.total_fat += (item.nf_total_fat || 0) * servingQty;
+      totalNutrition.saturated_fat += (item.nf_saturated_fat || 0) * servingQty;
       totalNutrition.trans_fat +=
-        item.full_nutrients?.find((n) => n.attr_id === 605)?.value || 0;
+        (item.full_nutrients?.find((n) => n.attr_id === 605)?.value || 0) * servingQty;
       totalNutrition.polyunsaturated_fat +=
-        item.full_nutrients?.find((n) => n.attr_id === 646)?.value || 0;
+        (item.full_nutrients?.find((n) => n.attr_id === 646)?.value || 0) * servingQty;
       totalNutrition.monounsaturated_fat +=
-        item.full_nutrients?.find((n) => n.attr_id === 645)?.value || 0;
-      totalNutrition.cholesterol += item.nf_cholesterol || 0;
-      totalNutrition.sodium += item.nf_sodium || 0;
-      totalNutrition.total_carbs += item.nf_total_carbohydrate || 0;
-      totalNutrition.dietary_fiber += item.nf_dietary_fiber || 0;
-      totalNutrition.sugars += item.nf_sugars || 0;
-      totalNutrition.protein += item.nf_protein || 0;
+        (item.full_nutrients?.find((n) => n.attr_id === 645)?.value || 0) * servingQty;
+      totalNutrition.cholesterol += (item.nf_cholesterol || 0) * servingQty;
+      totalNutrition.sodium += (item.nf_sodium || 0) * servingQty;
+      totalNutrition.total_carbs += (item.nf_total_carbohydrate || 0) * servingQty;
+      totalNutrition.dietary_fiber += (item.nf_dietary_fiber || 0) * servingQty;
+      totalNutrition.sugars += (item.nf_sugars || 0) * servingQty;
+      totalNutrition.protein += (item.nf_protein || 0) * servingQty;
 
       totalNutrition.vitamin_d +=
-        item.full_nutrients?.find((n) => n.attr_id === 324)?.value || 0;
+        (item.full_nutrients?.find((n) => n.attr_id === 324)?.value || 0) * servingQty;
       totalNutrition.calcium +=
-        item.full_nutrients?.find((n) => n.attr_id === 301)?.value || 0;
+        (item.full_nutrients?.find((n) => n.attr_id === 301)?.value || 0) * servingQty;
       totalNutrition.iron +=
-        item.full_nutrients?.find((n) => n.attr_id === 303)?.value || 0;
+        (item.full_nutrients?.find((n) => n.attr_id === 303)?.value || 0) * servingQty;
       totalNutrition.potassium +=
-        item.full_nutrients?.find((n) => n.attr_id === 306)?.value || 0;
+        (item.full_nutrients?.find((n) => n.attr_id === 306)?.value || 0) * servingQty;
     });
 
     return totalNutrition;
@@ -859,7 +862,10 @@ export default function SearchFood() {
                     <Text style={styles.naturalTotalCalories}>
                       Total Calories:{" "}
                       {naturalFoodItems
-                        .reduce((sum, item) => sum + (item.nf_calories || 0), 0)
+                        .reduce((sum, item) => {
+                          const servingQty = item.serving_qty || 1;
+                          return sum + ((item.nf_calories || 0) * servingQty);
+                        }, 0)
                         .toFixed(0)}
                     </Text>
                   </View>

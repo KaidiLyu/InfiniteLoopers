@@ -218,7 +218,7 @@ export default function SearchFood() {
 
       await batch.commit();
       console.log(`Added ${count} items to tracker.`);
-      Alert.alert("Success", `${count} items added to today's tracker.`);
+      Alert.alert("Success", `${count} item(s) added to today's tracker.`);
       setNaturalFoodItems([]);
     } catch (error) {
       console.error("Error adding all items to tracker:", error);

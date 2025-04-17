@@ -60,17 +60,14 @@ export default function SignIn() {
         console.log(errorCode, errorMessage);
         console.log("-----------------");
 
-        if (
-          errorCode === "auth/invalid-credential" ||
-          errorCode === "auth/invalid-login-credentials"
-        ) {
+        if (errorCode === "auth/invalid-credential") {
           if (isAndroid) {
             ToastAndroid.show("Invalid Credentials", ToastAndroid.BOTTOM);
           }
           if (isIOS) Alert.alert("Invalid Credentials");
           console.log("Invalid Credentials");
         }
-        else if (errorCode === "auth/missing-password") {
+        if (errorCode === "auth/missing-password") {
           if (isAndroid)
             ToastAndroid.show("Missing password", ToastAndroid.BOTTOM);
           if (isIOS) Alert.alert("Missing password");

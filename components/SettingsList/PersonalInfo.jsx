@@ -31,6 +31,14 @@ export default function UpdateProfile() {
         Alert.alert("Error. There is no current user");
         return;
       }
+      if (
+        name.trim() === user?.displayName &&
+        email.trim() === user?.email &&
+        password.trim() === ""
+      ) {
+        Alert.alert("No changes detected", "One or more fields are the same as before.");
+        return;
+      }
       if (name && name !== user.displayName) {
         await updateProfile(user, { displayName: name });
       }
@@ -50,6 +58,8 @@ export default function UpdateProfile() {
       Alert.alert("Error, could not update your profile");
     }
   };
+
+  const canUpdate = name.trim() !== "" || email.trim() !== "" || password.trim() !== "";
 
   return (
     <View style={styles.container}>
@@ -78,9 +88,12 @@ export default function UpdateProfile() {
           onChangeText={setPassword}
           secureTextEntry
         />
-        <TouchableOpacity style={styles.button} onPress={updateUserProfile}>
+        <TouchableOpacity
+          style={[styles.button, !canUpdate && styles.disabledButton]}
+          onPress={updateUserProfile}
+          disabled={!canUpdate}>
           <Text style={styles.buttonText}>Update Profile</Text>
-        </TouchableOpacity>
+          </TouchableOpacity>
         <TouchableOpacity
           style={styles.button}
           onPress={() => navigation.goBack()}>
@@ -146,6 +159,9 @@ const styles = StyleSheet.create({
     color: Colors.WHITE,
     fontFamily: "myfont-bold",
     fontSize: 18,
+  },
+  disabledButton: {
+    backgroundColor: Colors.GRAY
   },
   note: {
     textAlign: "center",

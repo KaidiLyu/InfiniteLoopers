@@ -218,7 +218,7 @@ export default function Tracker() {
           <Text style={styles.nutritionLabel}>Sodium</Text>
           <View style={styles.valueContainer}>
             <Text style={styles.nutritionValue}>
-              {nutritionFacts.sodium.toFixed(0)}mg
+              {nutritionFacts.sodium.toFixed(1)}mg
             </Text>
             <Text style={styles.nutritionPercent}>
               {calculateDailyValue("sodium", nutritionFacts.sodium)}%

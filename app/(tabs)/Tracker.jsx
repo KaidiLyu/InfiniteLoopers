@@ -22,6 +22,8 @@ import {
   deleteDoc,
   doc,
   setDoc,
+  getDocs,
+  writeBatch,
 } from "firebase/firestore";
 import { MaterialCommunityIcons, Ionicons } from "@expo/vector-icons";
 import { useFocusEffect } from "expo-router";
@@ -424,8 +426,33 @@ export default function Tracker() {
         style: "destructive",
         onPress: async () => {
           try {
+            // 删除 dailyTracker 中的项目
             await deleteDoc(doc(db, "dailyTracker", itemId));
-            console.log("Deleted item:", itemId);
+            console.log("Deleted item from dailyTracker:", itemId);
+            
+            // 查找并删除 mealsSaved 中对应的项目
+            // 注意：这里我们需要找到与当前项目匹配的 mealsSaved 项目
+            // 由于没有直接的引用，我们通过日期和食物名称进行匹配
+            const item = trackedItems.find(item => item.id === itemId);
+            if (item) {
+              const mealsSavedQuery = query(
+                collection(db, "mealsSaved"),
+                where("userId", "==", user.uid),
+                where("foodName", "==", item.foodName),
+                where("date", "==", item.date)
+              );
+              
+              const mealsSavedSnapshot = await getDocs(mealsSavedQuery);
+              
+              if (!mealsSavedSnapshot.empty) {
+                const batch = writeBatch(db);
+                mealsSavedSnapshot.forEach((doc) => {
+                  batch.delete(doc.ref);
+                });
+                await batch.commit();
+                console.log("Deleted corresponding items from mealsSaved");
+              }
+            }
           } catch (err) {
             console.error("Error deleting tracker item:", err);
             Alert.alert("Error", "Could not remove item.");

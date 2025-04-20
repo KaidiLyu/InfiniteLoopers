@@ -6,12 +6,12 @@ import {
   TouchableOpacity,
   Alert,
 } from "react-native";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import * as ImagePicker from "expo-image-picker";
 import { auth, db, storage } from "../../configs/FirebaseConfig";
 import { Colors } from "../../constants/Colors";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { useRouter } from "expo-router";
+import { useRouter, useFocusEffect } from "expo-router";
 import { collection, query, where, getDocs } from "firebase/firestore";
 import { updateProfile } from "firebase/auth";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
@@ -39,10 +39,19 @@ export default function Profile() {
 
     const currentUser = auth.currentUser;
     setUser(currentUser);
-    if (currentUser) {
-      fetchUserStats(currentUser.uid);
-    }
   }, []);
+
+  useFocusEffect(
+    useCallback(() => {
+      const currentUser = auth.currentUser;
+      if (currentUser) {
+        fetchUserStats(currentUser.uid);
+      }
+      return () => {
+        // 清理函数（如果需要）
+      };
+    }, [])
+  );
 
   const fetchUserStats = async (userId) => {
     try {
@@ -60,6 +69,7 @@ export default function Profile() {
         recipes: recipesSnapshot.size,
         products: productsSnapshot.size,
       });
+      console.log("Stats updated, meals saved count:", productsSnapshot.size);
     } catch (error) {
       console.error("Error fetching user stats:", error);
     }

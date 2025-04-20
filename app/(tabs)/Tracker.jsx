@@ -22,6 +22,12 @@ import {
   deleteDoc,
   doc,
   setDoc,
+  getDocs,
+  getDoc,
+  writeBatch,
+  addDoc,
+  Timestamp,
+  limit,
 } from "firebase/firestore";
 import { MaterialCommunityIcons, Ionicons } from "@expo/vector-icons";
 import { useFocusEffect } from "expo-router";
@@ -46,6 +52,8 @@ export default function Tracker() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [sortOption, setSortOption] = useState("addedAt_desc");
+  const [calorieGoal, setCalorieGoal] = useState(2000); // Default Target
+  const [goalChecked, setGoalChecked] = useState(false);
 
   const today = useMemo(() => new Date(), []);
   const thirtyDaysAgo = useMemo(() => {
@@ -60,6 +68,161 @@ export default function Tracker() {
     const day = String(currentDate.getDate()).padStart(2, "0");
     return `${year}-${month}-${day}`;
   }, [currentDate]);
+
+  // Calculate total cash
+  const totalCalories = useMemo(() => {
+    return trackedItems.reduce((sum, item) => {
+      const servingQty = item.servingQty || 0;
+      return sum + ((item.calories || 0) * servingQty);
+    }, 0);
+  }, [trackedItems]);
+
+  // Loading the user's calorie goal
+  const loadCalorieGoal = useCallback(async () => {
+    if (!user?.uid) return;
+    
+    try {
+      const goalDocRef = doc(db, "userCalorieGoals", user.uid);
+      const goalSnapshot = await getDoc(goalDocRef);
+      
+      if (goalSnapshot.exists()) {
+        const goalData = goalSnapshot.data();
+        setCalorieGoal(goalData.calorieGoal || 2000);
+        console.log("Loaded calorie goal:", goalData.calorieGoal);
+      }
+    } catch (error) {
+      console.error("Error loading calorie goal:", error);
+    }
+  }, [user]);
+
+  // Check if the user has reached their calorie goal
+  const checkCalorieGoal = useCallback(async () => {
+    if (!user?.uid || goalChecked || trackedItems.length === 0) return;
+    
+    const isGoalMet = totalCalories <= calorieGoal;
+    
+    try {
+      // Check if goal achievement has been recorded today
+      const goalMetQuery = query(
+        collection(db, "goalsMet"),
+        where("userId", "==", user.uid),
+        where("date", "==", currentDateString)
+      );
+      
+      const goalMetSnapshot = await getDocs(goalMetQuery);
+      
+      // Get the total number of goalsMet documents for a user
+      const allGoalsMetQuery = query(
+        collection(db, "goalsMet"),
+        where("userId", "==", user.uid)
+      );
+      
+      const allGoalsMetSnapshot = await getDocs(allGoalsMetQuery);
+      const currentMetCount = allGoalsMetSnapshot.size;
+      
+      if (isGoalMet) {
+        // Achievement of goals
+        if (goalMetSnapshot.empty) {
+          // If there is no record today, add a record
+          await addDoc(collection(db, "goalsMet"), {
+            userId: user.uid,
+            userEmail: user.email,
+            date: currentDateString,
+            goalCalories: calorieGoal,
+            actualCalories: totalCalories,
+            createdAt: Timestamp.now()
+          });
+          
+          console.log("Calorie goal met for today!");
+        }
+      } else {
+        // Exceeding the target
+        // If there is already a record today, delete it
+        if (!goalMetSnapshot.empty) {
+          const batch = writeBatch(db);
+          goalMetSnapshot.forEach((doc) => {
+            batch.delete(doc.ref);
+          });
+          await batch.commit();
+          console.log("Removed today's goal met record due to exceeding calorie limit");
+        }
+        
+        // If there is no record currently, you need to reduce a history record
+        if (goalMetSnapshot.empty && currentMetCount > 0) {
+          // Delete the earliest record
+          const oldestGoalMetQuery = query(
+            collection(db, "goalsMet"),
+            where("userId", "==", user.uid),
+            orderBy("createdAt", "asc"),
+            limit(1)
+          );
+          
+          const oldestGoalMetSnapshot = await getDocs(oldestGoalMetQuery);
+          
+          if (!oldestGoalMetSnapshot.empty) {
+            await deleteDoc(oldestGoalMetSnapshot.docs[0].ref);
+            console.log("Reduced goal met count by 1 due to exceeding calorie limit");
+          }
+        }
+      }
+      
+      setGoalChecked(true);
+    } catch (error) {
+      console.error("Error checking calorie goal:", error);
+    }
+  }, [user, totalCalories, calorieGoal, currentDateString, goalChecked, trackedItems]);
+
+  // Listen for changes in the tracked items
+  useFocusEffect(
+    useCallback(() => {
+      if (!user?.uid) return;
+      
+      setLoading(true);
+      setError(null);
+      
+      // Load the user's calorie goal
+      loadCalorieGoal();
+      
+      // Real-time monitoring of the current date's tracked items
+      const q = query(
+        collection(db, "dailyTracker"),
+        where("userId", "==", user.uid),
+        where("date", "==", currentDateString),
+        orderBy("addedAt", "desc")
+      );
+      
+      const unsubscribe = onSnapshot(
+        q,
+        (snapshot) => {
+          const items = [];
+          snapshot.forEach((doc) => {
+            items.push({
+              id: doc.id,
+              ...doc.data(),
+            });
+          });
+          setTrackedItems(items);
+          setLoading(false);
+        },
+        (err) => {
+          setError("Error fetching tracker data: " + err.message);
+          setLoading(false);
+        }
+      );
+      
+      // Reset the goal check flag when the component gains focus
+      setGoalChecked(false);
+      
+      return () => unsubscribe();
+    }, [user, currentDateString])
+  );
+
+  // When the tracked items or calorie goal changes, check if the goal has been reached
+  useEffect(() => {
+    if (trackedItems.length > 0 && !goalChecked) {
+      checkCalorieGoal();
+    }
+  }, [trackedItems, checkCalorieGoal, goalChecked]);
 
   const calculateTotalNutrition = () => {
     const totalNutrition = {
@@ -355,51 +518,6 @@ export default function Tracker() {
     return sorted;
   }, [trackedItems, sortOption]);
 
-  useFocusEffect(
-    useCallback(() => {
-      if (!user?.uid) {
-        setError("Please log in to view tracker.");
-        setLoading(false);
-        setTrackedItems([]);
-        return;
-      }
-
-      setLoading(true);
-      setError(null);
-      console.log(`Fetching tracker for: ${currentDateString}`);
-
-      const q = query(
-        collection(db, "dailyTracker"),
-        where("userId", "==", user.uid),
-        where("date", "==", currentDateString),
-        orderBy("addedAt", "desc")
-      );
-
-      const unsubscribe = onSnapshot(
-        q,
-        (querySnapshot) => {
-          const items = [];
-          querySnapshot.forEach((doc) => {
-            items.push({ id: doc.id, ...doc.data() });
-          });
-          setTrackedItems(items);
-          setLoading(false);
-          console.log(`Fetched ${items.length} items for ${currentDateString}`);
-        },
-        (err) => {
-          console.error("Error fetching tracker data:", err);
-          setError("Failed to load tracker data. Please try again.");
-          setLoading(false);
-        }
-      );
-
-      return () => {
-        console.log("Unsubscribing tracker listener for", currentDateString);
-        unsubscribe();
-      };
-    }, [user, currentDateString])
-  );
-
   const changeDate = (days) => {
     const newDate = new Date(currentDate);
     newDate.setDate(newDate.getDate() + days);
@@ -424,8 +542,33 @@ export default function Tracker() {
         style: "destructive",
         onPress: async () => {
           try {
+            // Delete items from dailyTracker
             await deleteDoc(doc(db, "dailyTracker", itemId));
-            console.log("Deleted item:", itemId);
+            console.log("Deleted item from dailyTracker:", itemId);
+            
+           // Find and delete the corresponding item in mealsSaved
+           // Note: Here we need to find the mealsSaved item that matches the current item
+           // Since there is no direct reference, we match by date and food name
+            const item = trackedItems.find(item => item.id === itemId);
+            if (item) {
+              const mealsSavedQuery = query(
+                collection(db, "mealsSaved"),
+                where("userId", "==", user.uid),
+                where("foodName", "==", item.foodName),
+                where("date", "==", item.date)
+              );
+              
+              const mealsSavedSnapshot = await getDocs(mealsSavedQuery);
+              
+              if (!mealsSavedSnapshot.empty) {
+                const batch = writeBatch(db);
+                mealsSavedSnapshot.forEach((doc) => {
+                  batch.delete(doc.ref);
+                });
+                await batch.commit();
+                console.log("Deleted corresponding items from mealsSaved");
+              }
+            }
           } catch (err) {
             console.error("Error deleting tracker item:", err);
             Alert.alert("Error", "Could not remove item.");
@@ -434,13 +577,6 @@ export default function Tracker() {
       },
     ]);
   };
-
-  const totalCalories = useMemo(() => {
-    return trackedItems.reduce((sum, item) => {
-      const servingQty = item.servingQty || 0;
-      return sum + ((item.calories || 0) * servingQty);
-    }, 0);
-  }, [trackedItems]);
 
   const renderItem = ({ item }) => (
     <View style={styles.itemRow}>
@@ -622,9 +758,29 @@ export default function Tracker() {
         {!loading && !error && trackedItems.length > 0 && (
           <View style={styles.footerContainer}>
             {renderNutritionLabel()}
-            <Text style={styles.totalCaloriesText}>
-              Total Calories: {totalCalories.toFixed(0)}
-            </Text>
+            <View style={styles.calorieStats}>
+              <View style={styles.calorieStat}>
+                <Text style={styles.calorieStatLabel}>Total Calories:</Text>
+                <Text style={styles.totalCaloriesText}>{totalCalories.toFixed(0)}</Text>
+              </View>
+              
+              <View style={styles.calorieStat}>
+                <Text style={styles.calorieStatLabel}>Target:</Text>
+                <Text style={styles.goalText}>{calorieGoal.toFixed(0)}</Text>
+              </View>
+              
+              <View style={styles.calorieStat}>
+                <Text style={styles.calorieStatLabel}>state:</Text>
+                <Text style={[
+                  styles.statusText,
+                  totalCalories <= calorieGoal ? styles.metGoal : styles.exceededGoal
+                ]}>
+                  {totalCalories <= calorieGoal 
+                    ? "✓ Achieve your goals" 
+                    : `Beyond ${(totalCalories - calorieGoal).toFixed(0)} Calories`}
+                </Text>
+              </View>
+            </View>
           </View>
         )}
       </View>
@@ -774,10 +930,43 @@ const styles = StyleSheet.create({
     borderTopColor: Colors.EXTRA_LIGHT_GRAY,
     alignItems: "center",
   },
+  calorieStats: {
+    backgroundColor: Colors.EXTRA_LIGHT_GRAY,
+    borderRadius: 8,
+    padding: 15,
+    marginTop: 15,
+  },
+  calorieStat: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 5,
+  },
+  calorieStatLabel: {
+    fontSize: 14,
+    fontFamily: "myfont-bold",
+    color: Colors.BLACK,
+  },
   totalCaloriesText: {
-    fontSize: 18,
+    fontSize: 16,
+    fontFamily: "myfont-bold",
+    color: Colors.BLACK,
+  },
+  goalText: {
+    fontSize: 16,
     fontFamily: "myfont-bold",
     color: Colors.PRIMARY,
+  },
+  statusText: {
+    fontSize: 16,
+    fontFamily: "myfont-bold",
+    color: Colors.PRIMARY,
+  },
+  metGoal: {
+    color: Colors.GREEN,
+  },
+  exceededGoal: {
+    color: Colors.RED,
   },
   nutritionContainer: {
     padding: 10,

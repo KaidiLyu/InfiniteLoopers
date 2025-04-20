@@ -172,6 +172,20 @@ export default function SearchFood() {
 
       const docRef = await addDoc(collection(db, "dailyTracker"), trackerEntry);
       console.log("Added to tracker: ", item.food_name, " Doc ID: ", docRef.id);
+      
+      // 同时添加到mealsSaved集合
+      const mealSavedRef = await addDoc(collection(db, "mealsSaved"), {
+        userId: user.uid,
+        userEmail: user.email,
+        foodName: item.food_name,
+        date: todayDate,
+        calories: item.nf_calories || 0,
+        source: "natural",
+        photo: item.photo?.thumb || null,
+        addedAt: new Date(),
+      });
+      console.log("Added to mealsSaved: ", item.food_name, " Doc ID: ", mealSavedRef.id);
+      
       Alert.alert("Success", `${item.food_name} added to today's tracker.`);
     } catch (error) {
       console.error("Error adding item to tracker:", error);
@@ -187,6 +201,7 @@ export default function SearchFood() {
     try {
       const todayDate = getTodayDateString();
       const batch = writeBatch(db);
+      const mealsSavedBatch = writeBatch(db);
       let count = 0;
 
       naturalFoodItems.forEach((item) => {
@@ -213,11 +228,27 @@ export default function SearchFood() {
         };
         const docRef = doc(collection(db, "dailyTracker"));
         batch.set(docRef, trackerEntry);
+        
+        // 同时添加到mealsSaved集合
+        const mealSavedRef = doc(collection(db, "mealsSaved"));
+        mealsSavedBatch.set(mealSavedRef, {
+          userId: user.uid,
+          userEmail: user.email,
+          foodName: item.food_name,
+          date: todayDate,
+          calories: item.nf_calories || 0,
+          source: "natural",
+          photo: item.photo?.thumb || null,
+          addedAt: new Date(),
+        });
+        
         count++;
       });
 
       await batch.commit();
-      console.log(`Added ${count} items to tracker.`);
+      await mealsSavedBatch.commit(); // 提交mealsSaved的批量操作
+      
+      console.log(`Added ${count} items to tracker and mealsSaved.`);
       Alert.alert("Success", `${count} item(s) added to today's tracker.`);
       setNaturalFoodItems([]);
     } catch (error) {

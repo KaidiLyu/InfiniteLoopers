@@ -27,6 +27,7 @@ export default function RootLayout() {
         <Stack.Screen name="(tabs)" />
         <Stack.Screen name="settings" />
         <Stack.Screen name="PersonalInfo" />
+        <Stack.Screen name="CalorieGoal" />
       </Stack>
     </PlatformContext.Provider>
   );

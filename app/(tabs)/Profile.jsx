@@ -6,12 +6,12 @@ import {
   TouchableOpacity,
   Alert,
 } from "react-native";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import * as ImagePicker from "expo-image-picker";
 import { auth, db, storage } from "../../configs/FirebaseConfig";
 import { Colors } from "../../constants/Colors";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { useRouter } from "expo-router";
+import { useRouter, useFocusEffect } from "expo-router";
 import { collection, query, where, getDocs } from "firebase/firestore";
 import { updateProfile } from "firebase/auth";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
@@ -39,10 +39,19 @@ export default function Profile() {
 
     const currentUser = auth.currentUser;
     setUser(currentUser);
-    if (currentUser) {
-      fetchUserStats(currentUser.uid);
-    }
   }, []);
+
+  useFocusEffect(
+    useCallback(() => {
+      const currentUser = auth.currentUser;
+      if (currentUser) {
+        fetchUserStats(currentUser.uid);
+      }
+      return () => {
+        // Clean up function (if needed)
+      };
+    }, [])
+  );
 
   const fetchUserStats = async (userId) => {
     try {
@@ -55,11 +64,53 @@ export default function Profile() {
       const productsSnapshot = await getDocs(
         query(collection(db, "mealsSaved"), where("userId", "==", userId))
       );
+      
+      // Get the latest calorie goal data
+      const userGoalDocRef = query(
+        collection(db, "userCalorieGoals"), 
+        where("userId", "==", userId)
+      );
+      const userGoalSnapshot = await getDocs(userGoalDocRef);
+      
+      let calorieGoal = 2000; // default value
+      if (!userGoalSnapshot.empty) {
+        const goalData = userGoalSnapshot.docs[0].data();
+        calorieGoal = goalData.calorieGoal || 2000;
+      }
+      
+      // Get today's date string
+      const today = new Date();
+      const year = today.getFullYear();
+      const month = String(today.getMonth() + 1).padStart(2, "0");
+      const day = String(today.getDate()).padStart(2, "0");
+      const todayString = `${year}-${month}-${day}`;
+      
+      // Check your calorie intake today
+      const todayTrackerQuery = query(
+        collection(db, "dailyTracker"),
+        where("userId", "==", userId),
+        where("date", "==", todayString)
+      );
+      
+      const todayTrackerSnapshot = await getDocs(todayTrackerQuery);
+      
+      // Calculate total calories for today
+      let todayTotalCalories = 0;
+      todayTrackerSnapshot.forEach((doc) => {
+        const item = doc.data();
+        const servingQty = item.servingQty || 0;
+        todayTotalCalories += (item.calories || 0) * servingQty;
+      });
+      
       setStats({
         savedFoods: savedFoodsSnapshot.size,
         recipes: recipesSnapshot.size,
         products: productsSnapshot.size,
+        todayCalories: todayTotalCalories,
+        calorieGoal: calorieGoal,
       });
+      
+      console.log("Stats updated, meals saved count:", productsSnapshot.size);
     } catch (error) {
       console.error("Error fetching user stats:", error);
     }
@@ -170,6 +221,29 @@ export default function Profile() {
             <Text style={styles.statLabel}>Meals saved</Text>
           </View>
         </View>
+        
+        {stats.todayCalories > 0 && (
+          <View style={styles.calorieStatus}>
+            <Text style={styles.calorieStatusText}>
+            Ingested today: {stats.todayCalories.toFixed(0)} Calories
+            </Text>
+            <Text style={[
+              styles.calorieStatusGoal,
+              stats.todayCalories <= stats.calorieGoal 
+                ? styles.calorieStatusGood 
+                : styles.calorieStatusBad
+            ]}>
+              {stats.todayCalories <= stats.calorieGoal 
+                ? `Distance to target ${(stats.calorieGoal - stats.todayCalories).toFixed(0)} Calories` 
+                : `Exceeding Target ${(stats.todayCalories - stats.calorieGoal).toFixed(0)} Calories!`}
+            </Text>
+          </View>
+        )}
+        
+        <TouchableOpacity style={styles.goalButton} onPress={() => router.push("/CalorieGoal")}>
+          <MaterialCommunityIcons name="target" size={24} color="#fff" />
+          <Text style={styles.goalText}>Set Calorie Goal</Text>
+        </TouchableOpacity>
 
         <TouchableOpacity style={styles.settingsButton} onPress={toSettings}>
           <MaterialCommunityIcons name="cog" size={24} color="#fff" />
@@ -294,6 +368,21 @@ const styles = StyleSheet.create({
     fontFamily: "myfont",
     color: Colors.GRAY,
   },
+  goalButton: {
+    backgroundColor: Colors.BLACK,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: 15,
+    borderRadius: 12,
+    marginBottom: 10,
+  },
+  goalText: {
+    color: "#fff",
+    fontFamily: "myfont-bold",
+    fontSize: 16,
+    marginLeft: 10,
+  },
   settingsButton: {
     backgroundColor: Colors.BLACK,
     flexDirection: "row",
@@ -335,5 +424,26 @@ const styles = StyleSheet.create({
     color: Colors.GRAY,
     fontSize: 10,
     marginTop: 5,
+  },
+  calorieStatus: {
+    backgroundColor: Colors.EXTRA_LIGHT_GRAY,
+    borderRadius: 10,
+    padding: 15,
+    marginBottom: 15,
+  },
+  calorieStatusText: {
+    fontFamily: "myfont-medium",
+    fontSize: 16,
+    marginBottom: 5,
+  },
+  calorieStatusGoal: {
+    fontFamily: "myfont-bold",
+    fontSize: 14,
+  },
+  calorieStatusGood: {
+    color: Colors.GREEN,
+  },
+  calorieStatusBad: {
+    color: Colors.RED,
   },
 });

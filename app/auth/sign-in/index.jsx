@@ -60,19 +60,36 @@ export default function SignIn() {
         console.log(errorCode, errorMessage);
         console.log("-----------------");
 
+        let errorMsg = "Login failed, please try again"; // 默认错误消息
+
         if (errorCode === "auth/invalid-credential") {
-          if (isAndroid) {
-            ToastAndroid.show("Invalid Credentials", ToastAndroid.BOTTOM);
-          }
-          if (isIOS) Alert.alert("Invalid Credentials");
-          console.log("Invalid Credentials");
+          errorMsg = "Invalid login credentials";
+        } else if (errorCode === "auth/missing-password") {
+          errorMsg = "Please enter your password";
+        } else if (errorCode === "auth/wrong-password") {
+          errorMsg = "Wrong password, please try again";
+        } else if (errorCode === "auth/user-not-found") {
+          errorMsg = "The user does not exist, please check your email or register a new account";
+        } else if (errorCode === "auth/too-many-requests") {
+          errorMsg = "Too many login attempts, please try again later";
+        } else if (errorCode === "auth/network-request-failed") {
+          errorMsg = "Network connection failed, please check your network";
         }
-        if (errorCode === "auth/missing-password") {
-          if (isAndroid)
-            ToastAndroid.show("Missing password", ToastAndroid.BOTTOM);
-          if (isIOS) Alert.alert("Missing password");
-          console.log("Missing password");
+
+        // 显示错误消息
+        if (isAndroid) {
+          ToastAndroid.show(errorMsg, ToastAndroid.BOTTOM);
         }
+        if (isIOS) {
+          Alert.alert("Login Error", errorMsg);
+        }
+        if (isWeb || isMacos) {
+          console.error("Login Error:", errorMsg);
+          // 如果Web端有其他显示错误的方式，可以在这里添加
+          Alert.alert("Login Error", errorMsg);
+        }
+        console.log(errorMsg);
+        
         return;
       });
   };

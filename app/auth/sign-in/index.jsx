@@ -115,15 +115,15 @@ export default function SignIn() {
                 zIndex: 0,
               }}
             />
-            <Link
-              href="/"
+            <TouchableOpacity
+              onPress={() => router.back()}
               style={{
                 position: "absolute",
                 padding: 20,
                 marginTop: 20,
               }}>
               <FontAwesome6 name="circle-arrow-left" size={30} color="black" />
-            </Link>
+            </TouchableOpacity>
             <View style={{ padding: 20, marginTop: "50%" }}>
               <Text
                 style={{

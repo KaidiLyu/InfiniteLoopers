@@ -94,6 +94,8 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontFamily: "myfont-medium",
     color: Colors.WHITE,
+    minWidth: 100,
+    textAlign: "center",
   },
   continueIcon: {
     position: "absolute",

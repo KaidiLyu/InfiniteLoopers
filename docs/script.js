@@ -197,6 +197,19 @@ document.addEventListener("DOMContentLoaded", () => {
     if (videoElement && videoPlayBtn && videoOverlay) {
       videoPlayBtn.addEventListener("click", toggleVideo)
   
+      // 当视频自己暂停或播放时也更新覆盖层状态
+      videoElement.addEventListener("play", function() {
+        videoOverlay.style.opacity = "0"
+        videoOverlay.style.pointerEvents = "none"
+        videoPlayBtn.innerHTML = '<i class="lucide lucide-pause"></i>'
+      })
+  
+      videoElement.addEventListener("pause", function() {
+        videoOverlay.style.opacity = "1"
+        videoOverlay.style.pointerEvents = "auto"
+        videoPlayBtn.innerHTML = '<i class="lucide lucide-play"></i>'
+      })
+  
       /**
        * 切换视频播放/暂停状态
        * Toggle video play/pause state
@@ -205,10 +218,12 @@ document.addEventListener("DOMContentLoaded", () => {
         if (videoElement.paused) {
           videoElement.play()
           videoOverlay.style.opacity = "0"
+          videoOverlay.style.pointerEvents = "none"
           videoPlayBtn.innerHTML = '<i class="lucide lucide-pause"></i>'
         } else {
           videoElement.pause()
           videoOverlay.style.opacity = "1"
+          videoOverlay.style.pointerEvents = "auto"
           videoPlayBtn.innerHTML = '<i class="lucide lucide-play"></i>'
         }
       }
@@ -225,6 +240,7 @@ document.addEventListener("DOMContentLoaded", () => {
                   .play()
                   .then(() => {
                     videoOverlay.style.opacity = "0"
+                    videoOverlay.style.pointerEvents = "none"
                     videoPlayBtn.innerHTML = '<i class="lucide lucide-pause"></i>'
                   })
                   .catch((error) => {
@@ -234,6 +250,7 @@ document.addEventListener("DOMContentLoaded", () => {
               } else if (!entry.isIntersecting && !videoElement.paused) {
                 videoElement.pause()
                 videoOverlay.style.opacity = "1"
+                videoOverlay.style.pointerEvents = "auto"
                 videoPlayBtn.innerHTML = '<i class="lucide lucide-play"></i>'
               }
             })

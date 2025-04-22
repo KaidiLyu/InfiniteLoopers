@@ -12,6 +12,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <!-- Lucide图标库引用 Lucide Icons Library Reference -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lucide-icons@0.284.0/font/lucide.min.css">
+  <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 <body class="dark">
   <!-- 导航栏 Navbar -->
@@ -119,7 +120,7 @@
           <!-- 功能卡片1：图像识别 Feature Card 1: Image Recognition -->
           <div class="feature-card">
             <div class="feature-icon cyan">
-              <i class="lucide lucide-camera"></i>
+              <i data-lucide="camera" size="36"></i>
             </div>
             <h3 class="feature-title" data-i18n="feature1Title">Image Recognition</h3>
             <p class="feature-description" data-i18n="feature1Description">Take a photo of any food and get instant nutritional information.</p>
@@ -127,7 +128,7 @@
           <!-- 功能卡片2：自然语言搜索 Feature Card 2: Natural Language Search -->
           <div class="feature-card">
             <div class="feature-icon emerald">
-              <i class="lucide lucide-search"></i>
+              <i data-lucide="search" size="36"></i>
             </div>
             <h3 class="feature-title" data-i18n="feature2Title">Natural Language Search</h3>
             <p class="feature-description" data-i18n="feature2Description">Simply describe the food you're looking for in natural language.</p>
@@ -135,7 +136,7 @@
           <!-- 功能卡片3：全面数据 Feature Card 3: Comprehensive Data -->
           <div class="feature-card">
             <div class="feature-icon blue">
-              <i class="lucide lucide-database"></i>
+              <i data-lucide="database" size="36"></i>
             </div>
             <h3 class="feature-title" data-i18n="feature3Title">Comprehensive Data</h3>
             <p class="feature-description" data-i18n="feature3Description">Get detailed nutritional breakdown including calories, macros, vitamins, and more.</p>
@@ -180,7 +181,7 @@
       <div class="container">
         <h2 class="section-title gradient-text" data-i18n="howItWorksTitle">How It Works</h2>
         <!-- 步骤容器 Steps Container -->
-        <div class="steps-container">
+        <div class="steps-container compact-steps">
           <!-- 步骤1：拍照或输入描述 Step 1: Take photo or enter description -->
           <div class="step">
             <div class="step-number cyan">1</div>
@@ -466,6 +467,11 @@
   </div>
 
   <script src="script.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      lucide.createIcons();
+    });
+  </script>
 </body>
 </html>
 

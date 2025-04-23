@@ -1071,6 +1071,7 @@
     grid-template-columns: 1fr; /* 在移动设备上单列 - Single column on mobile */
     gap: 3rem;
     margin-bottom: 4rem;
+    align-items: stretch; /* 改为stretch，让两列高度匹配 */
   }
   
   /* 了解更多内容区域 - Learn more content area */
@@ -1078,6 +1079,7 @@
     display: flex;
     flex-direction: column;
     gap: 1.5rem;
+    height: 100%; /* 设置高度为100% */
   }
   
   /* 了解更多描述文本 - Learn more description */
@@ -1088,9 +1090,12 @@
   
   /* 了解更多图像容器 - Learn more image container */
   .learn-more-image {
-    background-color: var(--gray-900);
-    padding: 2rem;
+    width: 100%;
+    height: 100%; /* 设置高度为100% */
+    display: flex;
+    align-items: stretch;
     border-radius: var(--radius);
+    overflow: hidden;
   }
   
   /* 标签页内容标题 - Tab content title */
@@ -1211,7 +1216,7 @@
   
     .learn-more-grid {
       grid-template-columns: 1fr 1fr; /* 两列布局 - Two-column layout */
-      align-items: center;
+      align-items: stretch; /* 确保两列高度一致，使图片与文字内容对齐 */
     }
   
     .footer-grid {
@@ -1706,6 +1711,107 @@
       clear: both;
       padding-top: 0.5rem;
     }
+  }
+  
+  /* 轮播图样式 Carousel Styles */
+  .carousel-container {
+    position: relative;
+    overflow: hidden;
+    border-radius: var(--radius);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+    width: 100%;
+    height: auto; /* 改为自动高度 */
+    min-height: 100%; /* 设置最小高度100% */
+    background-color: var(--gray-900); /* 添加背景色 */
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .carousel-slides {
+    position: relative;
+    width: 100%;
+    flex: 1; /* 让幻灯片容器占据所有可用空间 */
+  }
+  
+  .carousel-slide {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    transition: opacity 0.5s ease-in-out;
+    z-index: 1; /* 确保幻灯片有正确的z-index */
+    display: none;
+  }
+  
+  .carousel-slide.active {
+    opacity: 1;
+    z-index: 2; /* 活动幻灯片显示在顶层 */
+    display: block;
+  }
+  
+  .carousel-slide img {
+    width: 100%;
+    max-height: 100%;
+    object-fit: contain; /* 改为contain而不是cover，确保整个图片可见 */
+    border-radius: var(--radius);
+    display: block; /* 确保图片正确显示 */
+  }
+  
+  .carousel-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background-color: rgba(0, 0, 0, 0.5);
+    color: white;
+    border: none;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    z-index: 10; /* 确保按钮位于幻灯片之上 */
+  }
+  
+  .carousel-btn:hover {
+    background-color: rgba(0, 0, 0, 0.8);
+  }
+  
+  .prev-btn {
+    left: 10px;
+  }
+  
+  .next-btn {
+    right: 10px;
+  }
+  
+  .carousel-indicators {
+    position: absolute;
+    bottom: 15px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 8px;
+    z-index: 10; /* 确保指示器位于幻灯片之上 */
+  }
+  
+  .indicator-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.5);
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  
+  .indicator-dot.active {
+    background-color: white;
+    transform: scale(1.2);
   }
   
   

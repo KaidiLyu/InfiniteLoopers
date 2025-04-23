@@ -8,6 +8,73 @@
   
   <!-- 样式表引用 Stylesheet References -->
   <link rel="stylesheet" href="styles.css">
+  <!-- 轮播图修复样式 Carousel Fix Styles -->
+  <link rel="stylesheet" href="carousel-fix.css">
+  <!-- 内联轮播图修复样式 Inline Carousel Fix Styles -->
+  <style>
+    /* 确保轮播图容器正确显示 */
+    .carousel-container {
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      border-radius: 8px;
+      background-color: #111;
+      margin: 0;
+      padding: 0;
+    }
+    
+    /* 轮播幻灯片区域 */
+    .carousel-slides {
+      position: relative;
+      flex: 1;
+      width: 100%;
+    }
+    
+    /* 确保轮播图幻灯片正确显示 */
+    .carousel-slide {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      left: 0;
+      top: 0;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.5s ease;
+      z-index: 1;
+      display: none;
+    }
+    
+    /* 确保激活的幻灯片正确显示 */
+    .carousel-slide.active {
+      opacity: 1;
+      visibility: visible;
+      z-index: 2;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    /* 确保图片正确显示 */
+    .carousel-slide img {
+      display: block;
+      max-width: 100%;
+      max-height: 100%;
+      width: auto;
+      height: auto;
+      object-fit: contain;
+      margin: auto;
+    }
+    
+    /* 确保图片容器正确显示 */
+    .learn-more-image {
+      width: 100%;
+      height: 100%;
+      display: flex;
+    }
+  </style>
   <!-- Google字体引用 Google Fonts Reference -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <!-- Lucide图标库引用 Lucide Icons Library Reference -->
@@ -104,7 +171,48 @@
           </div>
           <!-- 右侧应用截图 Right App Screenshot -->
           <div class="learn-more-image">
-            <img src="Promotional images and videos/Promotional images.jpg" alt="Salmon dish with vegetables - AI Nutritional Search">
+            <!-- 图片轮播容器 Image Carousel Container -->
+            <div class="carousel-container">
+              <!-- 轮播图片 Carousel Images -->
+              <div class="carousel-slides">
+                <!-- 幻灯片1 - Slide 1 -->
+                <div class="carousel-slide active">
+                  <img src="Promotional images and videos/Promotional images.jpg" alt="InfiniteLoopers App - Main View" loading="eager">
+                </div>
+                <!-- 幻灯片2 - Slide 2 -->
+                <div class="carousel-slide">
+                  <img src="Promotional images and videos/appPage1.jpg" alt="InfiniteLoopers App - Page 1" loading="lazy">
+                </div>
+                <!-- 幻灯片3 - Slide 3 -->
+                <div class="carousel-slide">
+                  <img src="Promotional images and videos/appPage2.jpg" alt="InfiniteLoopers App - Page 2" loading="lazy">
+                </div>
+                <!-- 幻灯片4 - Slide 4 -->
+                <div class="carousel-slide">
+                  <img src="Promotional images and videos/appPage3.jpg" alt="InfiniteLoopers App - Page 3" loading="lazy">
+                </div>
+              </div>
+              
+              <!-- 前一张按钮 Previous Button -->
+              <button class="carousel-btn prev-btn">
+                <i class="lucide lucide-chevron-left"></i>
+                <span class="fallback-icon">&lt;</span>
+              </button>
+              
+              <!-- 下一张按钮 Next Button -->
+              <button class="carousel-btn next-btn">
+                <i class="lucide lucide-chevron-right"></i>
+                <span class="fallback-icon">&gt;</span>
+              </button>
+              
+              <!-- 指示器 Indicators -->
+              <div class="carousel-indicators">
+                <button class="indicator-dot active" data-slide="0"></button>
+                <button class="indicator-dot" data-slide="1"></button>
+                <button class="indicator-dot" data-slide="2"></button>
+                <button class="indicator-dot" data-slide="3"></button>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -289,6 +397,26 @@
 
   <!-- JavaScript脚本引用 JavaScript Script Reference -->
   <script src="script.js"></script>
+  
+  <!-- 初始化Lucide图标 Initialize Lucide Icons -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // 初始化所有Lucide图标
+      lucide.createIcons();
+      
+      // 确保轮播按钮图标正确显示
+      const prevBtn = document.querySelector('.prev-btn');
+      const nextBtn = document.querySelector('.next-btn');
+      
+      if (prevBtn) {
+        prevBtn.innerHTML = '<i class="lucide lucide-chevron-left"></i>';
+      }
+      
+      if (nextBtn) {
+        nextBtn.innerHTML = '<i class="lucide lucide-chevron-right"></i>';
+      }
+    });
+  </script>
 </body>
 </html>
 

@@ -261,6 +261,111 @@ document.addEventListener("DOMContentLoaded", () => {
         observer.observe(videoSection)
       }
     }
+
+    // 轮播图功能 - Image Carousel Functionality
+    const carouselContainer = document.querySelector('.carousel-container');
+    if (carouselContainer) {
+      const slides = document.querySelectorAll('.carousel-slide');
+      const prevBtn = document.querySelector('.prev-btn');
+      const nextBtn = document.querySelector('.next-btn');
+      const indicators = document.querySelectorAll('.indicator-dot');
+      let currentSlide = 0;
+      let slideInterval;
+
+      // 初始化轮播图 - Initialize carousel
+      initCarousel();
+
+      /**
+       * 初始化轮播图 - Initialize the carousel
+       */
+      function initCarousel() {
+        // 启动自动轮播 - Start auto-slide
+        startAutoSlide();
+
+        // 点击下一张按钮 - Next button click
+        nextBtn.addEventListener('click', () => {
+          goToNextSlide();
+          resetAutoSlide();
+        });
+
+        // 点击上一张按钮 - Previous button click
+        prevBtn.addEventListener('click', () => {
+          goToPrevSlide();
+          resetAutoSlide();
+        });
+
+        // 点击指示器 - Indicator dots click
+        indicators.forEach((dot, index) => {
+          dot.addEventListener('click', () => {
+            goToSlide(index);
+            resetAutoSlide();
+          });
+        });
+
+        // 鼠标悬停时暂停自动轮播 - Pause auto-slide on hover
+        carouselContainer.addEventListener('mouseenter', () => {
+          clearInterval(slideInterval);
+        });
+
+        // 鼠标离开时恢复自动轮播 - Resume auto-slide when mouse leaves
+        carouselContainer.addEventListener('mouseleave', () => {
+          startAutoSlide();
+        });
+      }
+
+      /**
+       * 开始自动轮播 - Start auto-sliding
+       */
+      function startAutoSlide() {
+        // 每5秒自动切换到下一张 - Auto-change every 5 seconds
+        slideInterval = setInterval(goToNextSlide, 5000);
+      }
+
+      /**
+       * 重置自动轮播 - Reset auto-slide timer
+       */
+      function resetAutoSlide() {
+        clearInterval(slideInterval);
+        startAutoSlide();
+      }
+
+      /**
+       * 前往下一张幻灯片 - Go to next slide
+       */
+      function goToNextSlide() {
+        let nextSlide = currentSlide + 1;
+        if (nextSlide >= slides.length) {
+          nextSlide = 0;
+        }
+        goToSlide(nextSlide);
+      }
+
+      /**
+       * 前往上一张幻灯片 - Go to previous slide
+       */
+      function goToPrevSlide() {
+        let prevSlide = currentSlide - 1;
+        if (prevSlide < 0) {
+          prevSlide = slides.length - 1;
+        }
+        goToSlide(prevSlide);
+      }
+
+      /**
+       * 前往指定幻灯片 - Go to a specific slide
+       * @param {number} slideIndex - 幻灯片索引 / Slide index
+       */
+      function goToSlide(slideIndex) {
+        // 隐藏当前幻灯片 - Hide current slide
+        slides[currentSlide].classList.remove('active');
+        indicators[currentSlide].classList.remove('active');
+        
+        // 显示新的幻灯片 - Show new slide
+        currentSlide = slideIndex;
+        slides[currentSlide].classList.add('active');
+        indicators[currentSlide].classList.add('active');
+      }
+    }
   })
   
   /**

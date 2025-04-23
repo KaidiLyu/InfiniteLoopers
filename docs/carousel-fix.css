@@ -1,0 +1,145 @@
+/**
+ * 轮播图修复样式 - 解决图片显示问题
+ * Carousel fix styles - Fix image display issues
+ */
+
+/* 轮播容器样式覆盖 */
+.carousel-container {
+  display: flex !important;
+  flex-direction: column !important;
+  position: relative !important;
+  width: 100% !important;
+  height: 100% !important; /* 使用100%高度 */
+  overflow: hidden !important;
+  border-radius: 8px !important;
+  background-color: #111111 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* 轮播幻灯片区域 */
+.carousel-slides {
+  position: relative !important;
+  flex: 1 !important;
+  width: 100% !important;
+}
+
+/* 轮播幻灯片基础样式 */
+.carousel-slide {
+  position: absolute !important;
+  width: 100% !important;
+  height: 100% !important;
+  left: 0 !important;
+  top: 0 !important;
+  opacity: 0 !important;
+  transition: opacity 0.5s ease !important;
+  z-index: 1 !important;
+  visibility: hidden !important;
+  display: none !important;
+}
+
+/* 激活的幻灯片样式 */
+.carousel-slide.active {
+  opacity: 1 !important;
+  z-index: 2 !important;
+  visibility: visible !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+/* 轮播图片样式 */
+.carousel-slide img {
+  display: block !important;
+  max-width: 100% !important;
+  max-height: 100% !important;
+  width: auto !important;
+  height: auto !important;
+  object-fit: contain !important;
+  object-position: center !important;
+  margin: auto !important;
+}
+
+/* 轮播按钮样式 Carousel Button Styles */
+.carousel-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(0, 0, 0, 0.5);
+  color: white;
+  border: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  cursor: pointer;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  transition: background 0.3s ease;
+}
+
+.carousel-btn:hover {
+  background: rgba(0, 0, 0, 0.8);
+}
+
+.prev-btn {
+  left: 10px;
+}
+
+.next-btn {
+  right: 10px;
+}
+
+/* 备用图标样式 Fallback Icon Styles */
+.fallback-icon {
+  display: none;
+}
+
+/* 当图标库未加载时显示备用图标 */
+.carousel-btn i:not(.lucide),
+.carousel-btn i:empty {
+  display: none;
+}
+
+.carousel-btn i:not(.lucide) ~ .fallback-icon,
+.carousel-btn i:empty ~ .fallback-icon {
+  display: inline;
+}
+
+/* 指示器容器样式 */
+.carousel-indicators {
+  position: absolute !important;
+  bottom: 15px !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  display: flex !important;
+  gap: 8px !important;
+  z-index: 10 !important;
+}
+
+/* 指示器点样式 */
+.indicator-dot {
+  width: 10px !important;
+  height: 10px !important;
+  border-radius: 50% !important;
+  background-color: rgba(255, 255, 255, 0.5) !important;
+  border: none !important;
+  cursor: pointer !important;
+}
+
+/* 激活的指示器点样式 */
+.indicator-dot.active {
+  background-color: white !important;
+  transform: scale(1.2) !important;
+}
+
+/* 图片容器样式 */
+.learn-more-image {
+  width: 100% !important;
+  height: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  display: flex !important;
+} 

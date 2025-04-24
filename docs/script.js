@@ -479,11 +479,11 @@ document.addEventListener("DOMContentLoaded", () => {
       teamDescription2: "The InfiniteLoopers team was formed as part of the Capstone Project at the University of South Carolina's Computer Science program. Each member brings unique skills and perspectives to the project, collaborating closely to build an application that addresses real-world nutritional tracking needs.",
       teamDescription3: "Our development process follows Agile methodologies, with regular sprint planning and review meetings to ensure continuous improvement. We maintain a strong focus on user experience, performance optimization, and code quality throughout the development lifecycle.",
       teamDescription4: "The team is committed to creating technology that makes a positive impact on users' health and wellbeing. We believe that access to accurate nutritional information should be simple, fast, and available to everyone, regardless of their technical expertise.",
-      role1: "前端开发 & 网页开发与测试",
-      role2: "后端开发",
+      role1: "Frontend & Web Developer, QA Tester",
+      role2: "Backend Developer",
       role3: "Team Lead & Backend Developer",
       role4: "",
-      role5: "用户体验设计师"
+      role5: "UX Designer"
     },
     zh: {
       // 导航栏 (Navbar)
@@ -592,7 +592,7 @@ document.addEventListener("DOMContentLoaded", () => {
       teamDescription4: "团队致力于创造对用户健康和福祉产生积极影响的技术。我们相信，获取准确的营养信息应该简单、快速，并且对所有人开放，无论他们的技术专长如何。",
       role1: "前端开发 & 网页开发与测试",
       role2: "后端开发",
-      role3: "后端开发",
+      role3: "团队负责人 & 后端开发",
       role4: "",
       role5: "用户体验设计师"
     },

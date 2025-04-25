@@ -19,6 +19,7 @@ import { Link, useNavigation, useRouter } from "expo-router";
 import { Colors } from "../../constants/Colors";
 import { FontAwesome6, MaterialCommunityIcons } from "@expo/vector-icons";
 import { CameraView, useCameraPermissions } from "expo-camera";
+import { identifyFoodImage } from "../api/Vision";
 import { autoCompleteIngredients } from "../api/SearchIngredients";
 import { autoCompleteProducts } from "../api/SearchProducts";
 import { autoCompleteRecipes } from "../api/SearchRecipes";
@@ -26,6 +27,7 @@ import { getNaturalLanguageNutrition } from "../api/NutritionixNatural";
 import { getProductByUPC } from "../api/NutritionixUPC";
 import { getProductByUPCFromEandata } from "../api/EAN";
 import { auth, db } from "../../configs/FirebaseConfig";
+import * as ImagePicker from "expo-image-picker";
 import {
   doc,
   setDoc,
@@ -55,6 +57,8 @@ export default function SearchFood() {
   const [permission, requestPermission] = useCameraPermissions();
   const [isScannerVisible, setIsScannerVisible] = useState(false);
   const [scannedData, setScannedData] = useState(null);
+
+  const [cameraLabel, setCameraLabel] = useState("");
 
   useEffect(() => {
     navigation.setOptions({
@@ -176,6 +180,74 @@ export default function SearchFood() {
     } catch (error) {
       console.error("Error adding item to tracker:", error);
       Alert.alert("Error", "Could not add item to tracker.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const takePicture = async () => {
+    setError(null)
+    setLoading(true);
+    setNaturalFoodItems([]);
+    setCameraLabel("");
+  
+    try {
+      const result = await ImagePicker.launchCameraAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        quality: 0.5,
+        base64: true,
+      });
+  
+      if (result.cancelled || !result.assets?.[0]?.base64) {
+        setError("Picture cancelled.");
+        return;
+      }
+  
+      const base64Image = result.assets[0].base64;
+  
+      const { labels } = await identifyFoodImage(base64Image);
+      console.log("Vision labels:", labels);
+  
+      if (!labels || labels.length === 0) {
+        setError("Could not identifty the food in the image");
+        return;
+      }
+  
+      const vagueLabels = ["food", "dish", "meal", "product", "cuisine"];
+      let nutritionResult = null;
+      let finalLabel = null;
+  
+      for (const label of labels) {
+        if (vagueLabels.includes(label.toLowerCase())) continue;
+  
+        try {
+          console.log(`Searching for label "${label}"`);
+          const result = await getNaturalLanguageNutrition(label);
+          if (result?.foods?.length > 0) {
+            nutritionResult = result;
+            finalLabel = label;
+            break;
+          }
+        } catch (err) {
+          console.warn(`No label found for: "${label}"`);
+        }
+      }
+  
+      if (!nutritionResult) {
+        setError("Could not find a nutrtion label for the food");
+        return;
+      }
+  
+      setCameraLabel(finalLabel);
+  
+      const foodsWithZeroQty = nutritionResult.foods.map((food) => ({
+        ...food,
+        serving_qty: food.servingQty || 1,
+      }));
+      setNaturalFoodItems(foodsWithZeroQty);
+    } catch (err) {
+      console.error("Camera error: ", err?.response?.data || err.message);
+      setError("Could not identify the food or find it's nutrition label");
     } finally {
       setLoading(false);
     }
@@ -960,9 +1032,35 @@ export default function SearchFood() {
           )}
           {searchMode === "Camera" && (
             <>
-              <Text style={styles.header}>Coming Soon... 👀</Text>
-            </>
-          )}
+            <Text style={styles.header}>AI Camera</Text>
+            <TouchableOpacity
+              style={styles.actionButton}
+              onPress={takePicture}
+              disabled={loading}
+            >
+              <MaterialCommunityIcons
+                name="camera"
+                size={20}
+                color={Colors.WHITE}
+              />
+              <Text style={styles.actionButtonText}> Take a Picture</Text>
+            </TouchableOpacity>
+        
+            {cameraLabel && (
+              <Text style={{ textAlign: "center", marginTop: 10 }}>
+                Detected: {cameraLabel}
+              </Text>
+            )}
+            {naturalFoodItems.length > 0 && (
+              <>
+                {renderNutritionLabel()}
+              </>
+            )}
+            <Text style={styles.placeholderText}>
+              Take a picture of a food item and retrieve its nutritional information
+            </Text>
+          </>
+        )}
         </View>
       </ScrollView>
 

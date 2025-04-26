@@ -157,7 +157,7 @@ export default function SearchFood() {
         userEmail: user.email,
         date: todayDate,
         foodName: item.food_name,
-        servingQty: 1,
+        servingQty: item.servingQty || 1,
         servingUnit: item.serving_unit,
         calories: item.nf_calories || 0,
         nf_total_fat: item.nf_total_fat || 0,
@@ -1054,6 +1054,19 @@ export default function SearchFood() {
             {naturalFoodItems.length > 0 && (
               <>
                 {renderNutritionLabel()}
+                <TouchableOpacity
+                      style={[styles.actionButton, styles.addAllButton]}
+                      onPress={() => addItemToTracker(naturalFoodItems[0])}
+                      disabled={loading}>
+                      <MaterialCommunityIcons
+                        name="plus-box-multiple-outline"
+                        size={20}
+                        color={Colors.WHITE}
+                      />
+                      <Text style={styles.actionButtonText}>
+                        Add to Tracker
+                      </Text>
+                    </TouchableOpacity>
               </>
             )}
             <Text style={styles.placeholderText}>

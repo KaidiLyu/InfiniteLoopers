@@ -10,7 +10,7 @@ export const identifyFoodImage = async (base64Image) => {
         requests: [
           {
             image: { content: base64Image },
-            features: [{ type: "LABEL_DETECTION", maxResults: 3 }],
+            features: [{ type: "LABEL_DETECTION", maxResults: 5 }],
           },
         ],
       }

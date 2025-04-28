@@ -1,3 +1,4 @@
+// Import necessary React Native components and libraries
 import {
   Alert,
   StyleSheet,
@@ -18,13 +19,15 @@ import {
 } from "firebase/auth";
 import { auth } from "../../configs/FirebaseConfig";
 
+// Define UpdateProfile component
 export default function UpdateProfile() {
-  const user = auth.currentUser;
-  const [name, setName] = useState(user?.displayName || "");
-  const [email, setEmail] = useState(user?.email || "");
-  const [password, setPassword] = useState("");
-  const navigation = useNavigation();
+  const user = auth.currentUser; // Get the current authenticated user
+  const [name, setName] = useState(user?.displayName || ""); // State for name input
+  const [email, setEmail] = useState(user?.email || "");     // State for email input
+  const [password, setPassword] = useState("");              // State for password input
+  const navigation = useNavigation();                       // Hook for navigation
 
+  // Function to handle updating user profile
   const updateUserProfile = async () => {
     try {
       if (!user) {
@@ -39,32 +42,40 @@ export default function UpdateProfile() {
         Alert.alert("No changes detected", "One or more fields are the same as before.");
         return;
       }
+      // Update name if changed
       if (name && name !== user.displayName) {
         await updateProfile(user, { displayName: name });
       }
+      // Update email if changed
       if (email && email !== user.email) {
         await updateEmail(user, email);
-        // add these later
+        // Future implementation: email verification
         // await verifyBeforeUpdateEmail(user, email);
         // await applyActionCode(auth, code);
       }
+      // Update password if provided
       if (password) {
         await updatePassword(user, password);
       }
       Alert.alert("Your profile has been successfully updated");
-      navigation.goBack();
+      navigation.goBack(); // Navigate back after successful update
     } catch (error) {
       console.log(error);
       Alert.alert("Error, could not update your profile");
     }
   };
 
+  // Check if there is anything to update
   const canUpdate = name.trim() !== "" || email.trim() !== "" || password.trim() !== "";
 
   return (
     <View style={styles.container}>
+      {/* Page Header */}
       <Text style={styles.header}>Update Profile</Text>
+      
+      {/* Input Form Card */}
       <View style={styles.card}>
+        {/* Name Input */}
         <Text style={styles.label}>Name</Text>
         <TextInput
           placeholder="Enter New Name"
@@ -72,6 +83,8 @@ export default function UpdateProfile() {
           value={name}
           onChangeText={setName}
         />
+
+        {/* Email Input */}
         <Text style={styles.label}>Email</Text>
         <TextInput
           placeholder="Enter New Email"
@@ -80,6 +93,8 @@ export default function UpdateProfile() {
           onChangeText={setEmail}
           keyboardType="email-address"
         />
+
+        {/* Password Input */}
         <Text style={styles.label}>Password</Text>
         <TextInput
           placeholder="Enter New Password"
@@ -88,18 +103,24 @@ export default function UpdateProfile() {
           onChangeText={setPassword}
           secureTextEntry
         />
+
+        {/* Update Profile Button */}
         <TouchableOpacity
           style={[styles.button, !canUpdate && styles.disabledButton]}
           onPress={updateUserProfile}
           disabled={!canUpdate}>
           <Text style={styles.buttonText}>Update Profile</Text>
-          </TouchableOpacity>
+        </TouchableOpacity>
+
+        {/* Back Button */}
         <TouchableOpacity
           style={styles.button}
           onPress={() => navigation.goBack()}>
           <Text style={styles.buttonText}>Back</Text>
         </TouchableOpacity>
       </View>
+
+      {/* Small Note */}
       <Text style={styles.note}>
         Please ensure your information is accurate
       </Text>
@@ -107,6 +128,7 @@ export default function UpdateProfile() {
   );
 }
 
+// Stylesheet for UpdateProfile screen
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -161,7 +183,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
   },
   disabledButton: {
-    backgroundColor: Colors.GRAY
+    backgroundColor: Colors.GRAY,
   },
   note: {
     textAlign: "center",

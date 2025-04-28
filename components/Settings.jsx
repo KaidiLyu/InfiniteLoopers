@@ -1,38 +1,50 @@
+// Import necessary React Native components and libraries
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import React from "react";
 import { Colors } from "../constants/Colors";
 import { useRouter } from "expo-router";
 import AntDesign from "@expo/vector-icons/AntDesign";
 
+// Define Settings screen component
 export default function Settings() {
-  const router = useRouter();
+  const router = useRouter(); // Hook for navigation
+
+  // Define the settings options available
   const settingsOptions = [
     { name: "Personal Information", screen: "/PersonalInfo" },
   ];
 
   return (
     <View style={styles.container}>
+      {/* Header */}
       <Text style={styles.header}>Settings</Text>
+
+      {/* Settings Options Card */}
       <View style={styles.card}>
         {settingsOptions.map((option, index) => (
           <TouchableOpacity
             key={index}
             style={styles.optionButton}
-            onPress={() => router.push(option.screen)}>
+            onPress={() => router.push(option.screen)}
+          >
             <Text style={styles.optionText}>{option.name}</Text>
             <AntDesign name="right" size={20} color={Colors.WHITE} />
           </TouchableOpacity>
         ))}
       </View>
+
+      {/* Back Button */}
       <TouchableOpacity
         style={styles.backButton}
-        onPress={() => router.push("/(tabs)/Profile")}>
+        onPress={() => router.push("/(tabs)/Profile")}
+      >
         <Text style={styles.backButtonText}>Back</Text>
       </TouchableOpacity>
     </View>
   );
 }
 
+// Styles for the Settings screen
 const styles = StyleSheet.create({
   container: {
     flex: 1,

@@ -1,3 +1,10 @@
+/**
+ * Recipe Details Component
+ * 
+ * This component displays detailed information about a specific recipe,
+ * including ingredients, nutrition facts, cooking instructions, and summary.
+ * Users can save recipes to their log and share recipes with others.
+ */
 import React, { useEffect, useState } from "react";
 import {
   View,
@@ -17,6 +24,15 @@ import { FontAwesome6, MaterialCommunityIcons } from "@expo/vector-icons";
 import { auth, db } from "../../configs/FirebaseConfig";
 import { doc, setDoc, addDoc, collection } from "firebase/firestore";
 
+/**
+ * Helper function to render a nutrient row with label, amount and unit
+ * 
+ * @param {string} label - The name of the nutrient
+ * @param {number} amount - The amount of the nutrient
+ * @param {string} unit - The unit of measurement (e.g., "g", "mg")
+ * @param {boolean} indent - Whether to indent this row (for sub-nutrients)
+ * @returns {JSX.Element} - The rendered nutrient row
+ */
 const renderNutrient = (label, amount, unit, indent = false) => (
   <View key={label} style={[styles.nutrientRow, indent && styles.indent]}>
     <Text style={styles.nutrientLabel}>{label}:</Text>
@@ -29,16 +45,23 @@ const renderNutrient = (label, amount, unit, indent = false) => (
 );
 
 export default function RecipeDetails() {
+  // Get route parameters from previous screen
   const { recipeId, recipeTitle } = useLocalSearchParams();
   const navigation = useNavigation();
   const router = useRouter();
+  // Get current authenticated user
   const user = auth.currentUser;
 
+  // Component state variables
   const [recipeInfo, setRecipeInfo] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  /**
+   * Setup navigation header and fetch recipe details on component mount
+   */
   useEffect(() => {
+    // Configure header with title, back button and share button
     navigation.setOptions({
       headerShown: true,
       headerTitle: recipeTitle || "Recipe Details",
@@ -63,9 +86,14 @@ export default function RecipeDetails() {
       ),
     });
 
+    // Fetch recipe details when component mounts or when recipeId changes
     fetchRecipeDetails();
   }, [recipeId, recipeTitle]);
 
+  /**
+   * Fetch detailed recipe information from the API
+   * Handles loading states and error conditions
+   */
   const fetchRecipeDetails = async () => {
     if (!recipeId) {
       setError("Recipe ID is missing.");
@@ -85,10 +113,15 @@ export default function RecipeDetails() {
     }
   };
 
+  /**
+   * Save the current recipe to the user's log in Firestore
+   * Creates a new document with recipe details and nutrition information
+   */
   const saveRecipeToLog = async () => {
     if (!recipeInfo || !user?.email) return;
     setLoading(true);
     try {
+      // Create unique document ID with user ID, recipe ID and timestamp
       const docId = `${user.uid}-${recipeInfo.id}-${Date.now()}`;
       await setDoc(doc(db, "recipesLog", docId), {
         userEmail: user.email,
@@ -97,6 +130,7 @@ export default function RecipeDetails() {
         title: recipeInfo.title,
         image: recipeInfo.image,
         sourceUrl: recipeInfo.sourceUrl,
+        // Convert nutrition data to a simpler object format
         nutritionSummary: recipeInfo.nutrition?.nutrients.reduce(
           (acc, curr) => {
             acc[curr.name] = `${curr.amount.toFixed(1)} ${curr.unit}`;
@@ -116,6 +150,10 @@ export default function RecipeDetails() {
     }
   };
 
+  /**
+   * Share the recipe via the device's native share dialog
+   * Includes recipe title and source URL
+   */
   const handleShare = async () => {
     if (!recipeInfo?.sourceUrl) return;
     try {
@@ -130,6 +168,7 @@ export default function RecipeDetails() {
     }
   };
 
+  // Show loading indicator while fetching data
   if (loading) {
     return (
       <View style={styles.centerContainer}>
@@ -138,6 +177,7 @@ export default function RecipeDetails() {
     );
   }
 
+  // Show error message if something went wrong
   if (error) {
     return (
       <View style={styles.centerContainer}>
@@ -146,6 +186,7 @@ export default function RecipeDetails() {
     );
   }
 
+  // Show message if no recipe data is available
   if (!recipeInfo) {
     return (
       <View style={styles.centerContainer}>
@@ -154,6 +195,7 @@ export default function RecipeDetails() {
     );
   }
 
+  // Extract nutrition data from the recipe information
   const nutrients = recipeInfo.nutrition?.nutrients || [];
   const calories = nutrients.find((n) => n.name === "Calories");
   const protein = nutrients.find((n) => n.name === "Protein");
@@ -168,10 +210,12 @@ export default function RecipeDetails() {
     <ScrollView
       style={styles.container}
       contentContainerStyle={styles.contentContainer}>
+      {/* Recipe image */}
       {recipeInfo.image && (
         <Image source={{ uri: recipeInfo.image }} style={styles.recipeImage} />
       )}
 
+      {/* Recipe title */}
       <Text style={styles.title}>{recipeInfo.title}</Text>
 
       {/* Action Buttons */}
@@ -262,6 +306,18 @@ export default function RecipeDetails() {
   );
 }
 
+/**
+ * Component styles
+ * 
+ * Defines styling for:
+ * - Main container and content layout
+ * - Recipe image and title presentation
+ * - Action buttons with consistent styling
+ * - Section containers for different information categories
+ * - Typography for various text elements (ingredients, steps, etc.)
+ * - Nutrient display formatting
+ * - Loading and error states
+ */
 const styles = StyleSheet.create({
   container: {
     flex: 1,

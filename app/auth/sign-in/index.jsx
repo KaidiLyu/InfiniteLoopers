@@ -1,3 +1,10 @@
+/**
+ * Sign In Screen Component
+ * 
+ * This component provides a user interface for the sign-in functionality
+ * using Firebase Authentication with email and password.
+ * It includes form validation, error handling, and navigation between screens.
+ */
 import {
   View,
   Text,
@@ -26,6 +33,7 @@ export default function SignIn() {
   const navigation = useNavigation();
   const router = useRouter();
 
+  // Hide the header when component mounts
   useEffect(() => {
     if (navigation && navigation.setOptions) {
       navigation.setOptions({
@@ -34,11 +42,21 @@ export default function SignIn() {
     }
   }, [navigation]);
 
+  // State variables for user credentials
   const [email, setEmail] = useState(""); // just for testing
   const [password, setPassword] = useState(""); // just for testing
 
+  // Get platform-specific information from context
   const { isWeb, isIOS, isAndroid, isMacos, platform } = usePlatform();
+  
+  /**
+   * Handle user sign-in with Firebase authentication
+   * 
+   * Validates user inputs, attempts authentication with Firebase,
+   * and handles platform-specific error messages.
+   */
   const SignIn = () => {
+    // Validate that email and password fields are not empty
     if (!email || !password) {
       if (isAndroid)
         ToastAndroid.show("Please fill all fields.", ToastAndroid.BOTTOM);
@@ -48,6 +66,8 @@ export default function SignIn() {
       }
       return;
     }
+    
+    // Attempt Firebase authentication with provided credentials
     signInWithEmailAndPassword(auth, email, password)
       .then((userCredential) => {
         // Signed in
@@ -60,8 +80,9 @@ export default function SignIn() {
         console.log(errorCode, errorMessage);
         console.log("-----------------");
 
-        let errorMsg = "Login failed, please try again"; // 默认错误消息
+        let errorMsg = "Login failed, please try again"; // Default error message
 
+        // Provide specific error messages based on Firebase error codes
         if (errorCode === "auth/invalid-credential") {
           errorMsg = "Invalid login credentials";
         } else if (errorCode === "auth/missing-password") {
@@ -76,7 +97,7 @@ export default function SignIn() {
           errorMsg = "Network connection failed, please check your network";
         }
 
-        // 显示错误消息
+        // Display error message according to platform
         if (isAndroid) {
           ToastAndroid.show(errorMsg, ToastAndroid.BOTTOM);
         }
@@ -85,7 +106,7 @@ export default function SignIn() {
         }
         if (isWeb || isMacos) {
           console.error("Login Error:", errorMsg);
-          // 如果Web端有其他显示错误的方式，可以在这里添加
+          // If there are other ways to display errors on the web, add them here
           Alert.alert("Login Error", errorMsg);
         }
         console.log(errorMsg);
@@ -95,7 +116,9 @@ export default function SignIn() {
   };
 
   return (
+    // KeyboardAvoidingView adjusts layout when keyboard appears
     <KeyboardAvoidingView behavior="height" style={{ flex: 1 }}>
+      {/* Dismiss keyboard when tapping outside input fields */}
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <ScrollView
           contentContainerStyle={{
@@ -103,6 +126,7 @@ export default function SignIn() {
             backgroundColor: Colors.WHITE,
           }}>
           <View>
+            {/* Decorative background image */}
             <Image
               source={require("../../../assets/images/greenImage.jpg")}
               style={{
@@ -115,6 +139,7 @@ export default function SignIn() {
                 zIndex: 0,
               }}
             />
+            {/* Back button */}
             <TouchableOpacity
               onPress={() => router.back()}
               style={{
@@ -124,6 +149,7 @@ export default function SignIn() {
               }}>
               <FontAwesome6 name="circle-arrow-left" size={30} color="black" />
             </TouchableOpacity>
+            {/* Main form container */}
             <View style={{ padding: 20, marginTop: "50%" }}>
               <Text
                 style={{
@@ -142,6 +168,7 @@ export default function SignIn() {
                 }}>
                 Please Sign In
               </Text>
+              {/* Email input field */}
               <View style={{ marginTop: 30 }}>
                 <Text style={{ fontFamily: "myfont-bold", marginLeft: 10 }}>
                   Email
@@ -152,6 +179,7 @@ export default function SignIn() {
                   onChangeText={(value) => setEmail(value)}
                 />
               </View>
+              {/* Password input field */}
               <View style={{ marginTop: 15 }}>
                 <Text style={{ fontFamily: "myfont-bold", marginLeft: 10 }}>
                   Password
@@ -164,6 +192,7 @@ export default function SignIn() {
                 />
               </View>
 
+              {/* Sign In button */}
               <TouchableOpacity
                 onPress={SignIn}
                 style={{
@@ -197,6 +226,7 @@ export default function SignIn() {
                   }}
                 />
               </TouchableOpacity>
+              {/* Text and icon for new users */}
               <View
                 style={{
                   marginTop: 13,
@@ -221,6 +251,7 @@ export default function SignIn() {
                   }}
                 />
               </View>
+              {/* Create Account button */}
               <TouchableOpacity
                 onPress={() => router.push("auth/sign-up")}
                 style={{
@@ -262,6 +293,9 @@ export default function SignIn() {
   );
 }
 
+/**
+ * Component styles
+ */
 const styles = StyleSheet.create({
   inputForm: {
     padding: 20,

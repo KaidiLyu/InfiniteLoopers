@@ -36,36 +36,57 @@ import {
   writeBatch,
 } from "firebase/firestore";
 
+/**
+ * SearchFood Component
+ * 
+ * Main component for the food search functionality.
+ * Provides multiple methods to search for food:
+ * - Text-based search for ingredients/products
+ * - Natural language search
+ * - Barcode scanning
+ * - Image-based food identification
+ */
 export default function SearchFood() {
+  // Get current user information and navigation tools
   const user = auth.currentUser;
   const navigation = useNavigation();
   const router = useRouter();
 
-  const [searchMode, setSearchMode] = useState("Item");
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+  // State for controlling search mode and UI status
+  const [searchMode, setSearchMode] = useState("Item");  // Controls which search method is active
+  const [loading, setLoading] = useState(false);  // Tracks loading state for API calls
+  const [error, setError] = useState(null);  // Stores error messages
 
-  const [itemType, setItemType] = useState("");
-  const [itemQuery, setItemQuery] = useState("");
-  const [itemSuggestions, setItemSuggestions] = useState([]);
-  const [selectedItem, setSelectedItem] = useState(null);
-  const textInputRef = useRef();
+  // State for item search functionality
+  const [itemType, setItemType] = useState("");  // "Ingredients" or "Products"
+  const [itemQuery, setItemQuery] = useState("");  // Search text
+  const [itemSuggestions, setItemSuggestions] = useState([]);  // Autocomplete results
+  const [selectedItem, setSelectedItem] = useState(null);  // Currently selected item
+  const textInputRef = useRef();  // Reference to search input field
 
-  const [naturalQuery, setNaturalQuery] = useState("");
-  const [naturalFoodItems, setNaturalFoodItems] = useState([]);
+  // State for natural language search functionality
+  const [naturalQuery, setNaturalQuery] = useState("");  // Natural language query text
+  const [naturalFoodItems, setNaturalFoodItems] = useState([]);  // Results from natural language search
 
-  const [permission, requestPermission] = useCameraPermissions();
-  const [isScannerVisible, setIsScannerVisible] = useState(false);
-  const [scannedData, setScannedData] = useState(null);
+  // State for barcode scanner functionality
+  const [permission, requestPermission] = useCameraPermissions();  // Camera permissions
+  const [isScannerVisible, setIsScannerVisible] = useState(false);  // Controls scanner visibility
+  const [scannedData, setScannedData] = useState(null);  // Stores scanned barcode data
 
-  const [cameraLabel, setCameraLabel] = useState("");
+  // State for camera-based food identification
+  const [cameraLabel, setCameraLabel] = useState("");  // Stores identified food label
 
+  // Hide header on component mount
   useEffect(() => {
     navigation.setOptions({
       headerShown: false,
     });
   }, []);
 
+  /**
+   * Handles selection of item type (Ingredients or Products)
+   * Resets search state and focuses the input field
+   */
   const handleSelectItemType = (type) => {
     setItemType(type);
     setItemQuery("");
@@ -77,6 +98,10 @@ export default function SearchFood() {
     }, 0);
   };
 
+  /**
+   * Fetches autocomplete suggestions based on search text
+   * Uses different APIs based on the selected item type
+   */
   const fetchItemSuggestions = async (text) => {
     setItemQuery(text);
     if (text.length < 3) {
@@ -102,6 +127,10 @@ export default function SearchFood() {
     }
   };
 
+  /**
+   * Handles selection of an item from the suggestions list
+   * Navigates to the nutrition info page for the selected item
+   */
   const handleSelectItem = (item) => {
     setSelectedItem(item);
     setItemQuery(item.name || item.title);
@@ -109,6 +138,10 @@ export default function SearchFood() {
     navigateToNutritionInfo(item, itemType);
   };
 
+  /**
+   * Performs a natural language search for food items
+   * Uses the Nutritionix Natural Language API
+   */
   const handleNaturalSearch = async () => {
     if (!naturalQuery.trim()) return;
     setLoading(true);
@@ -139,6 +172,10 @@ export default function SearchFood() {
     }
   };
 
+  /**
+   * Returns current date in YYYY-MM-DD format
+   * Used for tracking food entries by date
+   */
   const getTodayDateString = () => {
     const today = new Date();
     const year = today.getFullYear();
@@ -147,6 +184,10 @@ export default function SearchFood() {
     return `${year}-${month}-${day}`;
   };
 
+  /**
+   * Adds a food item to the daily tracker
+   * Saves the item details to Firestore database
+   */
   const addItemToTracker = async (item) => {
     if (!user?.uid || !item) return;
     setLoading(true);
@@ -185,6 +226,10 @@ export default function SearchFood() {
     }
   };
 
+  /**
+   * Opens the camera to take a picture of food
+   * Uses image recognition to identify the food item
+   */
   const takePicture = async () => {
     setError(null)
     setLoading(true);

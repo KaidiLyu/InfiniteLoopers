@@ -1,18 +1,18 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <!-- 文档元信息 Document Meta Information -->
+  <!-- Document Meta Information -->
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Learn More - InfiniteLoopers Nutritional Search App</title>
   
-  <!-- 样式表引用 Stylesheet References -->
+  <!-- External Resources -->
   <link rel="stylesheet" href="styles.css">
-  <!-- 轮播图修复样式 Carousel Fix Styles -->
+  <!-- Carousel Fix Styles for Image Display -->
   <link rel="stylesheet" href="carousel-fix.css">
-  <!-- 内联轮播图修复样式 Inline Carousel Fix Styles -->
+  <!-- Inline Carousel Fix Styles -->
   <style>
-    /* 确保轮播图容器正确显示 */
+    /* Ensure proper carousel container display */
     .carousel-container {
       display: flex;
       flex-direction: column;
@@ -26,14 +26,14 @@
       padding: 0;
     }
     
-    /* 轮播幻灯片区域 */
+    /* Carousel slides area */
     .carousel-slides {
       position: relative;
       flex: 1;
       width: 100%;
     }
     
-    /* 确保轮播图幻灯片正确显示 */
+    /* Ensure proper slide display */
     .carousel-slide {
       position: absolute;
       width: 100%;
@@ -47,7 +47,7 @@
       display: none;
     }
     
-    /* 确保激活的幻灯片正确显示 */
+    /* Ensure active slide visibility */
     .carousel-slide.active {
       opacity: 1;
       visibility: visible;
@@ -57,7 +57,7 @@
       justify-content: center;
     }
     
-    /* 确保图片正确显示 */
+    /* Ensure proper image display */
     .carousel-slide img {
       display: block;
       max-width: 100%;
@@ -68,52 +68,52 @@
       margin: auto;
     }
     
-    /* 确保图片容器正确显示 */
+    /* Ensure proper image container display */
     .learn-more-image {
       width: 100%;
       height: 100%;
       display: flex;
     }
   </style>
-  <!-- Google字体引用 Google Fonts Reference -->
+  <!-- Google Fonts - Inter font family with various weights -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <!-- Lucide图标库引用 Lucide Icons Library Reference -->
+  <!-- Lucide Icons - Modern icon library for UI elements -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lucide-icons@0.284.0/font/lucide.min.css">
 </head>
 <body class="dark">
-  <!-- 导航栏 Navbar -->
+  <!-- Main Navigation Bar -->
   <nav class="navbar">
     <div class="container">
       <div class="navbar-content">
-        <!-- Logo链接 Logo Link -->
+        <!-- Brand Logo with Gradient Text Effect -->
         <a href="index.html" class="logo">
           <span class="gradient-text">InfiniteLoopers</span>
         </a>
 
-        <!-- 桌面导航菜单（在学习更多页面为空） Desktop Navigation (Empty for learn more page) -->
+        <!-- Desktop Navigation Menu (Empty for learn more page) -->
         <div class="desktop-nav">
           <!-- Empty for learn more page -->
         </div>
 
-        <!-- 导航栏操作区域（登录和语言切换） Nav Actions (Login and Language Toggle) -->
+        <!-- Navigation Actions (Language Toggle and Login) -->
         <div class="nav-actions">
-          <!-- 语言切换按钮 Language Toggle Button -->
+          <!-- Language Toggle Button with Globe Icon -->
           <button class="btn-language">
             <i class="lucide lucide-globe"></i>
             <span class="language-indicator">EN</span>
           </button>
 
-          <!-- 登录按钮 Login Button -->
+          <!-- Login Button with Outline Style -->
           <button class="btn btn-outline" id="loginBtn" data-i18n="login">Login</button>
         </div>
 
-        <!-- 移动端菜单按钮 Mobile Menu Button -->
+        <!-- Mobile Menu Button Group -->
         <div class="mobile-menu-btn">
-          <!-- 移动端语言切换按钮 Mobile Language Toggle Button -->
+          <!-- Mobile Language Toggle -->
           <button class="btn-language-mobile">
             <i class="lucide lucide-globe"></i>
           </button>
-          <!-- 移动端菜单展开按钮 Mobile Menu Toggle Button -->
+          <!-- Mobile Menu Toggle Button -->
           <button class="menu-toggle">
             <i class="lucide lucide-menu"></i>
           </button>
@@ -121,32 +121,32 @@
       </div>
     </div>
 
-    <!-- 移动端菜单（默认隐藏） Mobile Menu (Hidden by Default) -->
+    <!-- Mobile Menu (Hidden by Default) -->
     <div class="mobile-menu">
       <div class="mobile-menu-content">
-        <!-- 移动端登录按钮 Mobile Login Button -->
+        <!-- Mobile Login Button -->
         <button class="btn btn-outline" id="loginBtnMobile" data-i18n="login">Login</button>
       </div>
     </div>
   </nav>
 
-  <!-- 主要内容区域 Main Content Area -->
+  <!-- Main Content Area -->
   <main class="learn-more-page">
-    <!-- 了解更多区域 Learn More Section -->
+    <!-- Learn More Section -->
     <section class="learn-more-section">
       <div class="container">
-        <!-- 返回首页链接 Back to Home Link -->
+        <!-- Back to Home Link with Arrow Icon -->
         <a href="index.html" class="back-link">
           <i class="lucide lucide-arrow-left"></i>
           <span data-i18n="backToHome">Back to Home</span>
         </a>
 
-        <!-- 页面标题 Page Title -->
+        <!-- Page Title with Gradient Text -->
         <h1 class="page-title gradient-text" data-i18n="learnMoreTitle">Discover InfiniteLoopers</h1>
 
-        <!-- 了解更多网格布局（内容和图像） Learn More Grid (Content and Image) -->
+        <!-- Learn More Grid Layout (Content and Image) -->
         <div class="learn-more-grid">
-          <!-- 左侧内容 Left Content -->
+          <!-- Left Content Section -->
           <div class="learn-more-content">
             <p class="learn-more-description" data-i18n="learnMoreDescription1">
               InfiniteLoopers Nutritional Search App is an AI-powered mobile application that allows users to search for food items and receive comprehensive nutritional information instantly.
@@ -163,49 +163,49 @@
             <p class="learn-more-description" data-i18n="learnMoreDescription5">
               The app features real-time nutrition tracking, personalized recommendations based on dietary goals, and a comprehensive food database that is constantly expanding. Users can save their favorite meals, track their daily intake, and receive insights about their eating patterns over time.
             </p>
-            <!-- GitHub链接按钮 GitHub Link Button -->
+            <!-- GitHub Link Button with Icon -->
             <a href="https://github.com/SCCapstone/InfiniteLoopers" target="_blank" rel="noopener noreferrer" class="btn btn-primary">
               <i class="lucide lucide-github"></i>
               <span data-i18n="viewGitHub">View on GitHub</span>
             </a>
           </div>
-          <!-- 右侧应用截图 Right App Screenshot -->
+          <!-- Right App Screenshot Section -->
           <div class="learn-more-image">
-            <!-- 图片轮播容器 Image Carousel Container -->
+            <!-- Image Carousel Container -->
             <div class="carousel-container">
-              <!-- 轮播图片 Carousel Images -->
+              <!-- Carousel Images -->
               <div class="carousel-slides">
-                <!-- 幻灯片1 - Slide 1 -->
+                <!-- Slide 1 - Main View -->
                 <div class="carousel-slide active">
                   <img src="Promotional images and videos/Promotional images.jpg" alt="InfiniteLoopers App - Main View" loading="eager">
                 </div>
-                <!-- 幻灯片2 - Slide 2 -->
+                <!-- Slide 2 - Page 1 -->
                 <div class="carousel-slide">
                   <img src="Promotional images and videos/appPage1.jpg" alt="InfiniteLoopers App - Page 1" loading="lazy">
                 </div>
-                <!-- 幻灯片3 - Slide 3 -->
+                <!-- Slide 3 - Page 2 -->
                 <div class="carousel-slide">
                   <img src="Promotional images and videos/appPage2.jpg" alt="InfiniteLoopers App - Page 2" loading="lazy">
                 </div>
-                <!-- 幻灯片4 - Slide 4 -->
+                <!-- Slide 4 - Page 3 -->
                 <div class="carousel-slide">
                   <img src="Promotional images and videos/appPage3.jpg" alt="InfiniteLoopers App - Page 3" loading="lazy">
                 </div>
               </div>
               
-              <!-- 前一张按钮 Previous Button -->
+              <!-- Previous Button with Icon -->
               <button class="carousel-btn prev-btn">
                 <i class="lucide lucide-chevron-left"></i>
                 <span class="fallback-icon">&lt;</span>
               </button>
               
-              <!-- 下一张按钮 Next Button -->
+              <!-- Next Button with Icon -->
               <button class="carousel-btn next-btn">
                 <i class="lucide lucide-chevron-right"></i>
                 <span class="fallback-icon">&gt;</span>
               </button>
               
-              <!-- 指示器 Indicators -->
+              <!-- Slide Indicators -->
               <div class="carousel-indicators">
                 <button class="indicator-dot active" data-slide="0"></button>
                 <button class="indicator-dot" data-slide="1"></button>
@@ -216,17 +216,17 @@
           </div>
         </div>
 
-        <!-- 信息标签页 Info Tabs -->
+        <!-- Information Tabs Section -->
         <div class="info-tabs">
-          <!-- 标签页头部 Tabs Header -->
+          <!-- Tabs Header -->
           <div class="tabs-header">
             <button class="tab-btn active" data-tab="features" data-i18n="detailedFeatures">Features</button>
             <button class="tab-btn" data-tab="technical" data-i18n="technicalInfo">Technical Info</button>
             <button class="tab-btn" data-tab="team" data-i18n="aboutTeam">Team</button>
           </div>
-          <!-- 标签页内容 Tabs Content -->
+          <!-- Tabs Content -->
           <div class="tabs-content">
-            <!-- 功能特点标签页 Features Tab -->
+            <!-- Features Tab -->
             <div class="tab-pane active" id="features-tab">
               <h3 class="tab-title" data-i18n="detailedFeatures">Features</h3>
               <ul class="feature-list">
@@ -243,7 +243,7 @@
                 <li data-i18n="feature11Detail">Privacy-focused design that keeps your dietary information secure</li>
               </ul>
             </div>
-            <!-- 技术信息标签页 Technical Info Tab -->
+            <!-- Technical Info Tab -->
             <div class="tab-pane" id="technical-tab">
               <h3 class="tab-title" data-i18n="technicalInfo">Technical Info</h3>
               <div class="tech-info">
@@ -260,7 +260,7 @@
                 <p><strong data-i18n="crossPlatform">Cross-Platform Compatibility</strong>: <span data-i18n="crossPlatformDetail">Optimized for both iOS and Android platforms with platform-specific adaptations</span></p>
               </div>
             </div>
-            <!-- 团队信息标签页 Team Tab -->
+            <!-- Team Tab -->
             <div class="tab-pane" id="team-tab">
               <h3 class="tab-title" data-i18n="aboutTeam">Team</h3>
               <div class="team-info">
@@ -274,7 +274,7 @@
                 <p data-i18n="teamDescription4">
                   The team is committed to creating technology that makes a positive impact on users' health and wellbeing. We believe that access to accurate nutritional information should be simple, fast, and available to everyone, regardless of their technical expertise.
                 </p>
-                <!-- 小型团队成员网格 Small Team Members Grid -->
+                <!-- Small Team Members Grid -->
                 <div class="team-grid-small">
                   <div class="team-member">
                     <h4>Kaidi Lyu</h4>
@@ -316,17 +316,17 @@
     </section>
   </main>
 
-  <!-- 页脚 Footer -->
+  <!-- Footer Section -->
   <footer class="footer">
     <div class="container">
-      <!-- 页脚网格布局 Footer Grid Layout -->
+      <!-- Footer Grid Layout -->
       <div class="footer-grid">
-        <!-- 页脚栏目1：品牌信息 Footer Column 1: Brand Info -->
+        <!-- Footer Column 1: Brand Information -->
         <div class="footer-col">
           <h3 class="footer-title gradient-text">InfiniteLoopers</h3>
           <p class="footer-description">AI-powered nutritional search app for making informed dietary choices.</p>
         </div>
-        <!-- 页脚栏目2：链接 Footer Column 2: Links -->
+        <!-- Footer Column 2: Navigation Links -->
         <div class="footer-col">
           <h4 class="footer-heading">Links</h4>
           <ul class="footer-links">
@@ -335,7 +335,7 @@
             <li><a href="https://github.com/SCCapstone/InfiniteLoopers" target="_blank" rel="noopener noreferrer" class="footer-link">GitHub</a></li>
           </ul>
         </div>
-        <!-- 页脚栏目3：联系方式 Footer Column 3: Contact -->
+        <!-- Footer Column 3: Contact Information -->
         <div class="footer-col">
           <h4 class="footer-heading">Contact</h4>
           <ul class="footer-info">
@@ -343,7 +343,7 @@
             <li class="footer-info-item">Phone: (123) 456-7890</li>
           </ul>
         </div>
-        <!-- 页脚栏目4：社交媒体 Footer Column 4: Social Media -->
+        <!-- Footer Column 4: Social Media Links -->
         <div class="footer-col">
           <h4 class="footer-heading">Follow Us</h4>
           <div class="footer-social">
@@ -365,52 +365,52 @@
           </div>
         </div>
       </div>
-      <!-- 页脚底部：版权信息 Footer Bottom: Copyright -->
+      <!-- Footer Bottom: Copyright Information -->
       <div class="footer-bottom">
         <p class="copyright" data-i18n="copyright">© 2025 InfiniteLoopers. All rights reserved.</p>
       </div>
     </div>
   </footer>
 
-  <!-- 登录模态框 Login Modal -->
+  <!-- Login Modal -->
   <div class="modal" id="loginModal">
     <div class="modal-content">
-      <!-- 模态框头部 Modal Header -->
+      <!-- Modal Header -->
       <div class="modal-header">
         <h3 class="modal-title">Login</h3>
         <button class="modal-close">&times;</button>
       </div>
-      <!-- 模态框主体 Modal Body -->
+      <!-- Modal Body -->
       <div class="modal-body">
-        <!-- 登录表单 Login Form -->
+        <!-- Login Form -->
         <form id="loginForm" class="login-form">
-          <!-- 邮箱输入字段 Email Input Field -->
+          <!-- Email Input Field -->
           <div class="form-group">
             <label for="email">Email</label>
             <input type="email" id="email" placeholder="your@email.com" required>
           </div>
-          <!-- 密码输入字段 Password Input Field -->
+          <!-- Password Input Field -->
           <div class="form-group">
             <label for="password">Password</label>
             <input type="password" id="password" required>
           </div>
-          <!-- 提交按钮 Submit Button -->
+          <!-- Submit Button -->
           <button type="submit" class="btn btn-primary btn-full">Login</button>
         </form>
       </div>
     </div>
   </div>
 
-  <!-- JavaScript脚本引用 JavaScript Script Reference -->
+  <!-- JavaScript Script Reference -->
   <script src="script.js"></script>
   
-  <!-- 初始化Lucide图标 Initialize Lucide Icons -->
+  <!-- Initialize Lucide Icons -->
   <script>
     document.addEventListener('DOMContentLoaded', function() {
-      // 初始化所有Lucide图标
+      // Initialize all Lucide icons
       lucide.createIcons();
       
-      // 确保轮播按钮图标正确显示
+      // Ensure carousel button icons display correctly
       const prevBtn = document.querySelector('.prev-btn');
       const nextBtn = document.querySelector('.next-btn');
       

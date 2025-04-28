@@ -21,6 +21,16 @@ import { Colors } from "../../constants/Colors";
 import { deleteDoc, doc } from "firebase/firestore";
 import { db, auth } from "../../configs/FirebaseConfig";
 
+/**
+ * NutrientRow Component
+ * 
+ * A reusable component to display a nutrient name and its value
+ * 
+ * @param {string} label - The name of the nutrient
+ * @param {number|string} value - The value of the nutrient
+ * @param {string} unit - The unit of measurement (e.g., "g", "mg")
+ * @param {boolean} indent - Whether to indent this row (for sub-nutrients)
+ */
 const NutrientRow = ({ label, value, unit, indent = false }) => {
   if (value === undefined || value === null) return null;
   return (
@@ -33,22 +43,38 @@ const NutrientRow = ({ label, value, unit, indent = false }) => {
   );
 };
 
+/**
+ * NutritionInfo Component
+ * 
+ * Displays detailed nutritional information for a food item
+ * Supports different data sources (barcode scan, item search)
+ * Allows deletion of saved items
+ */
 export default function NutritionInfo() {
   const router = useRouter();
   const navigation = useNavigation();
+  // Get parameters passed from previous screen
   const params = useLocalSearchParams();
   const { source, id, title, name, image, apiResult } = params;
 
+  // Component state
   const [loading, setLoading] = useState(false);
   const [itemData, setItemData] = useState(null);
   const [error, setError] = useState(null);
+  // Get current authenticated user
   const user = auth.currentUser;
 
+  /**
+   * Process incoming data based on its source
+   * Formats data from different sources (barcode, item search) into a consistent format
+   */
   useEffect(() => {
+    // Hide the default header
     navigation.setOptions({
       headerShown: false,
     });
 
+    // Process data from barcode scan source
     if (source === "barcode" && apiResult) {
       try {
         const parsedResult = JSON.parse(apiResult);
@@ -57,9 +83,12 @@ export default function NutritionInfo() {
         console.error("Failed to parse barcode API result:", e);
         setError("Error displaying scanned item data.");
       }
-    } else if (source === "itemSearch" && apiResult) {
+    } 
+    // Process data from item search source
+    else if (source === "itemSearch" && apiResult) {
       try {
         console.log("Item Search Data (from params):", apiResult);
+        // Format the data into a consistent structure for rendering
         setItemData({
           food_name: name,
           photo: { thumb: image },
@@ -72,7 +101,9 @@ export default function NutritionInfo() {
         console.error("Failed to process item search data:", e);
         setError("Error displaying item data.");
       }
-    } else {
+    } 
+    // Handle unexpected or missing data
+    else {
       console.warn(
         "NutritionInfo loaded with unexpected source or missing data:",
         params
@@ -81,7 +112,13 @@ export default function NutritionInfo() {
     }
   }, [params]);
 
+  /**
+   * Handles deletion of a food item from the database
+   * Shows confirmation dialog before deleting
+   * Returns to search screen after successful deletion
+   */
   const handleDelete = () => {
+    // Determine which collection to delete from based on source and title
     let collectionName = null;
     let docIdToDelete = id;
 
@@ -108,6 +145,7 @@ export default function NutritionInfo() {
       return;
     }
 
+    // Show confirmation dialog
     Alert.alert("Delete Item", `Are you sure you want to delete ${name}?`, [
       {
         text: "Cancel",
@@ -120,9 +158,11 @@ export default function NutritionInfo() {
           setLoading(true);
           try {
             console.log(`Deleting doc: ${collectionName}/${docIdToDelete}`);
+            // Delete the document from Firestore
             await deleteDoc(doc(db, collectionName, docIdToDelete));
             setLoading(false);
             Alert.alert("Success", "Item deleted successfully");
+            // Navigate back to search screen with refresh parameter
             router.replace({
               pathname: "/(tabs)/SearchFood",
               params: { refresh: Date.now() },
@@ -137,6 +177,7 @@ export default function NutritionInfo() {
     ]);
   };
 
+  // Display loading indicator while operations are in progress
   if (loading) {
     return (
       <View style={styles.centerContainer}>
@@ -145,6 +186,7 @@ export default function NutritionInfo() {
     );
   }
 
+  // Display error message if data couldn't be loaded
   if (error || !itemData) {
     return (
       <View style={styles.container}>
@@ -167,6 +209,7 @@ export default function NutritionInfo() {
     );
   }
 
+  // Extract nutrition data from the item
   const itemName = itemData.food_name || name || "Unknown Item";
   const itemImageUri = itemData.photo?.thumb || image;
   const calories = itemData.nf_calories;
@@ -188,6 +231,7 @@ export default function NutritionInfo() {
 
   return (
     <View style={styles.container}>
+      {/* Header with back button, title, and delete button */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()}>
           <FontAwesome6 name="circle-arrow-left" size={30} color="black" />
@@ -203,6 +247,7 @@ export default function NutritionInfo() {
       <ScrollView
         style={styles.scrollView}
         contentContainerStyle={styles.scrollContent}>
+        {/* Food item name and image section */}
         <View style={styles.titleSection}>
           <Text style={styles.itemName}>{itemName}</Text>
           {itemImageUri ? (
@@ -218,6 +263,7 @@ export default function NutritionInfo() {
           )}
         </View>
 
+        {/* Nutrition facts section styled like a food label */}
         <View style={styles.nutritionSection}>
           <Text style={styles.sectionTitle}>Nutrition Facts</Text>
           <Text style={styles.servingSize}>
@@ -226,9 +272,11 @@ export default function NutritionInfo() {
           </Text>
           <View style={styles.separator} />
 
+          {/* Calories */}
           <NutrientRow label="Calories" value={calories?.toFixed(0)} unit="" />
           <View style={styles.separatorThin} />
 
+          {/* Macronutrients with sub-items */}
           <NutrientRow
             label="Total Fat"
             value={totalFat?.toFixed(1)}
@@ -268,7 +316,7 @@ export default function NutritionInfo() {
           <NutrientRow label="Protein" value={protein?.toFixed(1)} unit="g" />
           <View style={styles.separatorThin} />
 
-          {/* Add Vitamins/Minerals if available */}
+          {/* Additional micronutrients */}
           <NutrientRow
             label="Potassium"
             value={potassium?.toFixed(0)}
@@ -279,6 +327,7 @@ export default function NutritionInfo() {
           {/* <NutrientRow label="Iron" value={...} unit="mg" /> */}
         </View>
 
+        {/* Source link for additional information */}
         {sourceLink && (
           <TouchableOpacity
             onPress={() => Linking.openURL(sourceLink)}
@@ -292,7 +341,7 @@ export default function NutritionInfo() {
           </TouchableOpacity>
         )}
 
-        {/* Add Nutritionix attribution if data came from them */}
+        {/* Attribution for data sources */}
         {(source === "barcode" || source === "natural") && (
           <Text style={styles.attributionText}>
             Nutrition data powered by Nutritionix
@@ -309,6 +358,17 @@ export default function NutritionInfo() {
   );
 }
 
+/**
+ * Component styles for the NutritionInfo screen
+ * 
+ * Includes styling for:
+ * - Container layout
+ * - Header and navigation elements
+ * - Food item title and image
+ * - Nutrition facts section designed like a food label
+ * - Nutrient rows and separators
+ * - Source links and attribution text
+ */
 const styles = StyleSheet.create({
   container: {
     flex: 1,

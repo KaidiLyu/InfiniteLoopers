@@ -1,37 +1,46 @@
-/* Dashboard-specific styles to add to your existing styles.css */
+/**
+ * Dashboard Styles
+ *
+ * This stylesheet contains all styling specific to the dashboard interface.
+ * It includes layouts, cards, charts, and responsive design for the dashboard.
+ */
 
-/* Dashboard Page */
+/* Dashboard Page - Main container with spacing for the fixed navbar */
 .dashboard-page {
     padding-top: 4rem; /* Space for fixed navbar */
   }
   
-  /* Dashboard Header */
+  /* Dashboard Header - Gradient background section at the top of the dashboard */
   .dashboard-header {
     background: linear-gradient(to right, var(--gray-900), black);
     padding: 3rem 0 2rem;
   }
   
+  /* Welcome message container in the dashboard header */
   .dashboard-welcome {
     margin-bottom: 2rem;
   }
   
+  /* Main welcome title styling */
   .welcome-title {
     font-size: 2rem;
     margin-bottom: 0.5rem;
   }
   
+  /* Subtitle styling with muted color */
   .welcome-subtitle {
     color: var(--gray-400);
     font-size: 1.125rem;
   }
   
-  /* Quick Stats */
+  /* Quick Stats Section - Grid layout for statistics cards */
   .quick-stats {
     display: grid;
     grid-template-columns: 1fr;
     gap: 1rem;
   }
   
+  /* Individual stat card with dark semi-transparent background */
   .stat-card {
     background-color: rgba(17, 24, 39, 0.5);
     border: 1px solid var(--gray-800);
@@ -41,6 +50,7 @@
     align-items: center;
   }
   
+  /* Icon container within stat cards */
   .stat-icon {
     height: 3rem;
     width: 3rem;
@@ -51,28 +61,32 @@
     margin-right: 1rem;
   }
   
+  /* Container for the stat value and label */
   .stat-info {
     display: flex;
     flex-direction: column;
   }
   
+  /* Stat numeric value styling - large and bold */
   .stat-value {
     font-size: 1.5rem;
     font-weight: 700;
     color: white;
   }
   
+  /* Stat description label styling - smaller and muted */
   .stat-label {
     font-size: 0.875rem;
     color: var(--gray-400);
   }
   
-  /* Search Section */
+  /* Search Section - Area containing the search functionality */
   .search-section {
     padding: 3rem 0;
     background-color: black;
   }
   
+  /* Container for search elements with dark background */
   .search-container {
     background-color: rgba(17, 24, 39, 0.5);
     border: 1px solid var(--gray-800);
@@ -80,6 +94,7 @@
     padding: 2rem;
   }
   
+  /* Search input bar with rounded edges */
   .search-bar {
     display: flex;
     align-items: center;
@@ -89,11 +104,13 @@
     margin-bottom: 1.5rem;
   }
   
+  /* Search icon styling */
   .search-bar i {
     color: var(--gray-400);
     margin-right: 0.75rem;
   }
   
+  /* Search input field styling */
   .search-bar input {
     flex: 1;
     background: transparent;
@@ -103,6 +120,7 @@
     outline: none;
   }
   
+  /* Search button with gradient background */
   .search-button {
     background: linear-gradient(to right, var(--cyan-500), var(--emerald-500));
     border: none;
@@ -116,18 +134,21 @@
     cursor: pointer;
   }
   
+  /* Recent searches heading */
   .recent-searches h3 {
     font-size: 0.875rem;
     color: var(--gray-400);
     margin-bottom: 0.75rem;
   }
   
+  /* Container for search history pills */
   .search-pills {
     display: flex;
     flex-wrap: wrap;
     gap: 0.5rem;
   }
   
+  /* Individual search history pill styling */
   .search-pill {
     background-color: var(--gray-800);
     border: none;
@@ -139,11 +160,12 @@
     transition: all 0.2s ease;
   }
   
+  /* Hover state for search pills */
   .search-pill:hover {
     background-color: var(--gray-700);
   }
   
-  /* Camera Tab */
+  /* Camera Tab - Section for camera functionality */
   .camera-placeholder {
     display: flex;
     flex-direction: column;
@@ -154,6 +176,7 @@
     color: var(--gray-400);
   }
   
+  /* Camera icon container styling */
   .camera-icon {
     width: 4rem;
     height: 4rem;
@@ -165,21 +188,24 @@
     margin-bottom: 1.5rem;
   }
   
+  /* Camera icon styling */
   .camera-icon i {
     font-size: 1.5rem;
     color: var(--gray-300);
   }
   
+  /* Camera placeholder text styling */
   .camera-placeholder p {
     margin-bottom: 1.5rem;
   }
   
-  /* Nutrition Summary Section */
+  /* Nutrition Summary Section - Area for nutrition progress and charts */
   .nutrition-summary-section {
     padding: 3rem 0;
     background: linear-gradient(to right, black, var(--gray-900));
   }
   
+  /* Header for each dashboard section with title and action button */
   .section-header {
     display: flex;
     justify-content: space-between;
@@ -187,17 +213,20 @@
     margin-bottom: 1.5rem;
   }
   
+  /* Small button styling for section headers */
   .btn-sm {
     padding: 0.375rem 0.75rem;
     font-size: 0.875rem;
   }
   
+  /* Container for nutrition progress elements */
   .nutrition-progress {
     display: grid;
     grid-template-columns: 1fr;
     gap: 1.5rem;
   }
   
+  /* Cards for macro nutrients and calories */
   .macro-card, .calorie-card {
     background-color: rgba(17, 24, 39, 0.5);
     border: 1px solid var(--gray-800);
@@ -205,24 +234,27 @@
     padding: 1.5rem;
   }
   
+  /* Card titles for nutrition cards */
   .macro-card h3, .calorie-card h3 {
     font-size: 1.125rem;
     margin-bottom: 1.5rem;
     color: white;
   }
   
-  /* Calorie Chart */
+  /* Calorie Chart - Container for the circular progress chart */
   .calorie-chart {
     display: flex;
     justify-content: center;
   }
   
+  /* Placeholder for chart when data is loading or unavailable */
   .chart-placeholder {
     display: flex;
     flex-direction: column;
     align-items: center;
   }
   
+  /* Circular progress chart with gradient segments */
   .chart-circle {
     width: 10rem;
     height: 10rem;
@@ -238,6 +270,7 @@
     margin-bottom: 1.5rem;
   }
   
+  /* Inner circle of the donut chart showing total value */
   .chart-inner {
     width: 7rem;
     height: 7rem;
@@ -249,28 +282,33 @@
     justify-content: center;
   }
   
+  /* Value display in the center of chart */
   .chart-value {
     font-size: 1.5rem;
     font-weight: 700;
     color: white;
   }
   
+  /* Label for the chart value */
   .chart-label {
     font-size: 0.75rem;
     color: var(--gray-400);
   }
   
+  /* Legend for the chart segments */
   .chart-legend {
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
   }
   
+  /* Individual legend item with color indicator and text */
   .legend-item {
     display: flex;
     align-items: center;
   }
   
+  /* Color box matching the chart segment */
   .legend-color {
     width: 1rem;
     height: 0.5rem;
@@ -278,23 +316,26 @@
     margin-right: 0.5rem;
   }
   
+  /* Legend item text description */
   .legend-text {
     font-size: 0.875rem;
     color: var(--gray-300);
   }
   
-  /* Recent Foods Section */
+  /* Recent Foods Section - Lists recently logged food items */
   .recent-foods-section {
     padding: 3rem 0;
     background-color: black;
   }
   
+  /* Grid container for food item cards */
   .food-cards {
     display: grid;
     grid-template-columns: 1fr;
     gap: 1rem;
   }
   
+  /* Individual food item card */
   .food-card {
     background-color: rgba(17, 24, 39, 0.5);
     border: 1px solid var(--gray-800);
@@ -304,6 +345,7 @@
     align-items: center;
   }
   
+  /* Container for food item thumbnail */
   .food-image {
     width: 3.5rem;
     height: 3.5rem;
@@ -312,34 +354,40 @@
     margin-right: 1rem;
   }
   
+  /* Food thumbnail image styling */
   .food-image img {
     width: 100%;
     height: 100%;
     object-fit: cover;
   }
   
+  /* Container for food item details */
   .food-info {
     flex: 1;
   }
   
+  /* Food item name styling */
   .food-info h4 {
     font-size: 1rem;
     margin-bottom: 0.25rem;
     color: white;
   }
   
+  /* Timestamp for when the food was logged */
   .food-time {
     font-size: 0.75rem;
     color: var(--gray-400);
     margin-bottom: 0.5rem;
   }
   
+  /* Container for nutrition tags */
   .food-nutrition {
     display: flex;
     flex-wrap: wrap;
     gap: 0.5rem;
   }
   
+  /* Individual nutrition information tag */
   .nutrition-tag {
     background-color: var(--gray-800);
     color: var(--gray-300);
@@ -348,6 +396,7 @@
     border-radius: 0.25rem;
   }
   
+  /* Icon button styling used throughout the dashboard */
   .btn-icon {
     background: none;
     border: none;
@@ -358,23 +407,26 @@
     transition: background-color 0.2s ease;
   }
   
+  /* Hover state for icon buttons */
   .btn-icon:hover {
     background-color: var(--gray-800);
     color: white;
   }
   
-  /* Recommendations Section */
+  /* Recommendations Section - Personalized health suggestions */
   .recommendations-section {
     padding: 3rem 0;
     background: linear-gradient(to right, var(--gray-900), black);
   }
   
+  /* Grid container for recommendation cards */
   .recommendation-cards {
     display: grid;
     grid-template-columns: 1fr;
     gap: 1.5rem;
   }
   
+  /* Individual recommendation card */
   .recommendation-card {
     background-color: rgba(17, 24, 39, 0.5);
     border: 1px solid var(--gray-800);
@@ -383,6 +435,7 @@
     text-align: center;
   }
   
+  /* Icon container for recommendation cards */
   .recommendation-icon {
     height: 3.5rem;
     width: 3.5rem;
@@ -393,24 +446,27 @@
     margin: 0 auto 1.25rem;
   }
   
+  /* Icon styling for recommendation cards */
   .recommendation-icon i {
     font-size: 1.5rem;
     color: white;
   }
   
+  /* Recommendation title styling */
   .recommendation-card h3 {
     font-size: 1.125rem;
     margin-bottom: 0.75rem;
     color: white;
   }
   
+  /* Recommendation description text */
   .recommendation-card p {
     font-size: 0.875rem;
     color: var(--gray-400);
     margin-bottom: 1.25rem;
   }
   
-  /* Add Food Button */
+  /* Fixed Add Food Button - Floating action button */
   .add-food-button {
     position: fixed;
     bottom: 2rem;
@@ -418,6 +474,7 @@
     z-index: 40;
   }
   
+  /* Floating action button styling with gradient */
   .btn-floating {
     width: 3.5rem;
     height: 3.5rem;
@@ -434,15 +491,17 @@
     transition: transform 0.2s ease;
   }
   
+  /* Hover effect for floating action button */
   .btn-floating:hover {
     transform: scale(1.05);
   }
   
-  /* User Profile */
+  /* User Profile - Container for user information in header */
   .user-profile {
     position: relative;
   }
   
+  /* User button styling in header navigation */
   .btn-user {
     display: flex;
     align-items: center;
@@ -455,10 +514,12 @@
     transition: background-color 0.2s ease;
   }
   
+  /* Hover effect for user button */
   .btn-user:hover {
     background-color: rgba(255, 255, 255, 0.1);
   }
   
+  /* User avatar container */
   .user-avatar {
     width: 2rem;
     height: 2rem;
@@ -467,12 +528,13 @@
     margin-right: 0.5rem;
   }
   
+  /* User display name styling */
   .user-name {
     font-size: 0.875rem;
     margin-right: 0.5rem;
   }
   
-  /* Mobile User Profile */
+  /* Mobile User Profile - For smaller screens */
   .mobile-user-profile {
     display: flex;
     align-items: center;
@@ -482,26 +544,30 @@
     margin: 1rem 0;
   }
   
+  /* Adjust avatar margin for mobile view */
   .mobile-user-profile .user-avatar {
     margin-right: 1rem;
   }
   
+  /* Container for user name and email */
   .user-info {
     display: flex;
     flex-direction: column;
   }
   
+  /* User email styling */
   .user-email {
     font-size: 0.75rem;
     color: var(--gray-400);
   }
   
-  /* Active Navigation Link */
+  /* Active Navigation Link - Styling for the current section */
   .nav-link.active, .nav-link-mobile.active {
     color: white;
     font-weight: 500;
   }
   
+  /* Underline indicator for active navigation link */
   .nav-link.active::after {
     content: '';
     display: block;
@@ -510,8 +576,9 @@
     margin-top: 0.25rem;
   }
   
-  /* Responsive Styles */
+  /* Responsive Styles - For different screen sizes */
   @media (min-width: 640px) {
+    /* Small screens: 2 columns for stat and food cards */
     .quick-stats {
       grid-template-columns: repeat(2, 1fr);
     }
@@ -526,6 +593,7 @@
   }
   
   @media (min-width: 768px) {
+    /* Medium screens: Larger welcome title and adjusted grid layouts */
     .welcome-title {
       font-size: 2.5rem;
     }
@@ -540,6 +608,7 @@
   }
   
   @media (min-width: 1024px) {
+    /* Large screens: 4 columns for stat and food cards */
     .quick-stats {
       grid-template-columns: repeat(4, 1fr);
     }

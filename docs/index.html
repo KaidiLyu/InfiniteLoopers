@@ -2,62 +2,65 @@
 <html lang="en">
 
 <head>
-  <!-- 文档元信息 Document Meta Information -->
+  <!-- Document Meta Information -->
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>InfiniteLoopers - AI-Powered Nutritional Search App</title>
 
-  <!-- 样式表引用 Stylesheet References -->
+  <!-- External Resources -->
   <link rel="stylesheet" href="styles.css">
-  <!-- Google字体引用 Google Fonts Reference -->
+  <!-- Google Fonts - Inter font family with various weights -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <!-- Lucide图标库引用 Lucide Icons Library Reference -->
+  <!-- Lucide Icons - Modern icon library for UI elements -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lucide-icons@0.284.0/font/lucide.min.css">
   <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 
 <body class="dark">
-  <!-- 导航栏 Navbar -->
+  <!-- Main Navigation Bar -->
   <nav class="navbar">
     <div class="container">
       <div class="navbar-content">
-        <!-- Logo链接 Logo Link -->
+        <!-- Brand Logo with Gradient Text Effect -->
         <a href="index.html" class="logo">
           <span class="gradient-text">InfiniteLoopers</span>
         </a>
 
-        <!-- 桌面导航菜单 Desktop Navigation -->
+        <!-- Desktop Navigation Menu -->
         <div class="desktop-nav">
+          <!-- Features Navigation Link -->
           <button class="nav-link" data-scroll-to="features">
             <span class="nav-text" data-i18n="features">Features</span>
           </button>
+          <!-- How It Works Navigation Link -->
           <button class="nav-link" data-scroll-to="how-it-works">
             <span class="nav-text" data-i18n="howItWorks">How It Works</span>
           </button>
+          <!-- Team Navigation Link -->
           <button class="nav-link" data-scroll-to="team">
             <span class="nav-text" data-i18n="team">Team</span>
           </button>
         </div>
 
-        <!-- 导航栏操作区域（登录和语言切换） Nav Actions (Login and Language Toggle) -->
+        <!-- Navigation Actions (Language Toggle and Login) -->
         <div class="nav-actions">
-          <!-- 语言切换按钮 Language Toggle Button -->
+          <!-- Language Toggle Button with Globe Icon -->
           <button class="btn-language">
             <i class="lucide lucide-globe"></i>
             <span class="language-indicator">EN</span>
           </button>
 
-          <!-- 登录按钮 Login Button -->
+          <!-- Login Button with Outline Style -->
           <button class="btn btn-outline" id="loginBtn" data-i18n="login">Login</button>
         </div>
 
-        <!-- 移动端菜单按钮 Mobile Menu Button -->
+        <!-- Mobile Menu Button Group -->
         <div class="mobile-menu-btn">
-          <!-- 移动端语言切换按钮 Mobile Language Toggle Button -->
+          <!-- Mobile Language Toggle -->
           <button class="btn-language-mobile">
             <i class="lucide lucide-globe"></i>
           </button>
-          <!-- 移动端菜单展开按钮 Mobile Menu Toggle Button -->
+          <!-- Mobile Menu Toggle Button -->
           <button class="menu-toggle">
             <i class="lucide lucide-menu"></i>
           </button>
@@ -65,10 +68,10 @@
       </div>
     </div>
 
-    <!-- 移动端菜单（默认隐藏） Mobile Menu (Hidden by Default) -->
+    <!-- Mobile Menu (Hidden by Default) -->
     <div class="mobile-menu">
       <div class="mobile-menu-content">
-        <!-- 移动端导航链接 Mobile Navigation Links -->
+        <!-- Mobile Navigation Links -->
         <button class="nav-link-mobile" data-scroll-to="features">
           <span data-i18n="features">Features</span>
         </button>
@@ -78,35 +81,35 @@
         <button class="nav-link-mobile" data-scroll-to="team">
           <span data-i18n="team">Team</span>
         </button>
-        <!-- 移动端登录按钮 Mobile Login Button -->
+        <!-- Mobile Login Button -->
         <button class="btn btn-outline" id="loginBtnMobile" data-i18n="login">Login</button>
       </div>
     </div>
   </nav>
 
-  <!-- 主要内容区域 Main Content Area -->
+  <!-- Main Content Area -->
   <main>
-    <!-- 英雄区域（首屏） Hero Section (First Screen) -->
+    <!-- Hero Section (First Screen) -->
     <section class="hero">
-      <!-- 英雄区域背景 Hero Background -->
+      <!-- Hero Background Elements -->
       <div class="hero-bg">
         <div class="hero-overlay"></div>
         <div class="hero-glow"></div>
       </div>
 
-      <!-- 英雄区域内容 Hero Content -->
+      <!-- Hero Content -->
       <div class="hero-content">
         <h1 class="hero-title gradient-text" data-i18n="heroTitle">AI-Powered Nutritional Search</h1>
         <p class="hero-subtitle" data-i18n="heroSubtitle">Discover the nutritional content of any food with just a photo
           or text search, powered by advanced AI.</p>
-        <!-- 英雄区域按钮组 Hero Buttons -->
+        <!-- Hero Call-to-Action Buttons -->
         <div class="hero-buttons">
           <button class="btn btn-primary" id="downloadBtn" data-i18n="downloadNow">Download Now</button>
           <a href="learn-more.html" class="btn btn-secondary" data-i18n="learnMore">Learn More</a>
         </div>
       </div>
 
-      <!-- 滚动指示器 Scroll Indicator -->
+      <!-- Scroll Indicator -->
       <div class="scroll-indicator">
         <button class="btn-scroll" data-scroll-to="features">
           <i class="lucide lucide-chevron-down"></i>
@@ -114,13 +117,13 @@
       </div>
     </section>
 
-    <!-- 功能特点区域 Features Section -->
+    <!-- Features Section -->
     <section class="features" id="features">
       <div class="container">
         <h2 class="section-title gradient-text" data-i18n="featuresTitle">Key Features</h2>
-        <!-- 功能卡片网格 Features Card Grid -->
+        <!-- Features Grid Layout -->
         <div class="features-grid">
-          <!-- 功能卡片1：图像识别 Feature Card 1: Image Recognition -->
+          <!-- Feature Card 1: Image Recognition -->
           <div class="feature-card">
             <div class="feature-icon cyan">
               <i data-lucide="camera" size="36"></i>
@@ -129,7 +132,7 @@
             <p class="feature-description" data-i18n="feature1Description">Take a photo of any food and get instant
               nutritional information.</p>
           </div>
-          <!-- 功能卡片2：自然语言搜索 Feature Card 2: Natural Language Search -->
+          <!-- Feature Card 2: Natural Language Search -->
           <div class="feature-card">
             <div class="feature-icon emerald">
               <i data-lucide="search" size="36"></i>
@@ -138,7 +141,7 @@
             <p class="feature-description" data-i18n="feature2Description">Simply describe the food you're looking for
               in natural language.</p>
           </div>
-          <!-- 功能卡片3：全面数据 Feature Card 3: Comprehensive Data -->
+          <!-- Feature Card 3: Comprehensive Data -->
           <div class="feature-card">
             <div class="feature-icon blue">
               <i data-lucide="database" size="36"></i>
@@ -151,30 +154,29 @@
       </div>
     </section>
 
-    <!-- 视频展示区域 Video Section -->
+    <!-- Video Demonstration Section -->
     <section class="video-section" id="video">
       <div class="container">
         <h2 class="section-title gradient-text" data-i18n="videoTitle">See It In Action</h2>
         <p class="section-subtitle" data-i18n="videoSubtitle">Watch how our app works in real time</p>
-        <!-- 视频容器 Video Container -->
+        <!-- Video Container with Controls -->
         <div class="video-container">
-          <!-- 视频包装器 Video Wrapper -->
           <div class="video-wrapper">
-            <!-- 视频元素（带有占位符海报图像） Video Element (with placeholder poster image) -->
+            <!-- Video Element with Poster Image -->
             <video id="demoVideo" poster="Promotional images and videos/Promotional images.jpg" controls muted
               playsinline>
               <source src="Promotional images and videos/Demo.mov" type="video/quicktime">
               <source src="Promotional images and videos/Demo.mov" type="video/mp4">
               Your browser does not support the video tag.
             </video>
-            <!-- 视频覆盖层（包含播放按钮） Video Overlay (containing play button) -->
+            <!-- Video Play Button Overlay -->
             <div class="video-overlay">
               <button class="video-play-btn">
                 <i class="lucide lucide-play"></i>
               </button>
             </div>
           </div>
-          <!-- 视频信息区域 Video Info Area -->
+          <!-- Video Information Section -->
           <div class="video-info">
             <h3 class="video-info-title">InfiniteLoopers App Demo</h3>
             <p class="video-info-description">Watch our app in action as it identifies food and provides detailed
@@ -184,13 +186,13 @@
       </div>
     </section>
 
-    <!-- 工作原理区域 How It Works Section -->
+    <!-- How It Works Section -->
     <section class="how-it-works" id="how-it-works">
       <div class="container">
         <h2 class="section-title gradient-text" data-i18n="howItWorksTitle">How It Works</h2>
-        <!-- 步骤容器 Steps Container -->
+        <!-- Steps Container with Compact Layout -->
         <div class="steps-container compact-steps">
-          <!-- 步骤1：拍照或输入描述 Step 1: Take photo or enter description -->
+          <!-- Step 1: Photo or Description Input -->
           <div class="step">
             <div class="step-number cyan">1</div>
             <h3 class="step-title" data-i18n="step1">Take a photo or enter a description</h3>
@@ -200,7 +202,7 @@
               <i class="lucide lucide-camera"></i>
             </div>
           </div>
-          <!-- 步骤2：AI分析内容 Step 2: AI analyzes content -->
+          <!-- Step 2: AI Analysis -->
           <div class="step step-right">
             <div class="step-number emerald">2</div>
             <h3 class="step-title" data-i18n="step2">Our AI analyzes the content</h3>
@@ -210,7 +212,7 @@
               <i class="lucide lucide-cpu"></i>
             </div>
           </div>
-          <!-- 步骤3：获取详细营养信息 Step 3: Get detailed nutritional information -->
+          <!-- Step 3: Nutritional Information -->
           <div class="step">
             <div class="step-number blue">3</div>
             <h3 class="step-title" data-i18n="step3">Get detailed nutritional information</h3>
@@ -220,7 +222,7 @@
               <i class="lucide lucide-database"></i>
             </div>
           </div>
-          <!-- 步骤4：做出明智的饮食选择 Step 4: Make informed dietary choices -->
+          <!-- Step 4: Informed Choices -->
           <div class="step step-right">
             <div class="step-number purple">4</div>
             <h3 class="step-title" data-i18n="step4">Make informed dietary choices</h3>
@@ -234,14 +236,14 @@
       </div>
     </section>
 
-    <!-- 团队展示区域 Team Section -->
+    <!-- Team Section -->
     <section class="team-section" id="team">
       <div class="container">
         <h2 class="section-title gradient-text" data-i18n="teamTitle">Meet Our Team</h2>
         <p class="section-subtitle" data-i18n="teamDescription">The brilliant minds behind InfiniteLoopers</p>
-        <!-- 团队成员网格 Team Grid -->
+        <!-- Team Members Grid -->
         <div class="team-grid">
-          <!-- 团队成员1：Kaidi Lyu Team Member 1: Kaidi Lyu -->
+          <!-- Team Member 1: Kaidi Lyu -->
           <div class="team-card">
             <div class="team-avatar">
               <a href="https://www.linkedin.com/in/%E6%81%BA%E8%BF%AA-%E5%90%95-7b9562356/" target="_blank"
@@ -262,7 +264,7 @@
               </a>
             </div>
           </div>
-          <!-- 团队成员2：Yingdong Feng Team Member 2: Yingdong Feng -->
+          <!-- Team Member 2: Yingdong Feng -->
           <div class="team-card">
             <div class="team-avatar">
               <a href="https://www.linkedin.com/in/%E8%8B%B1%E4%B8%9C-%E5%86%AF-2794a42b2/" target="_blank"
@@ -283,7 +285,7 @@
               </a>
             </div>
           </div>
-          <!-- 团队成员3：Kiran Chhetri Team Member 3: Kiran Chhetri -->
+          <!-- Team Member 3: Kiran Chhetri -->
           <div class="team-card">
             <div class="team-avatar">
               <a href="https://www.linkedin.com/in/kiran-c-79bb65361/" target="_blank" rel="noopener noreferrer">
@@ -303,7 +305,7 @@
               </a>
             </div>
           </div>
-          <!-- 团队成员4：Andrew Dhillon Team Member 4: Andrew Dhillon -->
+          <!-- Team Member 4: Andrew Dhillon -->
           <div class="team-card">
             <div class="team-avatar">
               <img src="https://placehold.co/100x100/333333/FFFFFF/png" alt="Andrew Dhillon">
@@ -319,7 +321,7 @@
               </a>
             </div>
           </div>
-          <!-- 团队成员5：Logan Munn Team Member 5: Logan Munn -->
+          <!-- Team Member 5: Logan Munn -->
           <div class="team-card">
             <div class="team-avatar">
               <a href="https://www.linkedin.com/in/logan-munn-a58968227" target="_blank" rel="noopener noreferrer">
@@ -343,7 +345,7 @@
       </div>
     </section>
 
-    <!-- 行动召唤区域 Call to Action Section -->
+    <!-- Call to Action Section -->
     <section class="cta-section">
       <div class="container">
         <h2 class="section-title gradient-text" data-i18n="ctaTitle">Ready to Transform Your Nutrition?</h2>
@@ -354,17 +356,17 @@
     </section>
   </main>
 
-  <!-- 页脚 Footer -->
+  <!-- Footer Section -->
   <footer class="footer">
     <div class="container">
-      <!-- 页脚网格布局 Footer Grid Layout -->
+      <!-- Footer Grid Layout -->
       <div class="footer-grid">
-        <!-- 页脚栏目1：品牌信息 Footer Column 1: Brand Info -->
+        <!-- Footer Column 1: Brand Information -->
         <div class="footer-col">
           <h3 class="footer-title gradient-text">InfiniteLoopers</h3>
           <p class="footer-description">AI-powered nutritional search app for making informed dietary choices.</p>
         </div>
-        <!-- 页脚栏目2：链接 Footer Column 2: Links -->
+        <!-- Footer Column 2: Navigation Links -->
         <div class="footer-col">
           <h4 class="footer-heading">Links</h4>
           <ul class="footer-links">
@@ -374,7 +376,7 @@
                 class="footer-link">GitHub</a></li>
           </ul>
         </div>
-        <!-- 页脚栏目3：联系方式 Footer Column 3: Contact -->
+        <!-- Footer Column 3: Contact Information -->
         <div class="footer-col">
           <h4 class="footer-heading">Contact</h4>
           <ul class="footer-info">
@@ -382,7 +384,7 @@
             <li class="footer-info-item">Phone: (123) 456-7890</li>
           </ul>
         </div>
-        <!-- 页脚栏目4：社交媒体 Footer Column 4: Social Media -->
+        <!-- Footer Column 4: Social Media Links -->
         <div class="footer-col">
           <h4 class="footer-heading">Follow Us</h4>
           <div class="footer-social">
@@ -405,53 +407,53 @@
           </div>
         </div>
       </div>
-      <!-- 页脚底部：版权信息 Footer Bottom: Copyright -->
+      <!-- Footer Bottom: Copyright Information -->
       <div class="footer-bottom">
         <p class="copyright" data-i18n="copyright">© 2025 InfiniteLoopers. All rights reserved.</p>
       </div>
     </div>
   </footer>
 
-  <!-- 登录模态框 Login Modal -->
+  <!-- Login Modal -->
   <div class="modal" id="loginModal">
     <div class="modal-content">
-      <!-- 模态框头部 Modal Header -->
+      <!-- Modal Header -->
       <div class="modal-header">
         <h3 class="modal-title">Login</h3>
         <button class="modal-close">&times;</button>
       </div>
-      <!-- 模态框主体 Modal Body -->
+      <!-- Modal Body -->
       <div class="modal-body">
-        <!-- 登录表单 Login Form -->
+        <!-- Login Form -->
         <form id="loginForm" class="login-form">
-          <!-- 邮箱输入字段 Email Input Field -->
+          <!-- Email Input Field -->
           <div class="form-group">
             <label for="email">Email</label>
             <input type="email" id="email" placeholder="your@email.com" required>
           </div>
-          <!-- 密码输入字段 Password Input Field -->
+          <!-- Password Input Field -->
           <div class="form-group">
             <label for="password">Password</label>
             <input type="password" id="password" required>
           </div>
-          <!-- 提交按钮 Submit Button -->
+          <!-- Submit Button -->
           <button type="submit" class="btn btn-primary btn-full">Login</button>
         </form>
       </div>
     </div>
   </div>
 
-  <!-- 下载模态框 Download Modal -->
+  <!-- Download Modal -->
   <div class="modal" id="downloadModal">
     <div class="modal-content">
-      <!-- 模态框头部 Modal Header -->
+      <!-- Modal Header -->
       <div class="modal-header">
         <h3 class="modal-title" data-i18n="scanToDownload">Scan QR Code to Download</h3>
         <button class="modal-close">&times;</button>
       </div>
-      <!-- 模态框主体 Modal Body -->
+      <!-- Modal Body -->
       <div class="modal-body">
-        <!-- 二维码容器 QR Code Container -->
+        <!-- QR Code Container -->
         <div class="qr-container">
           <div class="qr-code">
             <img src="Promotional images and videos/Download QR code.png" alt="QR Code">
@@ -459,16 +461,16 @@
           <p class="qr-description">Scan this QR code with your mobile device to download the app</p>
         </div>
 
-        <!-- 下载标签页 Download Tabs -->
+        <!-- Download Tabs -->
         <div class="download-tabs">
-          <!-- 标签页头部 Tabs Header -->
+          <!-- Tabs Header -->
           <div class="tabs-header">
             <button class="tab-btn active" data-tab="android">Android</button>
             <button class="tab-btn" data-tab="ios">iOS</button>
           </div>
-          <!-- 标签页内容 Tabs Content -->
+          <!-- Tabs Content -->
           <div class="tabs-content">
-            <!-- 安卓下载标签页 Android Download Tab -->
+            <!-- Android Download Tab -->
             <div class="tab-pane active" id="android-tab">
               <a href="Promotional images and videos/InfiniteLoopers-0.9.zip" download class="btn btn-primary btn-full"
                 data-i18n="downloadAndroid">
@@ -480,7 +482,7 @@
                 Scan the QR code above to download our Android app
               </p>
             </div>
-            <!-- iOS下载标签页 iOS Download Tab -->
+            <!-- iOS Download Tab -->
             <div class="tab-pane" id="ios-tab">
               <a href="Promotional images and videos/InfiniteLoopers-0.9.zip" download class="btn btn-primary btn-full"
                 data-i18n="downloadIOS">
@@ -498,8 +500,10 @@
     </div>
   </div>
 
+  <!-- Scripts -->
   <script src="script.js"></script>
   <script>
+    // Initialize Lucide Icons
     document.addEventListener("DOMContentLoaded", () => {
       lucide.createIcons();
     });

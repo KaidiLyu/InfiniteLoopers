@@ -16,7 +16,18 @@ import { collection, query, where, getDocs } from "firebase/firestore";
 import { updateProfile } from "firebase/auth";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 
+/**
+ * Profile Component
+ * 
+ * Displays the user's profile information and statistics.
+ * Features:
+ * - Profile picture management
+ * - User achievement statistics
+ * - Navigation to settings
+ * - Sign out functionality
+ */
 export default function Profile() {
+  // State for user profile and statistics
   const [user, setUser] = useState(null);
   const [stats, setStats] = useState({
     savedFoods: 0,
@@ -25,6 +36,7 @@ export default function Profile() {
   });
   const router = useRouter();
 
+  // Request permissions and set up user on component mount
   useEffect(() => {
     (async () => {
       const { status } =
@@ -41,6 +53,7 @@ export default function Profile() {
     setUser(currentUser);
   }, []);
 
+  // Fetch updated user statistics when screen comes into focus
   useFocusEffect(
     useCallback(() => {
       const currentUser = auth.currentUser;
@@ -53,6 +66,13 @@ export default function Profile() {
     }, [])
   );
 
+  /**
+   * Fetches user statistics from Firestore
+   * Includes goal achievements, days logged, and meals saved
+   * Also retrieves the user's calorie goal and today's intake
+   * 
+   * @param {string} userId - The user's Firebase UID
+   */
   const fetchUserStats = async (userId) => {
     try {
       const savedFoodsSnapshot = await getDocs(
@@ -116,6 +136,11 @@ export default function Profile() {
     }
   };
 
+  /**
+   * Opens the image picker to select a profile picture
+   * Uploads the selected image to Firebase Storage
+   * Updates the user's profile with the new image URL
+   */
   const pickImage = async () => {
     try {
       let result = await ImagePicker.launchImageLibraryAsync({
@@ -155,6 +180,9 @@ export default function Profile() {
     }
   };
 
+  /**
+   * Signs the user out and navigates to the sign-in screen
+   */
   const handleSignOut = async () => {
     try {
       await auth.signOut();
@@ -164,10 +192,14 @@ export default function Profile() {
     }
   };
 
+  /**
+   * Navigates to the settings screen
+   */
   const toSettings = () => {
     router.push("/settings");
   };
 
+  // Display loading state if user data is not available
   if (!user) {
     return (
       <View style={styles.container}>

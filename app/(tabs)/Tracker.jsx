@@ -34,19 +34,40 @@ import { useFocusEffect } from "expo-router";
 import { Picker } from "@react-native-picker/picker";
 const user = auth.currentUser;
 
+/**
+ * Formats a date object to a readable string format
+ * @param {Date} date - The date to format
+ * @returns {string} - Formatted date string (e.g., "January 1, 2023")
+ */
 const formatDate = (date) => {
   const options = { year: "numeric", month: "long", day: "numeric" };
   return date.toLocaleDateString(undefined, options);
 };
 
+/**
+ * Formats a Firestore timestamp to a readable time string
+ * @param {Timestamp} timestamp - The Firestore timestamp
+ * @returns {string} - Formatted time string (e.g., "12:30 PM")
+ */
 const formatTime = (timestamp) => {
   if (!timestamp?.toDate) return "N/A";
   const options = { hour: "numeric", minute: "2-digit", hour12: true };
   return timestamp.toDate().toLocaleTimeString(undefined, options);
 };
 
+/**
+ * Tracker Component
+ * 
+ * Main component for tracking daily food intake.
+ * Features:
+ * - Display food items logged for the selected day
+ * - Show total nutrition information for the day
+ * - Allow navigation between different days
+ * - Track progress towards calorie goals
+ */
 export default function Tracker() {
   const user = auth.currentUser;
+  // State for date selection and tracked items
   const [currentDate, setCurrentDate] = useState(new Date());
   const [trackedItems, setTrackedItems] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -55,6 +76,7 @@ export default function Tracker() {
   const [calorieGoal, setCalorieGoal] = useState(2000); // Default Target
   const [goalChecked, setGoalChecked] = useState(false);
 
+  // Memoized date values used for filtering
   const today = useMemo(() => new Date(), []);
   const thirtyDaysAgo = useMemo(() => {
     const date = new Date();
@@ -62,6 +84,7 @@ export default function Tracker() {
     return date;
   }, []);
 
+  // Convert current date to string format for Firebase queries
   const currentDateString = useMemo(() => {
     const year = currentDate.getFullYear();
     const month = String(currentDate.getMonth() + 1).padStart(2, "0");
@@ -69,7 +92,10 @@ export default function Tracker() {
     return `${year}-${month}-${day}`;
   }, [currentDate]);
 
-  // Calculate total cash
+  /**
+   * Calculate total calories from all tracked items for the current day
+   * Used for progress tracking and goal monitoring
+   */
   const totalCalories = useMemo(() => {
     return trackedItems.reduce((sum, item) => {
       const servingQty = item.servingQty || 0;
@@ -77,7 +103,10 @@ export default function Tracker() {
     }, 0);
   }, [trackedItems]);
 
-  // Loading the user's calorie goal
+  /**
+   * Loads the user's calorie goal from Firestore
+   * Falls back to default value (2000) if no goal is set
+   */
   const loadCalorieGoal = useCallback(async () => {
     if (!user?.uid) return;
     
@@ -95,7 +124,11 @@ export default function Tracker() {
     }
   }, [user]);
 
-  // Check if the user has reached their calorie goal
+  /**
+   * Checks if the user has reached their calorie goal for the day
+   * Saves goal achievement records to Firestore
+   * Manages achievement streaks by removing past achievements if goal is broken
+   */
   const checkCalorieGoal = useCallback(async () => {
     if (!user?.uid || goalChecked || trackedItems.length === 0) return;
     
@@ -172,7 +205,11 @@ export default function Tracker() {
     }
   }, [user, totalCalories, calorieGoal, currentDateString, goalChecked, trackedItems]);
 
-  // Listen for changes in the tracked items
+  /**
+   * Effect hook that runs when the Tracker screen comes into focus
+   * Fetches tracked food items for the current date from Firestore
+   * Sets up a real-time listener for updates to tracked items
+   */
   useFocusEffect(
     useCallback(() => {
       if (!user?.uid) return;

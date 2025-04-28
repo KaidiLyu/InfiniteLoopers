@@ -1,3 +1,10 @@
+/**
+ * Calorie Goal Setting Screen
+ * 
+ * This screen allows users to set and customize their daily calorie targets.
+ * Users can either have their calorie needs calculated automatically based on 
+ * their physical attributes or set a custom calorie goal manually.
+ */
 import {
     View,
     Text,
@@ -33,11 +40,21 @@ import {
     { label: "Highly active (daily vigorous exercise or physical work)", value: "veryActive" },
   ];
   
+  /**
+   * CalorieGoal Component
+   * 
+   * Allows users to set up or modify their daily calorie goal.
+   * Features:
+   * - Automatic calculation based on user data (height, weight, age, gender, activity level)
+   * - Option to set a custom calorie goal
+   * - Stores user preferences in Firebase
+   */
   export default function CalorieGoal() {
     const navigation = useNavigation();
     const router = useRouter();
     const user = auth.currentUser;
   
+    // State for user physical data
     const [height, setHeight] = useState("");
     const [weight, setWeight] = useState("");
     const [age, setAge] = useState("");
@@ -49,11 +66,14 @@ import {
     const [useCustomGoal, setUseCustomGoal] = useState(false);
     const [loading, setLoading] = useState(true);
     
-    // Drop-down menu status
+    // State for dropdown UI
     const [genderModalVisible, setGenderModalVisible] = useState(false);
     const [activityModalVisible, setActivityModalVisible] = useState(false);
   
-    // Loading saved data
+    /**
+     * Load saved user data from Firebase on component mount
+     * Prefills form fields with existing data if available
+     */
     useEffect(() => {
       navigation.setOptions({
         headerShown: false,
@@ -64,6 +84,10 @@ import {
       }
     }, [user]);
   
+    /**
+     * Fetches user's saved calorie goal data from Firestore
+     * Populates form fields with the retrieved data
+     */
     const loadUserData = async () => {
       try {
         const userDocRef = doc(db, "userCalorieGoals", user.uid);
@@ -93,21 +117,37 @@ import {
       }
     };
   
-    // Select Gender
+    /**
+     * Handles selection of gender from dropdown
+     * Updates both the value and display label
+     * 
+     * @param {object} option - The selected gender option
+     */
     const selectGender = (option) => {
       setGender(option.value);
       setGenderLabel(option.label);
       setGenderModalVisible(false);
     };
     
-    // Select Activity Level
+    /**
+     * Handles selection of activity level from dropdown
+     * Updates both the value and display label
+     * 
+     * @param {object} option - The selected activity level option
+     */
     const selectActivity = (option) => {
       setActivityLevel(option.value);
       setActivityLabel(option.label);
       setActivityModalVisible(false);
     };
   
-    // Calculate Basal Metabolic Rate (BMR) - Using the Modified Harris-Benedict Formula
+    /**
+     * Calculates the Basal Metabolic Rate (BMR) and daily calorie goal
+     * Uses the Modified Harris-Benedict Formula
+     * Adjusts for gender, age, height, weight, and activity level
+     * 
+     * @returns {number} - The calculated daily calorie goal
+     */
     const calculateBMR = () => {
       if (!height || !weight || !age) return 0;
       
@@ -150,6 +190,11 @@ import {
       return Math.round(calorieGoal);
     };
   
+    /**
+     * Saves the calorie goal to Firestore
+     * Uses either the calculated goal or custom goal based on user preference
+     * Navigates back to previous screen on success
+     */
     const saveGoal = async () => {
       if (!user) {
         Alert.alert("Error", "You must be logged in to save your calorie goal");
@@ -207,7 +252,15 @@ import {
       }
     };
   
-    // Custom drop-down selector
+    /**
+     * Renders a custom dropdown selector component
+     * 
+     * @param {string} label - The label for the dropdown
+     * @param {string} value - The current selected value to display
+     * @param {function} onPress - Function to call when the dropdown is pressed
+     * @param {string} backgroundColor - Background color of the dropdown
+     * @returns {JSX.Element} - The rendered dropdown component
+     */
     const renderDropdownSelector = (
       label, 
       value, 
@@ -225,6 +278,7 @@ import {
   
     return (
       <ScrollView style={styles.container}>
+        {/* Header with back button and title */}
         <View style={styles.header}>
           <TouchableOpacity 
             style={styles.backButton} 
@@ -234,6 +288,7 @@ import {
           <Text style={styles.title}>Set a calorie goal</Text>
         </View>
         
+        {/* Toggle switch between calculated and custom goal */}
         <View style={styles.switchContainer}>
           <Text style={styles.switchLabel}>
             {useCustomGoal ? "Custom Targets" : "Calculated based on body data"}
@@ -284,6 +339,7 @@ import {
             <Text style={styles.inputLabel}>Activity Level</Text>
             {renderDropdownSelector("Activity Level", activityLabel, () => setActivityModalVisible(true))}
             
+            {/* Display calculated result when all required data is entered */}
             {height && weight && age && (
               <View style={styles.resultContainer}>
                 <Text style={styles.resultLabel}>Calculation results:</Text>
@@ -306,6 +362,7 @@ import {
           </View>
         )}
         
+        {/* Save button */}
         <TouchableOpacity 
           style={styles.saveButton} 
           onPress={saveGoal}
@@ -313,6 +370,7 @@ import {
           <Text style={styles.saveButtonText}>Save Target</Text>
         </TouchableOpacity>
         
+        {/* Informational section */}
         <View style={styles.infoContainer}>
           <Text style={styles.infoTitle}>About Calorie Goals</Text>
           <Text style={styles.infoText}>
@@ -365,7 +423,7 @@ import {
           </View>
         </Modal>
         
-        {/* Active level selection modal */}
+        {/* Activity level selection modal */}
         <Modal
           animationType="slide"
           transparent={true}
@@ -410,6 +468,16 @@ import {
     );
   }
   
+  /**
+   * Component styles
+   * 
+   * Defines styling for:
+   * - Main container layout and header
+   * - Form inputs and controls
+   * - Custom dropdown selectors
+   * - Result display and information sections
+   * - Modal dialogs for selection options
+   */
   const styles = StyleSheet.create({
     container: {
       flex: 1,

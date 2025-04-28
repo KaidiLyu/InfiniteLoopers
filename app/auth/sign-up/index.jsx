@@ -1,3 +1,10 @@
+/**
+ * Sign Up Screen Component
+ * 
+ * This component provides a user interface for the sign-up functionality
+ * using Firebase Authentication with email and password.
+ * It includes form validation, error handling, and navigation between screens.
+ */
 import {
   View,
   Text,
@@ -23,6 +30,7 @@ import { auth } from "../../../configs/FirebaseConfig.js";
 import { usePlatform } from "../../../contexts/PlatformContext.jsx";
 
 export default function SignUp() {
+  // Hide the header when component mounts
   useEffect(() => {
     navigation.setOptions({
       headerShown: false,
@@ -32,13 +40,22 @@ export default function SignUp() {
   const navigation = useNavigation();
   const router = useRouter();
 
+  // State variables for user registration information
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
 
+  // Get platform-specific information from context
   const { isWeb, isIOS, isAndroid, isMacos, platform } = usePlatform();
 
+  /**
+   * Handle user account creation with Firebase authentication
+   * 
+   * Validates user inputs, attempts to create a new account with Firebase,
+   * updates the user profile with display name, and handles platform-specific error messages.
+   */
   const CreateAccount = () => {
+    // Validate that all fields are not empty
     if (!email || !password || !name) {
       if (isAndroid)
         ToastAndroid.show("Please fill all the fields", ToastAndroid.BOTTOM);
@@ -47,6 +64,7 @@ export default function SignUp() {
       if (isMacos) alert("Please fill all the fields");
       return;
     }
+    // Attempt to create a new user with Firebase
     createUserWithEmailAndPassword(auth, email, password)
       .then((userCredential) => {
         // Signed up
@@ -63,6 +81,7 @@ export default function SignUp() {
         const errorCode = error.code;
         const errorMessage = error.message;
         console.log(errorCode);
+        // Handle specific Firebase error codes with platform-specific messages
         if (errorCode === "auth/weak-password") {
           if (isAndroid)
             ToastAndroid.show("Weak password", ToastAndroid.BOTTOM);
@@ -92,7 +111,9 @@ export default function SignUp() {
   };
 
   return (
+    // KeyboardAvoidingView adjusts layout when keyboard appears
     <KeyboardAvoidingView behavior="height" style={{ flex: 1 }}>
+      {/* Dismiss keyboard when tapping outside input fields */}
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <ScrollView
           contentContainerStyle={{
@@ -100,6 +121,7 @@ export default function SignUp() {
             backgroundColor: Colors.WHITE,
           }}>
           <View>
+            {/* Decorative background image */}
             <Image
               source={require("../../../assets/images/greenImage.jpg")}
               style={{
@@ -112,6 +134,7 @@ export default function SignUp() {
                 zIndex: 0,
               }}
             />
+            {/* Back button to sign-in screen */}
             <TouchableOpacity onPress={() => router.replace("auth/sign-in")}>
               <FontAwesome6
                 name="circle-arrow-left"
@@ -124,6 +147,7 @@ export default function SignUp() {
                 }}
               />
             </TouchableOpacity>
+            {/* Main form container */}
             <View style={{ padding: 20, marginTop: "45%" }}>
               <Text
                 style={{
@@ -142,6 +166,7 @@ export default function SignUp() {
                 </Text>{" "}
                 Account
               </Text>
+              {/* Email input field */}
               <View style={{ marginTop: 20 }}>
                 <Text style={{ fontFamily: "myfont-bold", marginLeft: 10 }}>
                   Email
@@ -152,6 +177,7 @@ export default function SignUp() {
                   onChangeText={(value) => setEmail(value)}
                 />
               </View>
+              {/* Password input field with requirement note */}
               <View style={{ marginTop: 15 }}>
                 <Text style={{ fontFamily: "myfont-bold", marginLeft: 10 }}>
                   Password
@@ -167,6 +193,7 @@ export default function SignUp() {
                   Password must be a minimum of 6 characters
                 </Text>
               </View>
+              {/* Name input field */}
               <View style={{ marginTop: 20 }}>
                 <Text style={{ fontFamily: "myfont-bold", marginLeft: 10 }}>
                   Name
@@ -177,6 +204,7 @@ export default function SignUp() {
                   onChangeText={(value) => setName(value)}
                 />
               </View>
+              {/* Create Account button */}
               <TouchableOpacity
                 style={{
                   backgroundColor: Colors.BLACK,
@@ -208,6 +236,7 @@ export default function SignUp() {
                   }}
                 />
               </TouchableOpacity>
+              {/* Sign in link for existing users */}
               <View
                 style={{
                   flexDirection: "row",
@@ -241,6 +270,9 @@ export default function SignUp() {
   );
 }
 
+/**
+ * Component styles
+ */
 const styles = StyleSheet.create({
   inputForm: {
     padding: 20,

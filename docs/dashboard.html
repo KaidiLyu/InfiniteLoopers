@@ -1,4 +1,10 @@
 <!DOCTYPE html>
+<!-- 
+  Dashboard Page
+  
+  This is the main dashboard of the InfiniteLoopers Nutritional Search App.
+  It displays user nutrition data, search functionality, and food tracking.
+-->
 <html lang="en">
 <head>
   <!-- Document Meta Information -->
@@ -14,7 +20,7 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lucide-icons@0.284.0/font/lucide.min.css">
 </head>
 <body class="dark">
-  <!-- Navbar -->
+  <!-- Navbar - Top navigation with logo, menu links, and user profile -->
   <nav class="navbar">
     <div class="container">
       <div class="navbar-content">
@@ -23,7 +29,7 @@
           <span class="gradient-text">InfiniteLoopers</span>
         </a>
 
-        <!-- Desktop Navigation -->
+        <!-- Desktop Navigation - Main menu links (visible on larger screens) -->
         <div class="desktop-nav">
           <button class="nav-link active">
             <span class="nav-text" data-i18n="dashboard">Dashboard</span>
@@ -39,7 +45,7 @@
           </button>
         </div>
 
-        <!-- Nav Actions (User Profile and Language Toggle) -->
+        <!-- Nav Actions - User Profile and Language Toggle (desktop view) -->
         <div class="nav-actions">
           <!-- Language Toggle Button -->
           <button class="btn-language">
@@ -59,7 +65,7 @@
           </div>
         </div>
 
-        <!-- Mobile Menu Button -->
+        <!-- Mobile Menu Button - Only visible on smaller screens -->
         <div class="mobile-menu-btn">
           <!-- Mobile Language Toggle Button -->
           <button class="btn-language-mobile">
@@ -73,7 +79,7 @@
       </div>
     </div>
 
-    <!-- Mobile Menu (Hidden by Default) -->
+    <!-- Mobile Menu - Navigation for mobile devices (hidden by default) -->
     <div class="mobile-menu">
       <div class="mobile-menu-content">
         <!-- Mobile Navigation Links -->
@@ -90,7 +96,7 @@
           <span data-i18n="settings">Settings</span>
         </button>
         
-        <!-- Mobile User Profile -->
+        <!-- Mobile User Profile - Shows user info in mobile menu -->
         <div class="mobile-user-profile">
           <div class="user-avatar">
             <img src="https://placehold.co/40x40/333333/FFFFFF/png" alt="User Avatar">
@@ -110,9 +116,9 @@
     </div>
   </nav>
 
-  <!-- Main Content Area -->
+  <!-- Main Content Area - Contains all dashboard sections -->
   <main class="dashboard-page">
-    <!-- Dashboard Header -->
+    <!-- Dashboard Header - Welcome message and quick stats -->
     <section class="dashboard-header">
       <div class="container">
         <div class="dashboard-welcome">
@@ -120,7 +126,7 @@
           <p class="welcome-subtitle">Track your nutrition and discover new foods</p>
         </div>
         
-        <!-- Quick Stats -->
+        <!-- Quick Stats - Key nutrition metrics displayed as cards -->
         <div class="quick-stats">
           <div class="stat-card">
             <div class="stat-icon cyan">
@@ -165,13 +171,13 @@
       </div>
     </section>
 
-    <!-- Search Section -->
+    <!-- Search Section - Food search interface with text and camera options -->
     <section class="search-section">
       <div class="container">
         <div class="search-container">
           <h2 class="section-title">Find Nutritional Information</h2>
           
-          <!-- Search Tabs -->
+          <!-- Search Tabs - Toggle between text search and camera search -->
           <div class="search-tabs">
             <div class="tabs-header">
               <button class="tab-btn active" data-tab="text">
@@ -185,7 +191,7 @@
             </div>
             
             <div class="tabs-content">
-              <!-- Text Search Tab -->
+              <!-- Text Search Tab - Search bar and recent searches -->
               <div class="tab-pane active" id="text-tab">
                 <div class="search-bar">
                   <i class="lucide lucide-search"></i>
@@ -195,7 +201,7 @@
                   </button>
                 </div>
                 
-                <!-- Recent Searches -->
+                <!-- Recent Searches - Pills showing recent search terms -->
                 <div class="recent-searches">
                   <h3>Recent Searches</h3>
                   <div class="search-pills">
@@ -207,7 +213,7 @@
                 </div>
               </div>
               
-              <!-- Camera Tab -->
+              <!-- Camera Tab - Interface for taking food photos -->
               <div class="tab-pane" id="camera-tab">
                 <div class="camera-placeholder">
                   <div class="camera-icon">
@@ -226,7 +232,7 @@
       </div>
     </section>
 
-    <!-- Nutrition Summary Section -->
+    <!-- Nutrition Summary Section - Charts and progress bars for nutrition data -->
     <section class="nutrition-summary-section">
       <div class="container">
         <div class="section-header">
@@ -237,13 +243,13 @@
           </button>
         </div>
         
-        <!-- Nutrition Progress -->
+        <!-- Nutrition Progress - Macronutrients and calorie breakdown -->
         <div class="nutrition-progress">
-          <!-- Macronutrients -->
+          <!-- Macronutrients - Progress bars for protein, carbs, and fat -->
           <div class="macro-card">
             <h3>Macronutrients</h3>
             
-            <!-- Protein -->
+            <!-- Protein - Progress bar for protein intake -->
             <div class="nutrition-bar">
               <div class="bar-label">Protein</div>
               <div class="bar-track">
@@ -252,7 +258,7 @@
               <div class="bar-value">75g / 100g</div>
             </div>
             
-            <!-- Carbs -->
+            <!-- Carbs - Progress bar for carbohydrate intake -->
             <div class="nutrition-bar">
               <div class="bar-label">Carbs</div>
               <div class="bar-track">
@@ -261,7 +267,7 @@
               <div class="bar-value">180g / 300g</div>
             </div>
             
-            <!-- Fat -->
+            <!-- Fat - Progress bar for fat intake -->
             <div class="nutrition-bar">
               <div class="bar-label">Fat</div>
               <div class="bar-track">
@@ -271,7 +277,7 @@
             </div>
           </div>
           
-          <!-- Calorie Breakdown -->
+          <!-- Calorie Breakdown - Donut chart showing macronutrient percentages -->
           <div class="calorie-card">
             <h3>Calorie Breakdown</h3>
             <div class="calorie-chart">
@@ -303,7 +309,7 @@
       </div>
     </section>
 
-    <!-- Recent Foods Section -->
+    <!-- Recent Foods Section - Cards displaying recently logged food items -->
     <section class="recent-foods-section">
       <div class="container">
         <div class="section-header">
@@ -315,7 +321,7 @@
         </div>
         
         <div class="food-cards">
-          <!-- Food Card 1 -->
+          <!-- Food Card 1 - Breakfast item -->
           <div class="food-card">
             <div class="food-image" style="background-color: var(--gray-800);">
               <img src="https://placehold.co/100x100/333333/FFFFFF/png" alt="Greek Yogurt with Berries">
@@ -334,7 +340,7 @@
             </button>
           </div>
           
-          <!-- Food Card 2 -->
+          <!-- Food Card 2 - Lunch item -->
           <div class="food-card">
             <div class="food-image" style="background-color: var(--gray-800);">
               <img src="https://placehold.co/100x100/333333/FFFFFF/png" alt="Grilled Chicken Salad">
@@ -353,7 +359,7 @@
             </button>
           </div>
           
-          <!-- Food Card 3 -->
+          <!-- Food Card 3 - Snack item -->
           <div class="food-card">
             <div class="food-image" style="background-color: var(--gray-800);">
               <img src="https://placehold.co/100x100/333333/FFFFFF/png" alt="Protein Smoothie">
@@ -372,7 +378,7 @@
             </button>
           </div>
           
-          <!-- Food Card 4 -->
+          <!-- Food Card 4 - Dinner item -->
           <div class="food-card">
             <div class="food-image" style="background-color: var(--gray-800);">
               <img src="https://placehold.co/100x100/333333/FFFFFF/png" alt="Salmon with Vegetables">
@@ -394,13 +400,13 @@
       </div>
     </section>
 
-    <!-- Recommendations Section -->
+    <!-- Recommendations Section - Personalized health and nutrition suggestions -->
     <section class="recommendations-section">
       <div class="container">
         <h2 class="section-title">Recommended for You</h2>
         
         <div class="recommendation-cards">
-          <!-- Recommendation Card 1 -->
+          <!-- Recommendation Card 1 - Protein goal suggestion -->
           <div class="recommendation-card">
             <div class="recommendation-icon cyan">
               <i class="lucide lucide-salad"></i>
@@ -410,7 +416,7 @@
             <button class="btn btn-outline btn-sm">View Suggestions</button>
           </div>
           
-          <!-- Recommendation Card 2 -->
+          <!-- Recommendation Card 2 - Hydration reminder -->
           <div class="recommendation-card">
             <div class="recommendation-icon emerald">
               <i class="lucide lucide-droplet"></i>
@@ -420,7 +426,7 @@
             <button class="btn btn-outline btn-sm">Track Water</button>
           </div>
           
-          <!-- Recommendation Card 3 -->
+          <!-- Recommendation Card 3 - Weekly nutrition report -->
           <div class="recommendation-card">
             <div class="recommendation-icon blue">
               <i class="lucide lucide-heart"></i>
@@ -433,7 +439,7 @@
       </div>
     </section>
 
-    <!-- Add Food Button (Fixed) -->
+    <!-- Add Food Button - Fixed floating action button for adding food entries -->
     <div class="add-food-button">
       <button class="btn-floating">
         <i class="lucide lucide-plus"></i>
@@ -441,7 +447,7 @@
     </div>
   </main>
 
-  <!-- Footer -->
+  <!-- Footer - Site information, links, and copyright -->
   <footer class="footer">
     <div class="container">
       <!-- Footer Grid Layout -->
@@ -500,7 +506,7 @@
   <!-- JavaScript Script Reference -->
   <script src="script.js"></script>
   
-  <!-- Additional Dashboard JavaScript -->
+  <!-- Additional Dashboard JavaScript - For tab functionality and interactions -->
   <script>
     document.addEventListener("DOMContentLoaded", () => {
       // Tab functionality for search tabs

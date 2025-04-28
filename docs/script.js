@@ -1,20 +1,20 @@
 /**
  * InfiniteLoopers - AI-Powered Nutritional Search App
- * 主要JavaScript文件 - 处理网站的交互和功能
  * Main JavaScript file - Handles website interactions and functionality
  */
 
+// Initialize when DOM content is loaded
 document.addEventListener("DOMContentLoaded", () => {
-    // 语言切换功能 - Language Toggle
+    // Language Toggle Functionality
     const btnLanguage = document.querySelector(".btn-language")
     const btnLanguageMobile = document.querySelector(".btn-language-mobile")
     const languageIndicator = document.querySelector(".language-indicator")
     let currentLanguage = localStorage.getItem("language") || "en"
   
-    // 设置初始语言 - Set initial language
+    // Set initial language
     setLanguage(currentLanguage)
   
-    // 语言切换按钮事件监听器 - Language toggle event listeners
+    // Add event listeners for language toggle buttons
     if (btnLanguage) {
       btnLanguage.addEventListener("click", toggleLanguage)
     }
@@ -24,7 +24,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   
     /**
-     * 切换语言函数 - 在英文和中文之间切换
      * Toggle language function - Switch between English and Chinese
      */
     function toggleLanguage() {
@@ -34,16 +33,15 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   
     /**
-     * 设置语言函数 - 更新所有可翻译元素的文本
      * Set language function - Updates text for all translatable elements
-     * @param {string} lang - 语言代码('en'或'zh') / Language code ('en' or 'zh')
+     * @param {string} lang - Language code ('en' or 'zh')
      */
     function setLanguage(lang) {
       if (languageIndicator) {
         languageIndicator.textContent = lang.toUpperCase()
       }
   
-      // 更新所有可翻译元素 - Update all translatable elements
+      // Update all translatable elements
       const elements = document.querySelectorAll("[data-i18n]")
       elements.forEach((el) => {
         const key = el.getAttribute("data-i18n")
@@ -53,7 +51,7 @@ document.addEventListener("DOMContentLoaded", () => {
       })
     }
   
-    // 移动端菜单切换 - Mobile Menu Toggle
+    // Mobile Menu Toggle Functionality
     const menuToggle = document.querySelector(".menu-toggle")
     const mobileMenu = document.querySelector(".mobile-menu")
   
@@ -61,7 +59,7 @@ document.addEventListener("DOMContentLoaded", () => {
       menuToggle.addEventListener("click", () => {
         mobileMenu.classList.toggle("active")
   
-        // 切换菜单图标 - Toggle menu icon
+        // Toggle menu icon
         const icon = menuToggle.querySelector("i")
         if (icon) {
           if (mobileMenu.classList.contains("active")) {
@@ -75,7 +73,7 @@ document.addEventListener("DOMContentLoaded", () => {
       })
     }
   
-    // 平滑滚动功能 - Smooth Scrolling
+    // Smooth Scrolling Functionality
     const scrollLinks = document.querySelectorAll("[data-scroll-to]")
   
     scrollLinks.forEach((link) => {
@@ -85,7 +83,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const targetElement = document.getElementById(targetId)
   
         if (targetElement) {
-          // 如果移动菜单打开，则关闭 - Close mobile menu if open
+          // Close mobile menu if open
           if (mobileMenu && mobileMenu.classList.contains("active")) {
             mobileMenu.classList.remove("active")
             const icon = menuToggle.querySelector("i")
@@ -95,7 +93,7 @@ document.addEventListener("DOMContentLoaded", () => {
             }
           }
   
-          // 滚动到目标位置 - Scroll to target
+          // Scroll to target position
           const navbarHeight = document.querySelector(".navbar").offsetHeight
           const targetPosition = targetElement.getBoundingClientRect().top + window.pageYOffset - navbarHeight
   
@@ -107,14 +105,14 @@ document.addEventListener("DOMContentLoaded", () => {
       })
     })
   
-    // 模态框功能 - Modal Functionality
+    // Modal Functionality
     const modals = document.querySelectorAll(".modal")
     const modalTriggers = {
       loginModal: [document.getElementById("loginBtn"), document.getElementById("loginBtnMobile")],
       downloadModal: [document.getElementById("downloadBtn"), document.getElementById("downloadBtnCta")],
     }
   
-    // 设置模态框触发器 - Setup modal triggers
+    // Setup modal triggers
     for (const [modalId, triggers] of Object.entries(modalTriggers)) {
       const modal = document.getElementById(modalId)
   
@@ -127,7 +125,7 @@ document.addEventListener("DOMContentLoaded", () => {
           }
         })
   
-        // 通过关闭按钮关闭模态框 - Close modal with close button
+        // Close modal with close button
         const closeBtn = modal.querySelector(".modal-close")
         if (closeBtn) {
           closeBtn.addEventListener("click", () => {
@@ -135,7 +133,7 @@ document.addEventListener("DOMContentLoaded", () => {
           })
         }
   
-        // 点击模态框外部关闭模态框 - Close modal when clicking outside
+        // Close modal when clicking outside
         modal.addEventListener("click", (e) => {
           if (e.target === modal) {
             modal.classList.remove("active")
@@ -144,7 +142,7 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     }
   
-    // 登录表单处理 - Login Form Handling
+    // Login Form Handling
     const loginForm = document.getElementById("loginForm")
     if (loginForm) {
       loginForm.addEventListener("submit", (e) => {
@@ -153,9 +151,9 @@ document.addEventListener("DOMContentLoaded", () => {
         const password = document.getElementById("password").value
   
         console.log("Login attempt with:", email, password)
-        // 这里通常会将数据发送到服务器 - Here you would typically send the data to a server
+        // Here you would typically send the data to a server
   
-        // 提交后关闭模态框 - Close the modal after submission
+        // Close the modal after submission
         const modal = document.getElementById("loginModal")
         if (modal) {
           modal.classList.remove("active")
@@ -163,7 +161,7 @@ document.addEventListener("DOMContentLoaded", () => {
       })
     }
   
-    // 标签页功能 - Tab Functionality
+    // Tab Functionality
     const tabButtons = document.querySelectorAll(".tab-btn")
   
     tabButtons.forEach((button) => {
@@ -172,14 +170,14 @@ document.addEventListener("DOMContentLoaded", () => {
         const tabContainer = this.closest(".download-tabs, .info-tabs")
   
         if (tabContainer) {
-          // 停用所有标签页 - Deactivate all tabs
+          // Deactivate all tabs
           const allTabs = tabContainer.querySelectorAll(".tab-pane")
           const allButtons = tabContainer.querySelectorAll(".tab-btn")
   
           allTabs.forEach((tab) => tab.classList.remove("active"))
           allButtons.forEach((btn) => btn.classList.remove("active"))
   
-          // 激活选中的标签页 - Activate selected tab
+          // Activate selected tab
           this.classList.add("active")
           const selectedTab = document.getElementById(`${tabId}-tab`)
           if (selectedTab) {
@@ -189,7 +187,7 @@ document.addEventListener("DOMContentLoaded", () => {
       })
     })
   
-    // 视频播放器功能 - Video Player Functionality
+    // Video Player Functionality
     const videoElement = document.getElementById("demoVideo")
     const videoPlayBtn = document.querySelector(".video-play-btn")
     const videoOverlay = document.querySelector(".video-overlay")
@@ -197,7 +195,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (videoElement && videoPlayBtn && videoOverlay) {
       videoPlayBtn.addEventListener("click", toggleVideo)
   
-      // 当视频自己暂停或播放时也更新覆盖层状态
+      // Update overlay state when video plays/pauses
       videoElement.addEventListener("play", function() {
         videoOverlay.style.opacity = "0"
         videoOverlay.style.pointerEvents = "none"
@@ -211,7 +209,6 @@ document.addEventListener("DOMContentLoaded", () => {
       })
   
       /**
-       * 切换视频播放/暂停状态
        * Toggle video play/pause state
        */
       function toggleVideo() {
@@ -228,14 +225,14 @@ document.addEventListener("DOMContentLoaded", () => {
         }
       }
   
-      // 当滚动到视图中时自动播放视频 - Auto-play video when scrolled into view
+      // Auto-play video when scrolled into view
       const videoSection = document.querySelector(".video-section")
       if (videoSection) {
         const observer = new IntersectionObserver(
           (entries) => {
             entries.forEach((entry) => {
               if (entry.isIntersecting && videoElement.paused) {
-                // 当视频进入视图时尝试播放 - Try to play video when it comes into view
+                // Try to play video when it comes into view
                 videoElement
                   .play()
                   .then(() => {
@@ -245,7 +242,7 @@ document.addEventListener("DOMContentLoaded", () => {
                   })
                   .catch((error) => {
                     console.error("Video play failed:", error)
-                    // 如果自动播放失败(在移动设备上常见)，保持叠加层可见 - Keep overlay visible if autoplay fails (common on mobile)
+                    // Keep overlay visible if autoplay fails (common on mobile)
                   })
               } else if (!entry.isIntersecting && !videoElement.paused) {
                 videoElement.pause()
@@ -262,7 +259,7 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     }
 
-    // 轮播图功能 - Image Carousel Functionality
+    // Image Carousel Functionality
     const carouselContainer = document.querySelector('.carousel-container');
     if (carouselContainer) {
       const slides = document.querySelectorAll('.carousel-slide');
@@ -272,29 +269,29 @@ document.addEventListener("DOMContentLoaded", () => {
       let currentSlide = 0;
       let slideInterval;
 
-      // 初始化轮播图 - Initialize carousel
+      // Initialize carousel
       initCarousel();
 
       /**
-       * 初始化轮播图 - Initialize the carousel
+       * Initialize the carousel
        */
       function initCarousel() {
-        // 启动自动轮播 - Start auto-slide
+        // Start auto-slide
         startAutoSlide();
 
-        // 点击下一张按钮 - Next button click
+        // Next button click
         nextBtn.addEventListener('click', () => {
           goToNextSlide();
           resetAutoSlide();
         });
 
-        // 点击上一张按钮 - Previous button click
+        // Previous button click
         prevBtn.addEventListener('click', () => {
           goToPrevSlide();
           resetAutoSlide();
         });
 
-        // 点击指示器 - Indicator dots click
+        // Indicator dots click
         indicators.forEach((dot, index) => {
           dot.addEventListener('click', () => {
             goToSlide(index);
@@ -302,27 +299,27 @@ document.addEventListener("DOMContentLoaded", () => {
           });
         });
 
-        // 鼠标悬停时暂停自动轮播 - Pause auto-slide on hover
+        // Pause auto-slide on hover
         carouselContainer.addEventListener('mouseenter', () => {
           clearInterval(slideInterval);
         });
 
-        // 鼠标离开时恢复自动轮播 - Resume auto-slide when mouse leaves
+        // Resume auto-slide when mouse leaves
         carouselContainer.addEventListener('mouseleave', () => {
           startAutoSlide();
         });
       }
 
       /**
-       * 开始自动轮播 - Start auto-sliding
+       * Start auto-sliding
        */
       function startAutoSlide() {
-        // 每5秒自动切换到下一张 - Auto-change every 5 seconds
+        // Auto-change every 5 seconds
         slideInterval = setInterval(goToNextSlide, 5000);
       }
 
       /**
-       * 重置自动轮播 - Reset auto-slide timer
+       * Reset auto-slide timer
        */
       function resetAutoSlide() {
         clearInterval(slideInterval);
@@ -330,7 +327,7 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       /**
-       * 前往下一张幻灯片 - Go to next slide
+       * Go to next slide
        */
       function goToNextSlide() {
         let nextSlide = currentSlide + 1;
@@ -341,7 +338,7 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       /**
-       * 前往上一张幻灯片 - Go to previous slide
+       * Go to previous slide
        */
       function goToPrevSlide() {
         let prevSlide = currentSlide - 1;
@@ -352,15 +349,15 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       /**
-       * 前往指定幻灯片 - Go to a specific slide
-       * @param {number} slideIndex - 幻灯片索引 / Slide index
+       * Go to a specific slide
+       * @param {number} slideIndex - Slide index
        */
       function goToSlide(slideIndex) {
-        // 隐藏当前幻灯片 - Hide current slide
+        // Hide current slide
         slides[currentSlide].classList.remove('active');
         indicators[currentSlide].classList.remove('active');
         
-        // 显示新的幻灯片 - Show new slide
+        // Show new slide
         currentSlide = slideIndex;
         slides[currentSlide].classList.add('active');
         indicators[currentSlide].classList.add('active');
@@ -369,7 +366,6 @@ document.addEventListener("DOMContentLoaded", () => {
   })
   
   /**
-   * 翻译内容 - 包含英文和中文两种语言的所有界面文本
    * Translations - Contains all interface text in both English and Chinese
    */
   const translations = {

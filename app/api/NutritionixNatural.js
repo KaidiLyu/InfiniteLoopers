@@ -41,7 +41,6 @@ export const getFoodItemNutrition = async (foodName) => {
     throw error;
   }
 };
-
 // Provides enhanced natural language search
 export const getNaturalLanguageNutrition = async (query) => {
   try {

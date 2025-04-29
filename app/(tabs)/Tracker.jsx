@@ -736,7 +736,7 @@ export default function Tracker() {
               </View>
 
               <View style={styles.calorieStat}>
-                <Text style={styles.calorieStatLabel}>tate:</Text>
+                <Text style={styles.calorieStatLabel}>State:</Text>
                 <Text
                   style={[
                     styles.statusText,

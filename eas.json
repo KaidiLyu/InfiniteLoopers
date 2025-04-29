@@ -7,6 +7,10 @@
     "preview": {
       "android": {
         "buildType": "apk"
+      },
+      "env": {
+        "NODE_ENV": "production",
+        "__API_SERVER_URL": "https://api.expo.dev/"
       }
     },
     "preview2": {

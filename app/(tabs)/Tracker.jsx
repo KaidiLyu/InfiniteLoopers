@@ -888,6 +888,36 @@ export default function Tracker() {
           </TouchableOpacity>
         </View>
 
+        <View style={styles.progressContainer}>
+          <View style={styles.progressHeader}>
+            <Text style={styles.progressText}>
+              {totalCalories.toFixed(0)} / {calorieGoal.toFixed(0)} Cal
+            </Text>
+            <Text style={[
+              styles.progressPercentage,
+              totalCalories > calorieGoal ? styles.exceededText : null
+            ]}>
+              {((totalCalories / calorieGoal) * 100).toFixed(0)}%
+            </Text>
+          </View>
+          <View style={styles.progressBarContainer}>
+            <View 
+              style={[
+                styles.progressBar,
+                {
+                  width: `${Math.min((totalCalories / calorieGoal) * 100, 100)}%`,
+                  backgroundColor: totalCalories > calorieGoal ? Colors.RED : Colors.PRIMARY
+                }
+              ]} 
+            />
+          </View>
+          {totalCalories > calorieGoal && (
+            <Text style={styles.warningText}>
+              已超出目标 {(totalCalories - calorieGoal).toFixed(0)} 卡路里
+            </Text>
+          )}
+        </View>
+
         {!loading && !error && trackedItems.length > 0 && (
           <View style={styles.sortContainer}>
             {renderCustomPicker()}
@@ -1358,5 +1388,48 @@ const styles = StyleSheet.create({
     color: Colors.PRIMARY,
     fontSize: 16,
     fontFamily: 'myfont-medium',
+  },
+  progressContainer: {
+    backgroundColor: Colors.WHITE,
+    paddingHorizontal: 15,
+    paddingVertical: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: Colors.EXTRA_LIGHT_GRAY,
+  },
+  progressHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  progressText: {
+    fontSize: 16,
+    fontFamily: 'myfont-bold',
+    color: Colors.BLACK,
+  },
+  progressPercentage: {
+    fontSize: 16,
+    fontFamily: 'myfont-bold',
+    color: Colors.PRIMARY,
+  },
+  exceededText: {
+    color: Colors.RED,
+  },
+  progressBarContainer: {
+    height: 8,
+    backgroundColor: Colors.EXTRA_LIGHT_GRAY,
+    borderRadius: 4,
+    overflow: 'hidden',
+  },
+  progressBar: {
+    height: '100%',
+    borderRadius: 4,
+  },
+  warningText: {
+    fontSize: 12,
+    fontFamily: 'myfont-medium',
+    color: Colors.RED,
+    marginTop: 4,
+    textAlign: 'right',
   },
 });

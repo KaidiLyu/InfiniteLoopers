@@ -1,6 +1,6 @@
 /**
  * Sign In Screen Component
- * 
+ *
  * This component provides a user interface for the sign-in functionality
  * using Firebase Authentication with email and password.
  * It includes form validation, error handling, and navigation between screens.
@@ -16,8 +16,7 @@ import {
   TouchableWithoutFeedback,
   Keyboard,
   ScrollView,
-  ToastAndroid,
-  Alert,
+  Platform,
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import { Link, useNavigation, useRouter } from "expo-router";
@@ -25,9 +24,9 @@ import { Colors } from "../../../constants/Colors.ts";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
-import { usePlatform } from "../../../contexts/PlatformContext.jsx";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../../../configs/FirebaseConfig.js";
+import { getFriendlyAuthErrorMessage } from "../../../src/utils/authUtils";
 
 export default function SignIn() {
   const navigation = useNavigation();
@@ -42,247 +41,135 @@ export default function SignIn() {
     }
   }, [navigation]);
 
-  // State variables for user credentials
-  const [email, setEmail] = useState(""); // just for testing
-  const [password, setPassword] = useState(""); // just for testing
+  // State variables for user credentials and error handling
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
 
-  // Get platform-specific information from context
-  const { isWeb, isIOS, isAndroid, isMacos, platform } = usePlatform();
-  
   /**
    * Handle user sign-in with Firebase authentication
-   * 
+   *
    * Validates user inputs, attempts authentication with Firebase,
    * and handles platform-specific error messages.
    */
-  const SignIn = () => {
-    // Validate that email and password fields are not empty
+  const handleSignIn = () => {
+    setError(""); // Clear previous error on new attempt
     if (!email || !password) {
-      if (isAndroid)
-        ToastAndroid.show("Please fill all fields.", ToastAndroid.BOTTOM);
-      console.log("Please fill all fields.");
-      if (isIOS) {
-        Alert.alert("Please fill all fields.");
-      }
+      setError("Please fill in both email and password.");
       return;
     }
-    
-    // Attempt Firebase authentication with provided credentials
+
     signInWithEmailAndPassword(auth, email, password)
       .then((userCredential) => {
-        // Signed in
         const user = userCredential.user;
-        router.replace("/SearchFood");
+        // Navigate to main app screen on successful sign-in
+        router.replace("/(tabs)/SearchFood"); // Example: Replace with your main tab route
       })
-      .catch((error) => {
-        const errorCode = error.code;
-        const errorMessage = error.message;
-        console.log(errorCode, errorMessage);
-        console.log("-----------------");
-
-        let errorMsg = "Login failed, please try again"; // Default error message
-
-        // Provide specific error messages based on Firebase error codes
-        if (errorCode === "auth/invalid-credential") {
-          errorMsg = "Invalid login credentials";
-        } else if (errorCode === "auth/missing-password") {
-          errorMsg = "Please enter your password";
-        } else if (errorCode === "auth/wrong-password") {
-          errorMsg = "Wrong password, please try again";
-        } else if (errorCode === "auth/user-not-found") {
-          errorMsg = "The user does not exist, please check your email or register a new account";
-        } else if (errorCode === "auth/too-many-requests") {
-          errorMsg = "Too many login attempts, please try again later";
-        } else if (errorCode === "auth/network-request-failed") {
-          errorMsg = "Network connection failed, please check your network";
-        }
-
-        // Display error message according to platform
-        if (isAndroid) {
-          ToastAndroid.show(errorMsg, ToastAndroid.BOTTOM);
-        }
-        if (isIOS) {
-          Alert.alert("Login Error", errorMsg);
-        }
-        if (isWeb || isMacos) {
-          console.error("Login Error:", errorMsg);
-          // If there are other ways to display errors on the web, add them here
-          Alert.alert("Login Error", errorMsg);
-        }
-        console.log(errorMsg);
-        
-        return;
+      .catch((err) => {
+        const friendlyError = getFriendlyAuthErrorMessage(err);
+        setError(friendlyError); // Set the error state to display message
+        // console.error("Sign In Error:", err); // Keep detailed log for debugging
       });
   };
 
   return (
     // KeyboardAvoidingView adjusts layout when keyboard appears
-    <KeyboardAvoidingView behavior="height" style={{ flex: 1 }}>
+    <KeyboardAvoidingView
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      style={{ flex: 1 }}
+      keyboardVerticalOffset={Platform.OS === "ios" ? 64 : 0}>
       {/* Dismiss keyboard when tapping outside input fields */}
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <ScrollView
-          contentContainerStyle={{
-            flexGrow: 1,
-            backgroundColor: Colors.WHITE,
-          }}>
+          contentContainerStyle={styles.scrollViewContent}
+          keyboardShouldPersistTaps="handled">
           <View>
             {/* Decorative background image */}
             <Image
               source={require("../../../assets/images/greenImage.jpg")}
-              style={{
-                width: "105%",
-                height: "50%",
-                position: "absolute",
-                transform: [{ rotate: "180deg" }],
-                top: -40,
-                right: -10,
-                zIndex: 0,
-              }}
+              style={styles.backgroundImage}
             />
             {/* Back button */}
             <TouchableOpacity
               onPress={() => router.back()}
-              style={{
-                position: "absolute",
-                padding: 20,
-                marginTop: 20,
-              }}>
+              style={styles.backButton}>
               <FontAwesome6 name="circle-arrow-left" size={30} color="black" />
             </TouchableOpacity>
             {/* Main form container */}
-            <View style={{ padding: 20, marginTop: "50%" }}>
-              <Text
-                style={{
-                  fontSize: 38,
-                  fontFamily: "myfont-bold",
-                }}>
-                Hello!
-              </Text>
-
-              <Text
-                style={{
-                  fontSize: 28,
-                  fontFamily: "myfont",
-                  marginTop: 10,
-                  color: Colors.GRAY,
-                }}>
-                Please Sign In
-              </Text>
+            <View style={styles.formContainer}>
+              <Text style={styles.title}>Hello!</Text>
+              <Text style={styles.subtitle}>Please Sign In</Text>
               {/* Email input field */}
-              <View style={{ marginTop: 30 }}>
-                <Text style={{ fontFamily: "myfont-bold", marginLeft: 10 }}>
-                  Email
-                </Text>
+              <View style={styles.inputGroup}>
+                <Text style={styles.inputLabel}>Email</Text>
                 <TextInput
                   placeholder="Enter Your Email"
                   style={styles.inputForm}
-                  onChangeText={(value) => setEmail(value)}
+                  value={email}
+                  onChangeText={(value) => {
+                    setEmail(value);
+                    setError("");
+                  }}
+                  keyboardType="email-address"
+                  autoCapitalize="none"
+                  autoComplete="email"
+                  textContentType="emailAddress"
                 />
               </View>
               {/* Password input field */}
-              <View style={{ marginTop: 15 }}>
-                <Text style={{ fontFamily: "myfont-bold", marginLeft: 10 }}>
-                  Password
-                </Text>
+              <View style={styles.inputGroup}>
+                <Text style={styles.inputLabel}>Password</Text>
                 <TextInput
                   placeholder="Enter Password"
                   secureTextEntry
                   style={styles.inputForm}
-                  onChangeText={(value) => setPassword(value)}
+                  value={password}
+                  onChangeText={(value) => {
+                    setPassword(value);
+                    setError("");
+                  }}
+                  autoComplete="current-password"
+                  textContentType="password"
                 />
               </View>
-
+              {/* Error Message Display */}
+              {error ? <Text style={styles.errorText}>{error}</Text> : null}
               {/* Sign In button */}
               <TouchableOpacity
-                onPress={SignIn}
-                style={{
-                  backgroundColor: Colors.WHITE,
-                  padding: 15,
-                  borderRadius: 10,
-                  borderWidth: 1,
-                  marginTop: "10%",
-                  borderRadius: 20,
-                  flexDirection: "row",
-                  justifyContent: "center",
-                  alignItems: "center",
-                }}>
-                <Text
-                  style={{
-                    fontSize: 18,
-                    fontFamily: "myfont-medium",
-                    color: Colors.BLACK,
-                    textAlign: "center",
-                    flex: 1,
-                  }}>
+                onPress={handleSignIn}
+                style={[styles.button, styles.submitButton]}>
+                <Text style={[styles.buttonText, styles.submitButtonText]}>
                   Submit
                 </Text>
                 <AntDesign
                   name="caretright"
                   size={24}
                   color="black"
-                  style={{
-                    position: "absolute",
-                    right: 20,
-                  }}
+                  style={styles.buttonIconRight}
                 />
               </TouchableOpacity>
               {/* Text and icon for new users */}
-              <View
-                style={{
-                  marginTop: 13,
-                  flexDirection: "row",
-                }}>
-                <Text
-                  style={{
-                    fontFamily: "myfont-medium",
-                    fontSize: 15,
-                    marginRight: 5,
-                  }}>
-                  First time users
-                </Text>
+              <View style={styles.newUserContainer}>
+                <Text style={styles.newUserText}>First time users</Text>
                 <MaterialCommunityIcons
                   name="arrow-down-right"
                   size={24}
                   color="black"
-                  style={{
-                    position: "relative",
-                    top: 4,
-                    right: 4,
-                  }}
+                  style={styles.newUserIcon}
                 />
               </View>
               {/* Create Account button */}
               <TouchableOpacity
                 onPress={() => router.push("auth/sign-up")}
-                style={{
-                  backgroundColor: Colors.BLACK,
-                  padding: 15,
-                  borderRadius: 10,
-                  borderWidth: 1,
-                  marginTop: "2%",
-                  borderRadius: 20,
-                  flexDirection: "row",
-                  justifyContent: "center",
-                  alignItems: "center",
-                }}>
-                <Text
-                  style={{
-                    fontSize: 18,
-                    fontFamily: "myfont-medium",
-                    color: Colors.WHITE,
-                    textAlign: "center",
-                    flex: 1,
-                  }}>
+                style={[styles.button, styles.createButton]}>
+                <Text style={[styles.buttonText, styles.createButtonText]}>
                   Create Account
                 </Text>
                 <AntDesign
                   name="caretright"
                   size={24}
                   color="white"
-                  style={{
-                    position: "absolute",
-                    right: 20,
-                  }}
+                  style={styles.buttonIconRight}
                 />
               </TouchableOpacity>
             </View>
@@ -297,12 +184,115 @@ export default function SignIn() {
  * Component styles
  */
 const styles = StyleSheet.create({
-  inputForm: {
-    padding: 20,
-    borderWidth: 1,
-    borderColor: Colors.GRAY,
-    borderRadius: 20,
+  scrollViewContent: {
+    flexGrow: 1,
+    backgroundColor: Colors.WHITE,
+    justifyContent: "center",
+  },
+  backgroundImage: {
+    width: "105%",
+    height: "50%",
+    position: "absolute",
+    transform: [{ rotate: "180deg" }],
+    top: -40,
+    right: -10,
+    zIndex: 0,
+  },
+  backButton: {
+    position: "absolute",
+    top: Platform.OS === "ios" ? 60 : 40,
+    left: 15,
+    zIndex: 10,
+    padding: 5,
+  },
+  formContainer: {
+    paddingHorizontal: 25,
+    paddingVertical: 20,
+    marginTop: "45%",
+  },
+  title: {
+    fontSize: 38,
+    fontFamily: "myfont-bold",
+    color: Colors.BLACK,
+  },
+  subtitle: {
+    fontSize: 28,
     fontFamily: "myfont",
     marginTop: 10,
+    color: Colors.GRAY,
   },
+  inputGroup: {
+    marginTop: 25,
+  },
+  inputLabel: {
+    fontFamily: "myfont-bold",
+    marginLeft: 10,
+    marginBottom: 5,
+    color: Colors.DARK_GRAY,
+  },
+  inputForm: {
+    paddingVertical: Platform.OS === "ios" ? 18 : 15,
+    paddingHorizontal: 20,
+    borderWidth: 1,
+    borderColor: Colors.LIGHT_GRAY,
+    borderRadius: 15,
+    fontFamily: "myfont",
+    fontSize: 16,
+    backgroundColor: Colors.WHITE,
+  },
+  errorText: {
+    color: Colors.RED,
+    fontFamily: "myfont-medium",
+    marginTop: 15,
+    marginBottom: 5,
+    textAlign: "center",
+    fontSize: 14,
+  },
+  button: {
+    padding: 15,
+    borderRadius: 20,
+    marginTop: 20,
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    minHeight: 50,
+  },
+  submitButton: {
+    backgroundColor: Colors.WHITE,
+    borderWidth: 1.5,
+    borderColor: Colors.BLACK,
+    marginTop: "10%",
+  },
+  submitButtonText: {
+    color: Colors.BLACK,
+  },
+  createButton: {
+    backgroundColor: Colors.BLACK,
+    marginTop: 10,
+  },
+  createButtonText: {
+    color: Colors.WHITE,
+  },
+  buttonText: {
+    fontSize: 18,
+    fontFamily: "myfont-medium",
+    textAlign: "center",
+    flex: 1,
+  },
+  buttonIconRight: {
+    position: "absolute",
+    right: 20,
+  },
+  newUserContainer: {
+    marginTop: 25,
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  newUserText: {
+    fontFamily: "myfont-medium",
+    fontSize: 15,
+    marginRight: 3,
+    color: Colors.DARK_GRAY,
+  },
+  newUserIcon: {},
 });

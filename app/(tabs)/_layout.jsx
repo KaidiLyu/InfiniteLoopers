@@ -1,120 +1,97 @@
-/**
- * Tabs Layout Component
- * 
- * This component defines the bottom tab navigation structure of the application.
- * It sets up the main navigation tabs and their visual appearance.
- */
-import { View, Text } from "react-native";
 import React from "react";
 import { Tabs } from "expo-router";
-import { Colors } from "../../constants/Colors.ts";
-import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
-import Ionicons from "@expo/vector-icons/Ionicons";
-import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { Colors } from "../../constants/Colors";
+import { DailyTrackerProvider } from "../contexts/DailyTrackerContext";
+import { Platform } from "react-native";
 
-/**
- * TabBarIcon Component
- * 
- * A reusable component for rendering icons in the tab bar.
- * Allows specifying different icon libraries for each tab.
- * 
- * @param {string} name - The icon name from the specified icon library
- * @param {string} color - The color of the icon (changes based on active state)
- * @param {Component} IconComponent - The icon library component to use
- */
-const TabBarIcon = ({
-  name,
-  color,
-  IconComponent = MaterialCommunityIcons,
-}) => (
-  <IconComponent
-    name={name}
-    size={28}
-    color={color}
-    style={{ marginBottom: -3 }}
-  />
-);
+export default function TabLayout() {
+  const tabBarHeight = Platform.OS === "ios" ? 85 : 65;
 
-export default function TabsLayout() {
   return (
-    <Tabs
-      screenOptions={{
-        // Hide the header for all tab screens
-        headerShown: false,
-        // Set active and inactive tab colors
-        tabBarActiveTintColor: Colors.BLACK,
-        tabBarInactiveTintColor: Colors.GRAY,
-        // Style the tab labels
-        tabBarLabelStyle: {
-          fontSize: 12,
-          fontFamily: "myfont-medium",
-        },
-        // Style the entire tab bar
-        tabBarStyle: {
-          height: 60,
-          paddingBottom: 5,
-          paddingTop: 5,
-        },
-      }}>
-      {/* Food Search Tab - Main search functionality for finding food items */}
-      <Tabs.Screen
-        name="SearchFood"
-        options={{
-          tabBarLabel: "Search",
-          tabBarIcon: ({ color }) => (
-            <TabBarIcon
-              name="magnifying-glass"
-              color={color}
-              IconComponent={FontAwesome6}
-            />
-          ),
-        }}
-      />
-      {/* MyFood Tab - Currently disabled
-          Would show user's food history
-      <Tabs.Screen
-        name="MyFood"
-        options={{
-          tabBarLabel: "History",
-          tabBarIcon: ({ color }) => (
-            <TabBarIcon name="history" color={color} />
-          ),
-        }}
-      /> */}
-      
-      {/* Daily Tracker Tab - Shows food intake tracking for the day */}
-      <Tabs.Screen
-        name="Tracker"
-        options={{
-          tabBarLabel: "Daily Tracker",
-          tabBarIcon: ({ color }) => (
-            <TabBarIcon name="calendar-check-outline" color={color} />
-          ),
-        }}
-      />
-      
-      {/* Recipe Search Tab - Currently disabled
-          Would provide recipe search functionality
-      <Tabs.Screen
-        name="RecipeSearch"
-        options={{
-          tabBarLabel: "Recipe Search",
-          tabBarIcon: ({ color }) => (
-            <MaterialCommunityIcons name="chef-hat" size={24} color={color} />
-          ),
-        }}
-      /> */}
-      
-      {/* User Profile Tab - Shows user information and settings */}
-      <Tabs.Screen
-        name="Profile"
-        options={{
-          tabBarLabel: "Profile",
-          tabBarIcon: ({ color }) => (
-            <Ionicons name="person" size={24} color={color} />
-          ),
-        }}
-      />
-    </Tabs>
+    <DailyTrackerProvider>
+      <Tabs
+        screenOptions={{
+          tabBarActiveTintColor: Colors.PRIMARY,
+          tabBarInactiveTintColor: Colors.GRAY,
+          headerShown: false,
+          tabBarStyle: {
+            backgroundColor: Colors.WHITE,
+            position: "absolute",
+            left: 0,
+            right: 0,
+            height: tabBarHeight,
+            paddingBottom: Platform.OS === "ios" ? 20 : 5,
+            paddingTop: 5,
+            borderTopWidth: 1,
+            borderTopColor: Colors.LIGHT_GRAY,
+            elevation: 5, // Android shadow
+            shadowColor: "#000", // iOS shadow
+            shadowOffset: { width: 0, height: -2 },
+            shadowOpacity: 0.1,
+            shadowRadius: 2,
+          },
+          tabBarLabelStyle: {
+            fontFamily: "myfont-medium",
+            fontSize: 11,
+            marginBottom: Platform.OS === "ios" ? -5 : 5,
+          },
+          tabBarIconStyle: {
+            marginTop: Platform.OS === "ios" ? 5 : 0,
+          },
+        }}>
+        {/* Tracker Tab */}
+        <Tabs.Screen
+          name="Tracker"
+          options={{
+            title: "Food Log",
+            tabBarIcon: ({ color }) => (
+              <MaterialCommunityIcons
+                name="food-apple"
+                size={28}
+                color={color}
+              />
+            ),
+          }}
+        />
+
+        {/* Nutrition Totals Tab */}
+        <Tabs.Screen
+          name="NutritionTotals"
+          options={{
+            title: "Daily Totals",
+            tabBarIcon: ({ color }) => (
+              <MaterialCommunityIcons
+                name="nutrition"
+                size={28}
+                color={color}
+              />
+            ),
+          }}
+        />
+
+        {/* SearchFood Tab */}
+        <Tabs.Screen
+          name="SearchFood"
+          options={{
+            title: "Search",
+            tabBarIcon: ({ color }) => (
+              <MaterialCommunityIcons name="magnify" size={28} color={color} />
+            ),
+          }}
+        />
+
+        {/* Profile Tab */}
+        <Tabs.Screen
+          name="Profile"
+          options={{
+            title: "Profile",
+            tabBarIcon: ({ color }) => (
+              <MaterialCommunityIcons name="account" size={28} color={color} />
+            ),
+          }}
+        />
+      </Tabs>
+    </DailyTrackerProvider>
   );
 }

@@ -38,7 +38,7 @@ import {
 
 /**
  * SearchFood Component
- * 
+ *
  * Main component for the food search functionality.
  * Provides multiple methods to search for food:
  * - Text-based search for ingredients/products
@@ -53,28 +53,31 @@ export default function SearchFood() {
   const router = useRouter();
 
   // State for controlling search mode and UI status
-  const [searchMode, setSearchMode] = useState("Item");  // Controls which search method is active
-  const [loading, setLoading] = useState(false);  // Tracks loading state for API calls
-  const [error, setError] = useState(null);  // Stores error messages
+  const [searchMode, setSearchMode] = useState("Item"); // Controls which search method is active
+  const [loading, setLoading] = useState(false); // Tracks loading state for API calls
+  const [error, setError] = useState(null); // Stores error messages
 
   // State for item search functionality
-  const [itemType, setItemType] = useState("");  // "Ingredients" or "Products"
-  const [itemQuery, setItemQuery] = useState("");  // Search text
-  const [itemSuggestions, setItemSuggestions] = useState([]);  // Autocomplete results
-  const [selectedItem, setSelectedItem] = useState(null);  // Currently selected item
-  const textInputRef = useRef();  // Reference to search input field
+  const [itemType, setItemType] = useState(""); // "Ingredients" or "Products"
+  const [itemQuery, setItemQuery] = useState(""); // Search text
+  const [itemSuggestions, setItemSuggestions] = useState([]); // Autocomplete results
+  const [selectedItem, setSelectedItem] = useState(null); // Currently selected item
+  const textInputRef = useRef(); // Reference to search input field
 
   // State for natural language search functionality
-  const [naturalQuery, setNaturalQuery] = useState("");  // Natural language query text
-  const [naturalFoodItems, setNaturalFoodItems] = useState([]);  // Results from natural language search
+  const [naturalQuery, setNaturalQuery] = useState(""); // Natural language query text
+  const [naturalFoodItems, setNaturalFoodItems] = useState([]); // Results from natural language search
 
   // State for barcode scanner functionality
-  const [permission, requestPermission] = useCameraPermissions();  // Camera permissions
-  const [isScannerVisible, setIsScannerVisible] = useState(false);  // Controls scanner visibility
-  const [scannedData, setScannedData] = useState(null);  // Stores scanned barcode data
+  const [permission, requestPermission] = useCameraPermissions(); // Camera permissions
+  const [isScannerVisible, setIsScannerVisible] = useState(false); // Controls scanner visibility
+  const [scannedData, setScannedData] = useState(null); // Stores scanned barcode data
+  const [productName, setProductName] = useState(""); // Name from EANdata/other source
+  const [productImage, setProductImage] = useState(""); // Image from EANdata/other source
+  const [scannedFoodItem, setScannedFoodItem] = useState(null); // Nutritionix data for scanned item
 
   // State for camera-based food identification
-  const [cameraLabel, setCameraLabel] = useState("");  // Stores identified food label
+  const [cameraLabel, setCameraLabel] = useState(""); // Stores identified food label
 
   // Hide header on component mount
   useEffect(() => {
@@ -92,6 +95,7 @@ export default function SearchFood() {
     setItemQuery("");
     setItemSuggestions([]);
     setSelectedItem(null);
+    setScannedFoodItem(null);
     textInputRef.current?.clear();
     setTimeout(() => {
       textInputRef.current?.focus();
@@ -152,12 +156,14 @@ export default function SearchFood() {
       console.log("Natural language search response:", result);
 
       if (result?.foods && result.foods.length > 0) {
-        const foodsWithZeroQty = result.foods.map(food => ({
+        const foodsWithZeroQty = result.foods.map((food) => ({
           ...food,
-          serving_qty: 0
+          serving_qty: 0,
         }));
         setNaturalFoodItems(foodsWithZeroQty);
-        console.log(`Found ${result.foods.length} food items matching your query.`);
+        console.log(
+          `Found ${result.foods.length} food items matching your query.`
+        );
       } else {
         console.warn("No food items found in natural language response.");
         setError("没有找到符合您查询的食物项。");
@@ -198,8 +204,8 @@ export default function SearchFood() {
         userEmail: user.email,
         date: todayDate,
         foodName: item.food_name,
-        servingQty: item.servingQty || 1,
-        servingUnit: item.serving_unit,
+        servingQty: item.serving_qty || item.servingQty || 1, // Adjust field names if needed
+        servingUnit: item.serving_unit || item.servingUnit,
         calories: item.nf_calories || 0,
         nf_total_fat: item.nf_total_fat || 0,
         nf_saturated_fat: item.nf_saturated_fat || 0,
@@ -210,14 +216,18 @@ export default function SearchFood() {
         nf_sugars: item.nf_sugars || 0,
         nf_protein: item.nf_protein || 0,
         full_nutrients: item.full_nutrients || null,
-        source: "natural",
-        photo: item.photo?.thumb || null,
+        source: "barcode",
+        photo: item.photo?.thumb || productImage || null,
         addedAt: new Date(),
+        upc: scannedData?.data,
       };
 
       const docRef = await addDoc(collection(db, "dailyTracker"), trackerEntry);
       console.log("Added to tracker: ", item.food_name, " Doc ID: ", docRef.id);
       Alert.alert("Success", `${item.food_name} added to today's tracker.`);
+      setProductImage("");
+      setProductName("");
+      setScannedFoodItem(null);
     } catch (error) {
       console.error("Error adding item to tracker:", error);
       Alert.alert("Error", "Could not add item to tracker.");
@@ -231,40 +241,40 @@ export default function SearchFood() {
    * Uses image recognition to identify the food item
    */
   const takePicture = async () => {
-    setError(null)
+    setError(null);
     setLoading(true);
     setNaturalFoodItems([]);
     setCameraLabel("");
-  
+
     try {
       const result = await ImagePicker.launchCameraAsync({
         mediaTypes: ImagePicker.MediaTypeOptions.Images,
         quality: 0.5,
         base64: true,
       });
-  
+
       if (result.cancelled || !result.assets?.[0]?.base64) {
         setError("Picture cancelled.");
         return;
       }
-  
+
       const base64Image = result.assets[0].base64;
-  
+
       const { labels } = await identifyFoodImage(base64Image);
       console.log("Vision labels:", labels);
-  
+
       if (!labels || labels.length === 0) {
         setError("Could not identifty the food in the image");
         return;
       }
-  
+
       const vagueLabels = ["food", "dish", "meal", "product", "cuisine"];
       let nutritionResult = null;
       let finalLabel = null;
-  
+
       for (const label of labels) {
         if (vagueLabels.includes(label.toLowerCase())) continue;
-  
+
         try {
           console.log(`Searching for label "${label}"`);
           const result = await getNaturalLanguageNutrition(label);
@@ -277,14 +287,14 @@ export default function SearchFood() {
           console.warn(`No label found for: "${label}"`);
         }
       }
-  
+
       if (!nutritionResult) {
         setError("Could not find a nutrtion label for the food");
         return;
       }
-  
+
       setCameraLabel(finalLabel);
-  
+
       const foodsWithZeroQty = nutritionResult.foods.map((food) => ({
         ...food,
         serving_qty: food.servingQty || 1,
@@ -360,11 +370,12 @@ export default function SearchFood() {
     }
     setScannedData(null);
     setError(null);
+    setProductName(""); // Reset product info on new scan
+    setProductImage("");
+    setScannedFoodItem(null); // Reset nutrition info on new scan
     setIsScannerVisible(true);
   };
 
-  const [productName, setProductName] = useState("");
-  const [productImage, setProductImage] = useState("");
   const lastScanTimeRef = useRef(0);
   const handleBarCodeScanned = async ({ type, data }) => {
     // debounce
@@ -374,69 +385,117 @@ export default function SearchFood() {
 
     setIsScannerVisible(false);
     setScannedData({ type, data });
+    setProductName(""); // Reset previous results
+    setProductImage("");
+    setScannedFoodItem(null); // Reset previous nutrition data
+    console.log("--------------------------------------");
     console.log(`Barcode scanned: Type: ${type}, Data: ${data}`);
 
     setLoading(true);
     setError(null);
 
+    // Attempt 1: Get basic product info (name/image) - using EANdata here
     try {
-      const result = await getProductByUPCFromEandata(data);
-      console.log("UPC Lookup Result:", result);
-
-      const name = result.product.attributes.product;
-      const image = result.product.image;
-      setProductName(name);
-      setProductImage(image);
+      const eanResult = await getProductByUPCFromEandata(data);
+      console.log("UPC Lookup Result Eandata:", eanResult);
+      if (eanResult?.product) {
+        const name =
+          eanResult.product.attributes?.product || "Product Name Unavailable";
+        const image = eanResult.product.image;
+        setProductName(name);
+        setProductImage(image);
+      } else {
+        console.log("No product info found via EANdata for this UPC.");
+        // Optionally set a default name or leave blank
+        setProductName("Product Name Unavailable");
+      }
     } catch (err) {
-      console.error("Error processing barcode:", err);
-      setError("Error fetching product details.");
+      console.error("Error fetching from EANdata:", err);
+      // Don't set global error yet, maybe Nutritionix will work
+      setProductName("Product Name Lookup Failed");
+    }
+
+    // Attempt 2: Get detailed nutrition info from Nutritionix
+    try {
+      console.log("trying1");
+      const nutritionixResult = await getProductByUPC(data);
+      console.log("UPC Lookup Result Nutritionix:", nutritionixResult); // Raw response
+      console.log("trying2");
+
+      if (nutritionixResult?.foods?.length > 0) {
+        const foodItem = nutritionixResult.foods[0];
+        // Set state to enable the "Add to Tracker" button
+        setScannedFoodItem(foodItem);
+
+        // Update product name/image if Nutritionix has better ones (optional)
+        if (
+          !productName ||
+          productName === "Product Name Unavailable" ||
+          productName === "Product Name Lookup Failed"
+        ) {
+          setProductName(foodItem.food_name || "Product Name Unavailable");
+        }
+        if (!productImage && foodItem.photo?.thumb) {
+          setProductImage(foodItem.photo.thumb);
+        }
+        // Now proceed to save raw scan & navigate (or maybe just navigate?)
+        saveAndNavigateScannedItem(foodItem, scannedData); // Keep or remove based on desired flow
+      } else {
+        setError("Nutritional info not found for this barcode.");
+        // Do not call saveAndNavigate if no nutrition info
+        setScannedFoodItem(null);
+      }
+    } catch (err) {
+      console.error("Error fetching product by UPC from Nutritionix:", err);
+      setError("Failed to fetch nutritional information.");
+      setScannedFoodItem(null);
+      // Don't navigate if Nutritionix failed
     } finally {
       setLoading(false);
-      setTimeout(() => setError(null), 3000);
+      // Consider removing the timeout or making it longer
+      // setTimeout(() => setError(null), 5000);
     }
-    // try {
-    //   const result = await getProductByUPC(data);
-    //   console.log("UPC Lookup Result:", result.data);
-    //   if (result.data?.foods?.length > 0) {
-    //     const foodItem = result.data.foods[0];
-    //     saveAndNavigateScannedItem(foodItem);
-    //   } else {
-    //     setError("Product not found for this barcode.");
-    //   }
-    // } catch (err) {
-    //   console.error("Error fetching product by UPC:", err);
-    //   setError("Failed to fetch product information from barcode.");
-    //   setTimeout(() => setError(null), 3000);
-    // } finally {
-    //   setLoading(false);
-    // }
   };
 
-  const saveAndNavigateScannedItem = async (foodItem) => {
+  // This function now accepts the scan data directly.
+  const saveAndNavigateScannedItem = async (foodItem, currentScanData) => {
+    // Safeguard against invalid data
+    if (!currentScanData || typeof currentScanData.data === "undefined") {
+      // console.error(
+      //   "Attempted to save/navigate without valid scan data:",
+      //   currentScanData
+      // );
+      //setError("Cannot proceed: scan data is missing or invalid.");
+      return; // Stop execution if data is bad
+    }
+
     try {
+      // Save the raw scan details to Firestore
       const docRef = await addDoc(collection(db, "scannedItems"), {
         userEmail: user?.email,
-        upc: scannedData?.data,
-        scanType: scannedData?.type,
-        apiResult: foodItem,
+        upc: currentScanData.data, // Use passed data
+        scanType: currentScanData.type, // Use passed data
+        apiResult: foodItem, // Store the raw Nutritionix result
         createdAt: new Date(),
       });
-      console.log("Scanned item saved with ID: ", docRef.id);
+      console.log("Raw scanned item saved with ID: ", docRef.id);
+
+      // Navigate to the details screen
       router.push({
         pathname: "/search-info/NutritionInfo",
         params: {
           title: "Scanned Product",
-          id: scannedData?.data,
+          id: currentScanData.data, // Use UPC as ID for consistency or docRef.id? Using UPC for now.
           name: foodItem.food_name,
-          image: foodItem.photo?.thumb,
-          apiResult: JSON.stringify(foodItem),
+          image: foodItem.photo?.thumb || productImage, // Pass image URL
+          apiResult: JSON.stringify(foodItem), // Pass full data
           source: "barcode",
         },
       });
     } catch (error) {
-      console.error("Error saving scanned item or navigating: ", error);
+      console.error("Error saving raw scanned item or navigating: ", error);
       setError("Failed to save or display scanned item info.");
-      setTimeout(() => setError(null), 3000);
+      // Keep the error message visible until the next action
     }
   };
 
@@ -504,32 +563,40 @@ export default function SearchFood() {
     naturalFoodItems.forEach((item) => {
       // 确保serving_qty有效，如果不存在则默认为0
       const servingQty = item.serving_qty || 0;
-      
+
       // 计算每个营养素时乘以servingQty
       totalNutrition.calories += (item.nf_calories || 0) * servingQty;
       totalNutrition.total_fat += (item.nf_total_fat || 0) * servingQty;
       totalNutrition.saturated_fat += (item.nf_saturated_fat || 0) * servingQty;
       totalNutrition.trans_fat +=
-        (item.full_nutrients?.find((n) => n.attr_id === 605)?.value || 0) * servingQty;
+        (item.full_nutrients?.find((n) => n.attr_id === 605)?.value || 0) *
+        servingQty;
       totalNutrition.polyunsaturated_fat +=
-        (item.full_nutrients?.find((n) => n.attr_id === 646)?.value || 0) * servingQty;
+        (item.full_nutrients?.find((n) => n.attr_id === 646)?.value || 0) *
+        servingQty;
       totalNutrition.monounsaturated_fat +=
-        (item.full_nutrients?.find((n) => n.attr_id === 645)?.value || 0) * servingQty;
+        (item.full_nutrients?.find((n) => n.attr_id === 645)?.value || 0) *
+        servingQty;
       totalNutrition.cholesterol += (item.nf_cholesterol || 0) * servingQty;
       totalNutrition.sodium += (item.nf_sodium || 0) * servingQty;
-      totalNutrition.total_carbs += (item.nf_total_carbohydrate || 0) * servingQty;
+      totalNutrition.total_carbs +=
+        (item.nf_total_carbohydrate || 0) * servingQty;
       totalNutrition.dietary_fiber += (item.nf_dietary_fiber || 0) * servingQty;
       totalNutrition.sugars += (item.nf_sugars || 0) * servingQty;
       totalNutrition.protein += (item.nf_protein || 0) * servingQty;
 
       totalNutrition.vitamin_d +=
-        (item.full_nutrients?.find((n) => n.attr_id === 324)?.value || 0) * servingQty;
+        (item.full_nutrients?.find((n) => n.attr_id === 324)?.value || 0) *
+        servingQty;
       totalNutrition.calcium +=
-        (item.full_nutrients?.find((n) => n.attr_id === 301)?.value || 0) * servingQty;
+        (item.full_nutrients?.find((n) => n.attr_id === 301)?.value || 0) *
+        servingQty;
       totalNutrition.iron +=
-        (item.full_nutrients?.find((n) => n.attr_id === 303)?.value || 0) * servingQty;
+        (item.full_nutrients?.find((n) => n.attr_id === 303)?.value || 0) *
+        servingQty;
       totalNutrition.potassium +=
-        (item.full_nutrients?.find((n) => n.attr_id === 306)?.value || 0) * servingQty;
+        (item.full_nutrients?.find((n) => n.attr_id === 306)?.value || 0) *
+        servingQty;
     });
 
     return totalNutrition;
@@ -758,11 +825,13 @@ export default function SearchFood() {
   return (
     <KeyboardAvoidingView
       style={styles.keyboardAvoidingContainer}
-      behavior={Platform.OS === "ios" ? "padding" : "height"}>
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      keyboardVerticalOffset={Platform.OS === "ios" ? 64 : 0} // Adjust if needed
+    >
       <ScrollView
         style={styles.scrollView}
         contentContainerStyle={styles.scrollContentContainer}
-        keyboardShouldPersistTaps="handled" // Good practice
+        keyboardShouldPersistTaps="handled" // Keep keyboard open if needed
       >
         <View style={styles.innerContainer}>
           <View style={styles.modeSelectorContainer}>
@@ -807,26 +876,7 @@ export default function SearchFood() {
                 AI Camera
               </Text>
             </TouchableOpacity>
-            {/* <TouchableOpacity
-            style={[
-              styles.modeButton,
-              searchMode === "Item" && styles.modeButtonActive,
-            ]}
-            onPress={() => setSearchMode("Item")}>
-            <MaterialCommunityIcons
-              name="format-list-bulleted"
-              size={20}
-              color={searchMode === "Item" ? Colors.WHITE : Colors.BLACK}
-            />
-            <Text
-              style={[
-                styles.modeButtonText,
-                searchMode === "Item" && styles.modeButtonTextActive,
-              ]}>
-              {" "}
-              Item Search
-            </Text>
-          </TouchableOpacity> */}
+
             <TouchableOpacity
               style={[
                 styles.modeButton,
@@ -849,13 +899,14 @@ export default function SearchFood() {
             </TouchableOpacity>
           </View>
           {/* Loading and Error Indicators */}
-          {loading && (
-            <ActivityIndicator
-              size="large"
-              color={Colors.BLACK}
-              style={styles.loader}
-            />
-          )}
+          {loading &&
+            !isScannerVisible && ( // Don't show main loader when scanner is visible
+              <ActivityIndicator
+                size="large"
+                color={Colors.BLACK}
+                style={styles.loader}
+              />
+            )}
           {error && <Text style={styles.errorText}>{error}</Text>}
           {/* == Item Search UI == */}
           {/* == Natural Language UI == */}
@@ -923,28 +974,42 @@ export default function SearchFood() {
                             style={styles.naturalItemImage}
                             defaultSource={require("../../assets/picture/food-placeholder.png")}
                           />
-                          <View style={[styles.naturalQtyCol, styles.qtyContainer]}>
+                          <View
+                            style={[styles.naturalQtyCol, styles.qtyContainer]}>
                             <TouchableOpacity
                               style={[
                                 styles.qtyButton,
-                                item.serving_qty <= 0 ? styles.qtyButtonDisabled : null
+                                item.serving_qty <= 0
+                                  ? styles.qtyButtonDisabled
+                                  : null,
                               ]}
                               disabled={item.serving_qty <= 0}
                               onPress={() => {
                                 const newItems = [...naturalFoodItems];
-                                const index = newItems.findIndex(i => i === item);
-                                if (index !== -1 && newItems[index].serving_qty > 0) {
+                                const index = newItems.findIndex(
+                                  (i) => i === item
+                                );
+                                if (
+                                  index !== -1 &&
+                                  newItems[index].serving_qty > 0
+                                ) {
                                   newItems[index] = {
                                     ...newItems[index],
-                                    serving_qty: newItems[index].serving_qty - 1
+                                    serving_qty:
+                                      newItems[index].serving_qty - 1,
                                   };
                                   setNaturalFoodItems(newItems);
                                 }
                               }}>
-                              <Text style={[
-                                styles.qtyButtonText,
-                                item.serving_qty <= 0 ? styles.qtyButtonTextDisabled : null
-                              ]}>-</Text>
+                              <Text
+                                style={[
+                                  styles.qtyButtonText,
+                                  item.serving_qty <= 0
+                                    ? styles.qtyButtonTextDisabled
+                                    : null,
+                                ]}>
+                                -
+                              </Text>
                             </TouchableOpacity>
                             <Text style={styles.naturalItemText}>
                               {item.serving_qty || 0}
@@ -953,16 +1018,25 @@ export default function SearchFood() {
                               style={[styles.qtyButton, styles.qtyButtonAdd]}
                               onPress={() => {
                                 const newItems = [...naturalFoodItems];
-                                const index = newItems.findIndex(i => i === item);
+                                const index = newItems.findIndex(
+                                  (i) => i === item
+                                );
                                 if (index !== -1) {
                                   newItems[index] = {
                                     ...newItems[index],
-                                    serving_qty: (newItems[index].serving_qty || 0) + 1
+                                    serving_qty:
+                                      (newItems[index].serving_qty || 0) + 1,
                                   };
                                   setNaturalFoodItems(newItems);
                                 }
                               }}>
-                              <Text style={[styles.qtyButtonText, styles.qtyButtonTextAdd]}>+</Text>
+                              <Text
+                                style={[
+                                  styles.qtyButtonText,
+                                  styles.qtyButtonTextAdd,
+                                ]}>
+                                +
+                              </Text>
                             </TouchableOpacity>
                           </View>
                           <Text
@@ -1020,7 +1094,7 @@ export default function SearchFood() {
                       {naturalFoodItems
                         .reduce((sum, item) => {
                           const servingQty = item.serving_qty || 0;
-                          return sum + ((item.nf_calories || 0) * servingQty);
+                          return sum + (item.nf_calories || 0) * servingQty;
                         }, 0)
                         .toFixed(0)}
                     </Text>
@@ -1038,7 +1112,9 @@ export default function SearchFood() {
               {!isScannerVisible && (
                 <TouchableOpacity
                   style={styles.actionButton}
-                  onPress={startScanner}>
+                  onPress={startScanner}
+                  disabled={loading} // Disable if already loading/processing
+                >
                   <MaterialCommunityIcons
                     name="barcode-scan"
                     size={20}
@@ -1047,78 +1123,152 @@ export default function SearchFood() {
                   <Text style={styles.actionButtonText}> Start Scanner</Text>
                 </TouchableOpacity>
               )}
-              {scannedData && (
-                <Text style={styles.scannedText}>
-                  Scanned: {scannedData.data} (Type: {scannedData.type})
-                </Text>
-              )}
-              <View style={styles.container}>
-                {loading && <ActivityIndicator size="large" color="#000" />}
-                {error && <Text style={styles.errorText}>{error}</Text>}
-                {productName && productImage ? (
-                  <View style={styles.productContainer}>
-                    <Image
-                      source={{ uri: productImage }}
-                      style={styles.productImage}
-                    />
-                    <Text style={styles.productName}>{productName}</Text>
-                    <Text style={styles.barcodeDisclaimer}>
-                      Saving products from barcode, nutrition value, and more
-                      coming soon.
-                    </Text>
-                  </View>
-                ) : (
-                  <Text style={styles.placeholderText}>
-                    Scan a barcode to view product details
+              {scannedData &&
+                !isScannerVisible && ( // Only show details if scanner closed
+                  <Text style={styles.scannedText}>
+                    Scanned: {scannedData.data} (Type: {scannedData.type})
                   </Text>
                 )}
-              </View>
+
+              {/* Product Display Area */}
+              {!isScannerVisible &&
+                (productName || productImage || scannedFoodItem) && ( // Show container if we have any info
+                  <View style={styles.productContainer}>
+                    {productImage ? (
+                      <Image
+                        source={{ uri: productImage }}
+                        style={styles.productImage}
+                        resizeMode="contain" // Use contain to avoid stretching
+                      />
+                    ) : (
+                      // Placeholder if no image found
+                      <View
+                        style={[styles.productImage, styles.imagePlaceholder]}>
+                        <MaterialCommunityIcons
+                          name="food-variant-off"
+                          size={50}
+                          color={Colors.GRAY}
+                        />
+                      </View>
+                    )}
+                    {productName && (
+                      <Text style={styles.productName}>{productName}</Text>
+                    )}
+
+                    {/* Add to Tracker Button */}
+                    {scannedFoodItem && !loading && (
+                      <TouchableOpacity
+                        style={[
+                          styles.actionButton,
+                          styles.addTrackerButtonScanner,
+                        ]}
+                        onPress={() => addItemToTracker(scannedFoodItem)}
+                        disabled={loading}>
+                        <MaterialCommunityIcons
+                          name="plus-circle-outline"
+                          size={20}
+                          color={Colors.WHITE}
+                        />
+                        <Text style={styles.actionButtonText}>
+                          {" "}
+                          Add to Daily Tracker
+                        </Text>
+                      </TouchableOpacity>
+                    )}
+
+                    {/* View Details Button - Pass scannedData here */}
+                    {scannedFoodItem && !loading && (
+                      <TouchableOpacity
+                        style={[
+                          styles.secondaryButton,
+                          styles.viewDetailsButton,
+                        ]}
+                        onPress={() =>
+                          saveAndNavigateScannedItem(
+                            scannedFoodItem,
+                            scannedData
+                          )
+                        } // Pass scannedData
+                        disabled={loading}>
+                        <MaterialCommunityIcons
+                          name="information-outline"
+                          size={20}
+                          color={Colors.BLACK}
+                        />
+                        <Text style={styles.secondaryButtonText}>
+                          {" "}
+                          View Details
+                        </Text>
+                      </TouchableOpacity>
+                    )}
+
+                    {/* Placeholder or status text */}
+                    {!scannedFoodItem && !loading && scannedData && (
+                      <Text style={styles.barcodeDisclaimer}>
+                        {error
+                          ? error
+                          : "Looking up nutritional information..."}
+                      </Text>
+                    )}
+                    {!scannedFoodItem && loading && (
+                      <ActivityIndicator
+                        size="small"
+                        color={Colors.BLACK}
+                        style={{ marginTop: 15 }}
+                      />
+                    )}
+                  </View>
+                )}
+              {/* Initial placeholder text */}
+              {!scannedData && !loading && (
+                <Text style={styles.placeholderText}>
+                  Scan a barcode to view product details
+                </Text>
+              )}
             </>
           )}
           {searchMode === "Camera" && (
             <>
-            <Text style={styles.header}>AI Camera</Text>
-            <TouchableOpacity
-              style={styles.actionButton}
-              onPress={takePicture}
-              disabled={loading}
-            >
-              <MaterialCommunityIcons
-                name="camera"
-                size={20}
-                color={Colors.WHITE}
-              />
-              <Text style={styles.actionButtonText}> Take a Picture</Text>
-            </TouchableOpacity>
-        
-            {cameraLabel && (
-              <Text style={{ textAlign: "center", marginTop: 10 }}>
-                Detected: {cameraLabel}
+              <Text style={styles.header}>AI Camera</Text>
+              <TouchableOpacity
+                style={styles.actionButton}
+                onPress={takePicture}
+                disabled={loading}>
+                <MaterialCommunityIcons
+                  name="camera"
+                  size={20}
+                  color={Colors.WHITE}
+                />
+                <Text style={styles.actionButtonText}> Take a Picture</Text>
+              </TouchableOpacity>
+
+              {cameraLabel && (
+                <Text style={{ textAlign: "center", marginTop: 10 }}>
+                  Detected: {cameraLabel}
+                </Text>
+              )}
+              {naturalFoodItems.length > 0 && (
+                <>
+                  {renderNutritionLabel()}
+                  <TouchableOpacity
+                    style={[styles.actionButton, styles.addAllButton]}
+                    onPress={() => addItemToTracker(naturalFoodItems[0])}
+                    disabled={loading}>
+                    <MaterialCommunityIcons
+                      name="plus-box-multiple-outline"
+                      size={20}
+                      color={Colors.WHITE}
+                    />
+                    <Text style={styles.actionButtonText}>Add to Tracker</Text>
+                  </TouchableOpacity>
+                </>
+              )}
+              <Text style={styles.placeholderText}>
+                Take a picture of a food item and retrieve its nutritional
+                information
               </Text>
-            )}
-            {naturalFoodItems.length > 0 && (
-              <>
-                {renderNutritionLabel()}
-                <TouchableOpacity
-                      style={[styles.actionButton, styles.addAllButton]}
-                      onPress={() => addItemToTracker(naturalFoodItems[0])}
-                      disabled={loading}>
-                      <MaterialCommunityIcons
-                        name="plus-box-multiple-outline"
-                        size={20}
-                        color={Colors.WHITE}
-                      />
-                      <Text style={styles.actionButtonText}>
-                        Add to Tracker
-                      </Text>
-                    </TouchableOpacity>
-              </>
-            )}
-            <Text style={styles.placeholderText}>
-              Take a picture of a food item and retrieve its nutritional information
-            </Text>
-          </>
-        )}
+            </>
+          )}
         </View>
       </ScrollView>
 
@@ -1130,12 +1280,16 @@ export default function SearchFood() {
         onRequestClose={() => setIsScannerVisible(false)}>
         <CameraView
           style={StyleSheet.absoluteFillObject}
-          onBarcodeScanned={handleBarCodeScanned}
+          onBarcodeScanned={loading ? undefined : handleBarCodeScanned} // Prevent scanning while processing previous one
           barcodeScannerSettings={{
-            barcodeTypes: ["ean13", "ean8", "upc_a", "upc_e", "qr", "pdf417"], // relevant types
+            barcodeTypes: ["ean13", "ean8", "upc_a", "upc_e"], // Focused relevant types
           }}
         />
-        <Button title="Cancel" onPress={() => setIsScannerVisible(false)} />
+        <TouchableOpacity
+          style={styles.cancelScanButton}
+          onPress={() => setIsScannerVisible(false)}>
+          <Text style={styles.cancelScanButtonText}>Cancel</Text>
+        </TouchableOpacity>
       </Modal>
     </KeyboardAvoidingView>
   );
@@ -1150,22 +1304,12 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   scrollContentContainer: {
-    paddingBottom: 20,
+    paddingBottom: 20, // Ensure space at bottom
     paddingHorizontal: 15,
-    paddingTop: 10,
-    flexGrow: 1,
-  },
-  container: {
-    backgroundColor: Colors.WHITE,
+    flexGrow: 1, // Make sure content can grow
   },
   innerContainer: {
-    paddingTop: 80,
-  },
-  backButton: {
-    position: "absolute",
-    top: 40,
-    left: 15,
-    zIndex: 10,
+    paddingTop: Platform.OS === "ios" ? 60 : 40, // Adjust top padding for status bar etc.
   },
   modeSelectorContainer: {
     flexDirection: "row",
@@ -1175,6 +1319,7 @@ const styles = StyleSheet.create({
     borderColor: Colors.LIGHT_GRAY,
     borderRadius: 20,
     overflow: "hidden",
+    backgroundColor: Colors.WHITE, // Ensure background
   },
   modeButton: {
     flex: 1,
@@ -1183,14 +1328,13 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     paddingVertical: 10,
     paddingHorizontal: 5,
-    backgroundColor: Colors.WHITE,
   },
   modeButtonActive: {
     backgroundColor: Colors.BLACK,
   },
   modeButtonText: {
     fontFamily: "myfont-medium",
-    fontSize: 14,
+    fontSize: 14, // Slightly smaller maybe
     color: Colors.BLACK,
     marginLeft: 5,
   },
@@ -1280,6 +1424,7 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     borderRadius: 8,
     marginTop: 10,
+    minHeight: 45, // Ensure minimum height
   },
   actionButtonText: {
     color: Colors.WHITE,
@@ -1287,9 +1432,29 @@ const styles = StyleSheet.create({
     fontSize: 16,
     marginLeft: 5,
   },
+  secondaryButton: {
+    // Style for secondary actions like "View Details"
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: Colors.WHITE,
+    paddingVertical: 10,
+    borderRadius: 8,
+    marginTop: 10,
+    borderWidth: 1,
+    borderColor: Colors.BLACK,
+    minHeight: 40,
+  },
+  secondaryButtonText: {
+    color: Colors.BLACK,
+    fontFamily: "myfont-medium",
+    fontSize: 15,
+    marginLeft: 5,
+  },
   scannedText: {
     textAlign: "center",
     marginTop: 15,
+    marginBottom: 10, // Add margin below
     fontFamily: "myfont",
     color: Colors.GRAY,
   },
@@ -1297,280 +1462,76 @@ const styles = StyleSheet.create({
     marginVertical: 20,
   },
   errorText: {
-    color: "red",
+    color: Colors.RED, // Use a distinct error color
     textAlign: "center",
-    marginVertical: 10,
-    fontFamily: "myfont",
-  },
-
-  resultsContainer: {
-    marginTop: 20,
-  },
-  foodItemsContainer: {
-    borderColor: Colors.LIGHT_GRAY,
-    borderWidth: 1,
-    borderRadius: 8,
-    padding: 10,
-    marginBottom: 15,
-  },
-  foodItemsList: {
-    maxHeight: 200,
-  },
-  naturalResultsContainer: {
-    marginTop: 20,
-    borderColor: Colors.LIGHT_GRAY,
-    borderWidth: 1,
-    borderRadius: 8,
-    padding: 10,
-    maxHeight: 600,
-  },
-  naturalResultsHeaderRow: {
-    flexDirection: "row",
-    marginBottom: 8,
-    paddingBottom: 5,
-    borderBottomWidth: 1,
-    borderBottomColor: Colors.LIGHT_GRAY,
-  },
-  naturalColumnHeader: {
-    fontFamily: "myfont-bold",
-    fontSize: 13,
-    color: Colors.DARK_GRAY,
-    textAlign: "left",
-  },
-  naturalItemRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingVertical: 8,
-    borderBottomWidth: 1,
-    borderBottomColor: Colors.EXTRA_LIGHT_GRAY,
-  },
-  naturalItemImage: {
-    width: 40,
-    height: 40,
-    borderRadius: 5,
-    marginRight: 10,
-    backgroundColor: Colors.EXTRA_LIGHT_GRAY,
-  },
-  naturalItemText: {
-    fontFamily: "myfont",
-    fontSize: 14,
-    textAlign: "left",
-    color: Colors.BLACK,
-  },
-  naturalQtyCol: {
-    flex: 1.5,
-    textAlign: "left",
-    marginRight: 20,
-  },
-  naturalUnitCol: {
-    flex: 3,
-    marginRight: 8,
-    textAlign: "left",
-  },
-  naturalFoodCol: {
-    flex: 4,
-    marginRight: 8,
-    textAlign: "left",
-  },
-  naturalCalCol: {
-    flex: 1.5,
-    textAlign: "right",
-  },
-  addTrackerButton: {
-    width: 40,
-    alignItems: "center",
-    justifyContent: "center",
-    paddingLeft: 5,
-  },
-  addAllButton: {
-    marginTop: 15,
-    backgroundColor: "#2E7D32",
-  },
-  naturalTotalCalories: {
-    marginTop: 15,
-    paddingTop: 5,
-    borderTopWidth: 1,
-    borderTopColor: Colors.LIGHT_GRAY,
-    fontFamily: "myfont-bold",
-    fontSize: 15,
-    textAlign: "right",
-  },
-  nutritionContainer: {
-    padding: 10,
-    backgroundColor: Colors.WHITE,
-    borderWidth: 1,
-    borderColor: Colors.BLACK,
-    borderRadius: 5,
-    marginBottom: 15,
-  },
-  nutritionTitle: {
-    fontSize: 20,
-    fontFamily: "myfont-bold",
-    color: Colors.BLACK,
-    textAlign: "center",
-    marginBottom: 5,
-  },
-  servingSize: {
-    fontSize: 14,
-    fontFamily: "myfont-regular",
-    color: Colors.BLACK,
-    marginBottom: 5,
-  },
-  nutritionMainRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginVertical: 5,
-  },
-  nutritionMainLabel: {
-    fontSize: 16,
-    fontFamily: "myfont-bold",
-    color: Colors.BLACK,
-  },
-  nutritionMainValue: {
-    fontSize: 26,
-    fontFamily: "myfont-bold",
-    color: Colors.BLACK,
-  },
-  nutritionDivider: {
-    height: 5,
-    backgroundColor: Colors.BLACK,
-    marginVertical: 5,
-  },
-  nutritionDailyValue: {
-    fontSize: 12,
-    fontFamily: "myfont-bold",
-    color: Colors.BLACK,
-    textAlign: "right",
-    marginVertical: 3,
-  },
-  nutritionRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    borderBottomWidth: 1,
-    borderBottomColor: Colors.LIGHT_GRAY,
-    paddingVertical: 1,
-    height: 25,
-  },
-  nutritionIndentedRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingLeft: 15,
-    borderBottomWidth: 1,
-    borderBottomColor: Colors.EXTRA_LIGHT_GRAY,
-    paddingVertical: 1,
-    height: 25,
-  },
-  nutritionLabel: {
-    fontSize: 14,
-    fontFamily: "myfont-bold",
-    color: Colors.BLACK,
-    flex: 1,
-  },
-  nutritionIndentedLabel: {
-    fontSize: 13,
-    fontFamily: "myfont-regular",
-    color: Colors.BLACK,
-    flex: 1,
-  },
-  nutritionValue: {
-    fontSize: 13,
-    fontFamily: "myfont-regular",
-    color: Colors.BLACK,
-    marginRight: 5,
-    textAlign: "right",
-  },
-  nutritionPercent: {
-    fontSize: 13,
-    fontFamily: "myfont-bold",
-    color: Colors.BLACK,
-    width: 30,
-    textAlign: "right",
-  },
-  nutritionFooter: {
-    fontSize: 10,
-    fontFamily: "myfont-regular",
-    color: Colors.BLACK,
-    marginTop: 5,
-  },
-  valueContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    width: 80,
-    justifyContent: "flex-end",
-  },
-  container: {
-    flex: 1,
-    padding: 16,
-    backgroundColor: "#fff",
-    justifyContent: "center",
-  },
-  errorText: {
-    color: "red",
-    marginVertical: 8,
-    textAlign: "center",
+    marginVertical: 15,
+    fontFamily: "myfont-medium",
+    paddingHorizontal: 10, // Add padding
   },
   productContainer: {
     alignItems: "center",
-    marginVertical: 16,
-    padding: 12,
-    backgroundColor: "#F2F2F2",
-    borderRadius: 8,
+    marginTop: 20,
+    padding: 15,
+    borderWidth: 1,
+    borderColor: Colors.LIGHT_GRAY,
+    borderRadius: 10,
+    backgroundColor: Colors.EXTRA_LIGHT_GRAY, // Light background for emphasis
   },
   productImage: {
     width: 150,
     height: 150,
-    resizeMode: "contain",
-    marginBottom: 12,
+    borderRadius: 8,
+    marginBottom: 10,
+    backgroundColor: Colors.LIGHT_GRAY, // Background for placeholder/loading
+  },
+  imagePlaceholder: {
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: Colors.LIGHT_GRAY,
   },
   productName: {
+    fontFamily: "myfont-bold",
     fontSize: 18,
-    fontWeight: "bold",
     textAlign: "center",
+    marginBottom: 15,
   },
-  placeholderText: {
-    textAlign: "center",
-    color: "#666",
-    marginTop: 12,
+  addTrackerButtonScanner: {
+    // Specific style for this button if needed
+    marginTop: 15,
+    backgroundColor: Colors.PRIMARY, // Use primary color for tracker actions
+  },
+  viewDetailsButton: {
+    marginTop: 8, // Less margin than primary button
+    borderColor: Colors.GRAY, // Subtler border
   },
   barcodeDisclaimer: {
-    fontSize: 8,
+    fontFamily: "myfont",
+    fontSize: 13,
     color: Colors.GRAY,
-    fontStyle: "italic",
+    textAlign: "center",
+    marginTop: 15,
   },
-  qtyContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    width: 65,
+  placeholderText: {
+    fontFamily: "myfont",
+    fontSize: 15,
+    color: Colors.GRAY,
+    textAlign: "center",
+    marginTop: 30,
+    paddingHorizontal: 20,
   },
-  qtyButton: {
-    width: 20,
-    height: 20,
-    borderWidth: 1,
-    borderColor: Colors.LIGHT_GRAY,
-    borderRadius: 4,
-    alignItems: "center",
-    justifyContent: "center",
+  cancelScanButton: {
+    position: "absolute",
+    bottom: 40,
+    left: 20,
+    right: 20,
+    backgroundColor: "rgba(0, 0, 0, 0.7)",
+    padding: 15,
+    borderRadius: 10,
   },
-  qtyButtonText: {
-    fontSize: 16,
-    fontFamily: "myfont-bold",
-    color: Colors.BLACK,
-  },
-  qtyButtonDisabled: {
-    borderColor: Colors.LIGHT_GRAY,
-    backgroundColor: Colors.DISABLED,
-  },
-  qtyButtonTextDisabled: {
-    color: Colors.DISABLED_TEXT,
-  },
-  qtyButtonAdd: {
-    backgroundColor: Colors.GREEN,
-    borderColor: Colors.GREEN,
-  },
-  qtyButtonTextAdd: {
+  cancelScanButtonText: {
     color: Colors.WHITE,
+    textAlign: "center",
+    fontFamily: "myfont-bold",
+    fontSize: 16,
   },
 });

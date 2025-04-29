@@ -59,7 +59,7 @@ const formatTime = (timestamp) => {
 
 /**
  * Tracker Component
- * 
+ *
  * Main component for tracking daily food intake.
  * Features:
  * - Display food items logged for the selected day
@@ -102,7 +102,7 @@ export default function Tracker() {
   const totalCalories = useMemo(() => {
     return trackedItems.reduce((sum, item) => {
       const servingQty = item.servingQty || 0;
-      return sum + ((item.calories || 0) * servingQty);
+      return sum + (item.calories || 0) * servingQty;
     }, 0);
   }, [trackedItems]);
 
@@ -112,11 +112,11 @@ export default function Tracker() {
    */
   const loadCalorieGoal = useCallback(async () => {
     if (!user?.uid) return;
-    
+
     try {
       const goalDocRef = doc(db, "userCalorieGoals", user.uid);
       const goalSnapshot = await getDoc(goalDocRef);
-      
+
       if (goalSnapshot.exists()) {
         const goalData = goalSnapshot.data();
         setCalorieGoal(goalData.calorieGoal || 2000);
@@ -134,9 +134,9 @@ export default function Tracker() {
    */
   const checkCalorieGoal = useCallback(async () => {
     if (!user?.uid || goalChecked || trackedItems.length === 0) return;
-    
+
     const isGoalMet = totalCalories <= calorieGoal;
-    
+
     try {
       // Check if goal achievement has been recorded today
       const goalMetQuery = query(
@@ -144,18 +144,18 @@ export default function Tracker() {
         where("userId", "==", user.uid),
         where("date", "==", currentDateString)
       );
-      
+
       const goalMetSnapshot = await getDocs(goalMetQuery);
-      
+
       // Get the total number of goalsMet documents for a user
       const allGoalsMetQuery = query(
         collection(db, "goalsMet"),
         where("userId", "==", user.uid)
       );
-      
+
       const allGoalsMetSnapshot = await getDocs(allGoalsMetQuery);
       const currentMetCount = allGoalsMetSnapshot.size;
-      
+
       if (isGoalMet) {
         // Achievement of goals
         if (goalMetSnapshot.empty) {
@@ -166,9 +166,9 @@ export default function Tracker() {
             date: currentDateString,
             goalCalories: calorieGoal,
             actualCalories: totalCalories,
-            createdAt: Timestamp.now()
+            createdAt: Timestamp.now(),
           });
-          
+
           console.log("Calorie goal met for today!");
         }
       } else {
@@ -180,9 +180,11 @@ export default function Tracker() {
             batch.delete(doc.ref);
           });
           await batch.commit();
-          console.log("Removed today's goal met record due to exceeding calorie limit");
+          console.log(
+            "Removed today's goal met record due to exceeding calorie limit"
+          );
         }
-        
+
         // If there is no record currently, you need to reduce a history record
         if (goalMetSnapshot.empty && currentMetCount > 0) {
           // Delete the earliest record
@@ -192,21 +194,30 @@ export default function Tracker() {
             orderBy("createdAt", "asc"),
             limit(1)
           );
-          
+
           const oldestGoalMetSnapshot = await getDocs(oldestGoalMetQuery);
-          
+
           if (!oldestGoalMetSnapshot.empty) {
             await deleteDoc(oldestGoalMetSnapshot.docs[0].ref);
-            console.log("Reduced goal met count by 1 due to exceeding calorie limit");
+            console.log(
+              "Reduced goal met count by 1 due to exceeding calorie limit"
+            );
           }
         }
       }
-      
+
       setGoalChecked(true);
     } catch (error) {
       console.error("Error checking calorie goal:", error);
     }
-  }, [user, totalCalories, calorieGoal, currentDateString, goalChecked, trackedItems]);
+  }, [
+    user,
+    totalCalories,
+    calorieGoal,
+    currentDateString,
+    goalChecked,
+    trackedItems,
+  ]);
 
   /**
    * Effect hook that runs when the Tracker screen comes into focus
@@ -216,13 +227,13 @@ export default function Tracker() {
   useFocusEffect(
     useCallback(() => {
       if (!user?.uid) return;
-      
+
       setLoading(true);
       setError(null);
-      
+
       // Load the user's calorie goal
       loadCalorieGoal();
-      
+
       // Real-time monitoring of the current date's tracked items
       const q = query(
         collection(db, "dailyTracker"),
@@ -230,7 +241,7 @@ export default function Tracker() {
         where("date", "==", currentDateString),
         orderBy("addedAt", "desc")
       );
-      
+
       const unsubscribe = onSnapshot(
         q,
         (snapshot) => {
@@ -249,12 +260,12 @@ export default function Tracker() {
           setLoading(false);
         }
       );
-      
+
       // Reset the goal check flag when the component gains focus
       setGoalChecked(false);
-      
+
       return () => unsubscribe();
-    }, [user, currentDateString])
+    }, [user, currentDateString, loadCalorieGoal])
   );
 
   // When the tracked items or calorie goal changes, check if the goal has been reached
@@ -263,269 +274,6 @@ export default function Tracker() {
       checkCalorieGoal();
     }
   }, [trackedItems, checkCalorieGoal, goalChecked]);
-
-  const calculateTotalNutrition = () => {
-    const totalNutrition = {
-      calories: 0,
-      total_fat: 0,
-      saturated_fat: 0,
-      trans_fat: 0,
-      polyunsaturated_fat: 0,
-      monounsaturated_fat: 0,
-      cholesterol: 0,
-      sodium: 0,
-      total_carbs: 0,
-      dietary_fiber: 0,
-      sugars: 0,
-      protein: 0,
-      vitamin_d: 0,
-      calcium: 0,
-      iron: 0,
-      potassium: 0,
-    };
-
-    trackedItems.forEach((item) => {
-      const servingQty = item.servingQty || 0;
-      
-      totalNutrition.calories += (item.calories || 0) * servingQty;
-      totalNutrition.total_fat += (item.nf_total_fat || 0) * servingQty;
-      totalNutrition.saturated_fat += (item.nf_saturated_fat || 0) * servingQty;
-      totalNutrition.trans_fat +=
-        (item.full_nutrients?.find((n) => n.attr_id === 605)?.value || 0) * servingQty;
-      totalNutrition.polyunsaturated_fat +=
-        (item.full_nutrients?.find((n) => n.attr_id === 646)?.value || 0) * servingQty;
-      totalNutrition.monounsaturated_fat +=
-        (item.full_nutrients?.find((n) => n.attr_id === 645)?.value || 0) * servingQty;
-      totalNutrition.cholesterol += (item.nf_cholesterol || 0) * servingQty;
-      totalNutrition.sodium += (item.nf_sodium || 0) * servingQty;
-      totalNutrition.total_carbs += (item.nf_total_carbohydrate || 0) * servingQty;
-      totalNutrition.dietary_fiber += (item.nf_dietary_fiber || 0) * servingQty;
-      totalNutrition.sugars += (item.nf_sugars || 0) * servingQty;
-      totalNutrition.protein += (item.nf_protein || 0) * servingQty;
-      totalNutrition.vitamin_d +=
-        (item.full_nutrients?.find((n) => n.attr_id === 324)?.value || 0) * servingQty;
-      totalNutrition.calcium +=
-        (item.full_nutrients?.find((n) => n.attr_id === 301)?.value || 0) * servingQty;
-      totalNutrition.iron +=
-        (item.full_nutrients?.find((n) => n.attr_id === 303)?.value || 0) * servingQty;
-      totalNutrition.potassium +=
-        (item.full_nutrients?.find((n) => n.attr_id === 306)?.value || 0) * servingQty;
-    });
-
-    return totalNutrition;
-  };
-
-  const nutritionFacts = useMemo(
-    () => calculateTotalNutrition(),
-    [trackedItems]
-  );
-
-  const renderNutritionLabel = () => {
-    if (!nutritionFacts) return null;
-
-    const dailyValue = {
-      total_fat: 78, // g
-      saturated_fat: 20, // g
-      trans_fat: 0, // g
-      cholesterol: 300, // mg
-      sodium: 2300, // mg
-      total_carbs: 275, // g
-      dietary_fiber: 28, // g
-      sugars: 50, // g
-      protein: 50, // g
-      vitamin_d: 20, // mcg
-      calcium: 1300, // mg
-      iron: 18, // mg
-      potassium: 4700, // mg
-    };
-
-    const calculateDailyValue = (nutrient, value) => {
-      if (!dailyValue[nutrient] || !value) return 0;
-      return Math.round((value / dailyValue[nutrient]) * 100);
-    };
-
-    return (
-      <View style={styles.nutritionContainer}>
-        <Text style={styles.nutritionTitle}>
-          {user.displayName}'s Nutrition Intake
-        </Text>
-        <Text style={styles.servingSize}>Amount Per Serving</Text>
-
-        {/* Calories */}
-        <View style={styles.nutritionMainRow}>
-          <Text style={styles.nutritionMainLabel}>Calories</Text>
-          <Text style={styles.nutritionMainValue}>
-            {Math.round(nutritionFacts.calories)}
-          </Text>
-        </View>
-
-        <View style={styles.nutritionDivider} />
-        <Text style={styles.nutritionDailyValue}>% Daily Value*</Text>
-
-        {/* Total Fat */}
-        <View style={styles.nutritionRow}>
-          <Text style={styles.nutritionLabel}>Total Fat</Text>
-          <View style={styles.valueContainer}>
-            <Text style={styles.nutritionValue}>
-              {nutritionFacts.total_fat.toFixed(1)}g
-            </Text>
-            <Text style={styles.nutritionPercent}>
-              {calculateDailyValue("total_fat", nutritionFacts.total_fat)}%
-            </Text>
-          </View>
-        </View>
-
-        {/* Saturated Fat */}
-        <View style={styles.nutritionIndentedRow}>
-          <Text style={styles.nutritionIndentedLabel}>Saturated Fat</Text>
-          <View style={styles.valueContainer}>
-            <Text style={styles.nutritionValue}>
-              {nutritionFacts.saturated_fat.toFixed(1)}g
-            </Text>
-            <Text style={styles.nutritionPercent}>
-              {calculateDailyValue(
-                "saturated_fat",
-                nutritionFacts.saturated_fat
-              )}
-              %
-            </Text>
-          </View>
-        </View>
-
-        {/* Trans Fat */}
-        <View style={styles.nutritionIndentedRow}>
-          <Text style={styles.nutritionIndentedLabel}>Trans Fat</Text>
-          <View style={styles.valueContainer}>
-            <Text style={styles.nutritionValue}>
-              {nutritionFacts.trans_fat.toFixed(1)}g
-            </Text>
-            <Text style={styles.nutritionPercent}></Text>
-          </View>
-        </View>
-
-        {/* Cholesterol */}
-        <View style={styles.nutritionRow}>
-          <Text style={styles.nutritionLabel}>Cholesterol</Text>
-          <View style={styles.valueContainer}>
-            <Text style={styles.nutritionValue}>
-              {nutritionFacts.cholesterol.toFixed(1)}mg
-            </Text>
-            <Text style={styles.nutritionPercent}>
-              {calculateDailyValue("cholesterol", nutritionFacts.cholesterol)}%
-            </Text>
-          </View>
-        </View>
-
-        {/* Sodium */}
-        <View style={styles.nutritionRow}>
-          <Text style={styles.nutritionLabel}>Sodium</Text>
-          <View style={styles.valueContainer}>
-            <Text style={styles.nutritionValue}>
-              {nutritionFacts.sodium.toFixed(1)}mg
-            </Text>
-            <Text style={styles.nutritionPercent}>
-              {calculateDailyValue("sodium", nutritionFacts.sodium)}%
-            </Text>
-          </View>
-        </View>
-
-        {/* Total Carbohydrates */}
-        <View style={styles.nutritionRow}>
-          <Text style={styles.nutritionLabel}>Total Carbohydrates</Text>
-          <View style={styles.valueContainer}>
-            <Text style={styles.nutritionValue}>
-              {nutritionFacts.total_carbs.toFixed(1)}g
-            </Text>
-            <Text style={styles.nutritionPercent}>
-              {calculateDailyValue("total_carbs", nutritionFacts.total_carbs)}%
-            </Text>
-          </View>
-        </View>
-
-        {/* Dietary Fiber */}
-        <View style={styles.nutritionIndentedRow}>
-          <Text style={styles.nutritionIndentedLabel}>Dietary Fiber</Text>
-          <View style={styles.valueContainer}>
-            <Text style={styles.nutritionValue}>
-              {nutritionFacts.dietary_fiber.toFixed(1)}g
-            </Text>
-            <Text style={styles.nutritionPercent}>
-              {calculateDailyValue(
-                "dietary_fiber",
-                nutritionFacts.dietary_fiber
-              )}
-              %
-            </Text>
-          </View>
-        </View>
-
-        {/* Sugars */}
-        <View style={styles.nutritionIndentedRow}>
-          <Text style={styles.nutritionIndentedLabel}>Sugars</Text>
-          <View style={styles.valueContainer}>
-            <Text style={styles.nutritionValue}>
-              {nutritionFacts.sugars.toFixed(1)}g
-            </Text>
-            <Text style={styles.nutritionPercent}></Text>
-          </View>
-        </View>
-
-        {/* Protein */}
-        <View style={styles.nutritionRow}>
-          <Text style={styles.nutritionLabel}>Protein</Text>
-          <View style={styles.valueContainer}>
-            <Text style={styles.nutritionValue}>
-              {nutritionFacts.protein.toFixed(1)}g
-            </Text>
-            <Text style={styles.nutritionPercent}>
-              {calculateDailyValue("protein", nutritionFacts.protein)}%
-            </Text>
-          </View>
-        </View>
-
-        <View style={styles.nutritionDivider} />
-
-        {/* Vitamin D */}
-        <View style={styles.nutritionRow}>
-          <Text style={styles.nutritionLabel}>Vitamin D</Text>
-          <Text style={styles.nutritionPercent}>
-            {calculateDailyValue("vitamin_d", nutritionFacts.vitamin_d)}%
-          </Text>
-        </View>
-
-        {/* Calcium */}
-        <View style={styles.nutritionRow}>
-          <Text style={styles.nutritionLabel}>Calcium</Text>
-          <Text style={styles.nutritionPercent}>
-            {calculateDailyValue("calcium", nutritionFacts.calcium)}%
-          </Text>
-        </View>
-
-        {/* Iron */}
-        <View style={styles.nutritionRow}>
-          <Text style={styles.nutritionLabel}>Iron</Text>
-          <Text style={styles.nutritionPercent}>
-            {calculateDailyValue("iron", nutritionFacts.iron)}%
-          </Text>
-        </View>
-
-        {/* Potassium */}
-        <View style={styles.nutritionRow}>
-          <Text style={styles.nutritionLabel}>Potassium</Text>
-          <Text style={styles.nutritionPercent}>
-            {calculateDailyValue("potassium", nutritionFacts.potassium)}%
-          </Text>
-        </View>
-
-        <View style={styles.nutritionDivider} />
-        <Text style={styles.nutritionFooter}>
-          * The % Daily Value tells you how much a nutrient in a serving of food
-          contributes to a daily diet. 2,000 calories a day is used for general
-          nutrition advice.
-        </Text>
-      </View>
-    );
-  };
 
   const sortedTrackedItems = useMemo(() => {
     let sorted = [...trackedItems];
@@ -585,11 +333,11 @@ export default function Tracker() {
             // Delete items from dailyTracker
             await deleteDoc(doc(db, "dailyTracker", itemId));
             console.log("Deleted item from dailyTracker:", itemId);
-            
-           // Find and delete the corresponding item in mealsSaved
-           // Note: Here we need to find the mealsSaved item that matches the current item
-           // Since there is no direct reference, we match by date and food name
-            const item = trackedItems.find(item => item.id === itemId);
+
+            // Find and delete the corresponding item in mealsSaved
+            // Note: Here we need to find the mealsSaved item that matches the current item
+            // Since there is no direct reference, we match by date and food name
+            const item = trackedItems.find((item) => item.id === itemId);
             if (item) {
               const mealsSavedQuery = query(
                 collection(db, "mealsSaved"),
@@ -597,9 +345,9 @@ export default function Tracker() {
                 where("foodName", "==", item.foodName),
                 where("date", "==", item.date)
               );
-              
+
               const mealsSavedSnapshot = await getDocs(mealsSavedQuery);
-              
+
               if (!mealsSavedSnapshot.empty) {
                 const batch = writeBatch(db);
                 mealsSavedSnapshot.forEach((doc) => {
@@ -623,14 +371,14 @@ export default function Tracker() {
    */
   const deleteAllItems = async () => {
     if (!user?.uid) return;
-    
+
     Alert.alert(
       "Delete All Items",
       "Are you sure you want to delete all items for today? This action cannot be undone.",
       [
         {
           text: "Cancel",
-          style: "cancel"
+          style: "cancel",
         },
         {
           text: "Delete All",
@@ -643,20 +391,20 @@ export default function Tracker() {
                 where("userId", "==", user.uid),
                 where("date", "==", currentDateString)
               );
-              
+
               const querySnapshot = await getDocs(q);
               querySnapshot.forEach((doc) => {
                 batch.delete(doc.ref);
               });
-              
+
               await batch.commit();
               Alert.alert("Success", "All items have been deleted.");
             } catch (error) {
               console.error("Error deleting all items:", error);
               Alert.alert("Error", "Could not delete all items.");
             }
-          }
-        }
+          },
+        },
       ]
     );
   };
@@ -679,47 +427,60 @@ export default function Tracker() {
           {item.foodName}
         </Text>
         <View style={styles.servingContainer}>
-          <TouchableOpacity 
+          <TouchableOpacity
             style={[
               styles.qtyButton,
-              item.servingQty <= 0 ? styles.qtyButtonDisabled : null
+              item.servingQty <= 0 ? styles.qtyButtonDisabled : null,
             ]}
             disabled={item.servingQty <= 0}
             onPress={async () => {
-              if(item.servingQty > 0) {
+              if (item.servingQty > 0) {
                 try {
-                  await setDoc(doc(db, "dailyTracker", item.id), {
-                    ...item,
-                    servingQty: item.servingQty - 1
-                  }, { merge: true });
+                  await setDoc(
+                    doc(db, "dailyTracker", item.id),
+                    {
+                      ...item,
+                      servingQty: item.servingQty - 1,
+                    },
+                    { merge: true }
+                  );
                 } catch (err) {
                   console.error("Error updating quantity", err);
                   Alert.alert("Error", "Could not update quantity");
                 }
               }
             }}>
-            <Text style={[
-              styles.qtyButtonText,
-              item.servingQty <= 0 ? styles.qtyButtonTextDisabled : null
-            ]}>-</Text>
+            <Text
+              style={[
+                styles.qtyButtonText,
+                item.servingQty <= 0 ? styles.qtyButtonTextDisabled : null,
+              ]}>
+              -
+            </Text>
           </TouchableOpacity>
           <Text style={styles.itemServing}>
             {item.servingQty || 0} {item.servingUnit}
           </Text>
-          <TouchableOpacity 
+          <TouchableOpacity
             style={[styles.qtyButton, styles.qtyButtonAdd]}
             onPress={async () => {
               try {
-                await setDoc(doc(db, "dailyTracker", item.id), {
-                  ...item,
-                  servingQty: (item.servingQty || 0) + 1
-                }, { merge: true });
+                await setDoc(
+                  doc(db, "dailyTracker", item.id),
+                  {
+                    ...item,
+                    servingQty: (item.servingQty || 0) + 1,
+                  },
+                  { merge: true }
+                );
               } catch (err) {
                 console.error("Error updating quantity", err);
                 Alert.alert("Error", "Could not update quantity");
               }
             }}>
-            <Text style={[styles.qtyButtonText, styles.qtyButtonTextAdd]}>+</Text>
+            <Text style={[styles.qtyButtonText, styles.qtyButtonTextAdd]}>
+              +
+            </Text>
           </TouchableOpacity>
         </View>
         <Text style={styles.itemTime}>Added: {formatTime(item.addedAt)}</Text>
@@ -743,7 +504,7 @@ export default function Tracker() {
   );
 
   const renderCustomPicker = () => {
-    if (Platform.OS === 'ios') {
+    if (Platform.OS === "ios") {
       return (
         <>
           <TouchableOpacity
@@ -811,14 +572,8 @@ export default function Tracker() {
           onValueChange={(itemValue) => setSortOption(itemValue)}
           style={styles.picker}
           dropdownIconColor={Colors.PRIMARY}>
-          <Picker.Item
-            label="Sort by: Added (Newest)"
-            value="addedAt_desc"
-          />
-          <Picker.Item
-            label="Sort by: Added (Oldest)"
-            value="addedAt_asc"
-          />
+          <Picker.Item label="Sort by: Added (Newest)" value="addedAt_desc" />
+          <Picker.Item label="Sort by: Added (Oldest)" value="addedAt_asc" />
           <Picker.Item
             label="Sort by: Calories (High-Low)"
             value="calories_desc"
@@ -893,22 +648,27 @@ export default function Tracker() {
             <Text style={styles.progressText}>
               {totalCalories.toFixed(0)} / {calorieGoal.toFixed(0)} Cal
             </Text>
-            <Text style={[
-              styles.progressPercentage,
-              totalCalories > calorieGoal ? styles.exceededText : null
-            ]}>
+            <Text
+              style={[
+                styles.progressPercentage,
+                totalCalories > calorieGoal ? styles.exceededText : null,
+              ]}>
               {((totalCalories / calorieGoal) * 100).toFixed(0)}%
             </Text>
           </View>
           <View style={styles.progressBarContainer}>
-            <View 
+            <View
               style={[
                 styles.progressBar,
                 {
-                  width: `${Math.min((totalCalories / calorieGoal) * 100, 100)}%`,
-                  backgroundColor: totalCalories > calorieGoal ? Colors.RED : Colors.PRIMARY
-                }
-              ]} 
+                  width: `${Math.min(
+                    (totalCalories / calorieGoal) * 100,
+                    100
+                  )}%`,
+                  backgroundColor:
+                    totalCalories > calorieGoal ? Colors.RED : Colors.PRIMARY,
+                },
+              ]}
             />
           </View>
           {totalCalories > calorieGoal && (
@@ -919,9 +679,7 @@ export default function Tracker() {
         </View>
 
         {!loading && !error && trackedItems.length > 0 && (
-          <View style={styles.sortContainer}>
-            {renderCustomPicker()}
-          </View>
+          <View style={styles.sortContainer}>{renderCustomPicker()}</View>
         )}
 
         <View style={styles.contentArea}>
@@ -940,21 +698,14 @@ export default function Tracker() {
               </Text>
             </View>
           ) : (
-            <ScrollView 
-              style={styles.scrollView}
-              contentContainerStyle={styles.scrollViewContent}
-              showsVerticalScrollIndicator={false}>
-              <FlatList
-                data={sortedTrackedItems}
-                renderItem={renderItem}
-                keyExtractor={(item) => item.id}
-                style={styles.list}
-                contentContainerStyle={styles.listContent}
-                showsVerticalScrollIndicator={false}
-                scrollEnabled={false}
-              />
-              {renderNutritionLabel()}
-            </ScrollView>
+            <FlatList
+              data={sortedTrackedItems}
+              renderItem={renderItem}
+              keyExtractor={(item) => item.id}
+              style={styles.list}
+              contentContainerStyle={styles.listContent}
+              showsVerticalScrollIndicator={false}
+            />
           )}
         </View>
 
@@ -970,27 +721,34 @@ export default function Tracker() {
               />
               <Text style={styles.deleteAllButtonText}>Delete All Items</Text>
             </TouchableOpacity>
-            
+
             <View style={styles.calorieStats}>
               <View style={styles.calorieStat}>
                 <Text style={styles.calorieStatLabel}>Total Calories:</Text>
-                <Text style={styles.totalCaloriesText}>{totalCalories.toFixed(0)}</Text>
+                <Text style={styles.totalCaloriesText}>
+                  {totalCalories.toFixed(0)}
+                </Text>
               </View>
-              
+
               <View style={styles.calorieStat}>
                 <Text style={styles.calorieStatLabel}>Target:</Text>
                 <Text style={styles.goalText}>{calorieGoal.toFixed(0)}</Text>
               </View>
-              
+
               <View style={styles.calorieStat}>
-                <Text style={styles.calorieStatLabel}>state:</Text>
-                <Text style={[
-                  styles.statusText,
-                  totalCalories <= calorieGoal ? styles.metGoal : styles.exceededGoal
-                ]}>
-                  {totalCalories <= calorieGoal 
-                    ? "✓ Achieve your goals" 
-                    : `Beyond ${(totalCalories - calorieGoal).toFixed(0)} Calories`}
+                <Text style={styles.calorieStatLabel}>tate:</Text>
+                <Text
+                  style={[
+                    styles.statusText,
+                    totalCalories <= calorieGoal
+                      ? styles.metGoal
+                      : styles.exceededGoal,
+                  ]}>
+                  {totalCalories <= calorieGoal
+                    ? "✓ Achieve your goals"
+                    : `Beyond ${(totalCalories - calorieGoal).toFixed(
+                        0
+                      )} Calories`}
                 </Text>
               </View>
             </View>
@@ -1045,13 +803,6 @@ const styles = StyleSheet.create({
   contentArea: {
     flex: 1,
     backgroundColor: Colors.BACKGROUND_COLOR || Colors.WHITE,
-  },
-  scrollView: {
-    flex: 1,
-  },
-  scrollViewContent: {
-    flexGrow: 1,
-    paddingBottom: Platform.OS === 'ios' ? 20 : 0,
   },
   list: {
     flexGrow: 0,
@@ -1146,9 +897,9 @@ const styles = StyleSheet.create({
     padding: 8,
   },
   footerContainer: {
-    paddingVertical: Platform.OS === 'ios' ? 15 : 10,
+    paddingVertical: Platform.OS === "ios" ? 15 : 10,
     paddingHorizontal: 20,
-    paddingBottom: Platform.OS === 'ios' ? 30 : 15,
+    paddingBottom: Platform.OS === "ios" ? 30 : 15,
     backgroundColor: Colors.WHITE,
     borderTopWidth: 1,
     borderTopColor: Colors.EXTRA_LIGHT_GRAY,
@@ -1159,7 +910,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     padding: 15,
     marginTop: 10,
-    width: '100%',
+    width: "100%",
   },
   calorieStat: {
     flexDirection: "row",
@@ -1193,145 +944,10 @@ const styles = StyleSheet.create({
   exceededGoal: {
     color: Colors.RED,
   },
-  nutritionContainer: {
-    margin: 10,
-    padding: 15,
-    backgroundColor: Colors.WHITE,
-    borderWidth: 1,
-    borderColor: Colors.BLACK,
-    borderRadius: 8,
-  },
-  nutritionTitle: {
-    fontSize: 20,
-    fontFamily: "myfont-bold",
-    color: Colors.BLACK,
-    textAlign: "center",
-    marginBottom: 5,
-  },
-  servingSize: {
-    fontSize: 14,
-    fontFamily: "myfont-regular",
-    color: Colors.BLACK,
-    marginBottom: 5,
-  },
-  nutritionMainRow: {
+  deleteAllButton: {
     flexDirection: "row",
-    justifyContent: "space-between",
-    marginVertical: 5,
-  },
-  nutritionMainLabel: {
-    fontSize: 16,
-    fontFamily: "myfont-bold",
-    color: Colors.BLACK,
-  },
-  nutritionMainValue: {
-    fontSize: 26,
-    fontFamily: "myfont-bold",
-    color: Colors.BLACK,
-  },
-  nutritionDivider: {
-    height: 5,
-    backgroundColor: Colors.BLACK,
-    marginVertical: 5,
-  },
-  nutritionDailyValue: {
-    fontSize: 12,
-    fontFamily: "myfont-bold",
-    color: Colors.BLACK,
-    textAlign: "right",
-    marginVertical: 3,
-  },
-  nutritionRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    borderBottomWidth: 1,
-    borderBottomColor: Colors.LIGHT_GRAY,
-    paddingVertical: 1,
-    height: 25,
-  },
-  nutritionIndentedRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingLeft: 15,
-    borderBottomWidth: 1,
-    borderBottomColor: Colors.EXTRA_LIGHT_GRAY,
-    paddingVertical: 1,
-    height: 25,
-  },
-  nutritionLabel: {
-    fontSize: 14,
-    fontFamily: "myfont-bold",
-    color: Colors.BLACK,
-    flex: 1,
-  },
-  nutritionIndentedLabel: {
-    fontSize: 13,
-    fontFamily: "myfont-regular",
-    color: Colors.BLACK,
-    flex: 1,
-  },
-  nutritionValue: {
-    fontSize: 13,
-    fontFamily: "myfont-regular",
-    color: Colors.BLACK,
-    marginRight: 5,
-    textAlign: "right",
-  },
-  nutritionPercent: {
-    fontSize: 12,
-    fontFamily: "myfont-bold",
-    color: Colors.BLACK,
-    width: 30,
-    textAlign: "right",
-  },
-  nutritionFooter: {
-    fontSize: 10,
-    fontFamily: "myfont-regular",
-    color: Colors.BLACK,
-    marginTop: 5,
-  },
-  valueContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    width: 80,
-    justifyContent: "flex-end",
-  },
-  servingContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 2,
-  },
-  qtyButton: {
-    width: 24,
-    height: 24,
     alignItems: "center",
     justifyContent: "center",
-    padding: 0,
-  },
-  qtyButtonText: {
-    fontSize: 16,
-    fontFamily: "myfont-bold",
-    color: Colors.PRIMARY,
-  },
-  qtyButtonDisabled: {
-    backgroundColor: Colors.DISABLED,
-  },
-  qtyButtonTextDisabled: {
-    color: Colors.DISABLED_TEXT,
-  },
-  qtyButtonAdd: {
-    backgroundColor: Colors.GREEN,
-    borderColor: Colors.GREEN,
-  },
-  qtyButtonTextAdd: {
-    color: Colors.WHITE,
-  },
-  deleteAllButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
     backgroundColor: Colors.RED,
     padding: 10,
     borderRadius: 8,
@@ -1339,7 +955,7 @@ const styles = StyleSheet.create({
   },
   deleteAllButtonText: {
     color: Colors.WHITE,
-    fontFamily: 'myfont-bold',
+    fontFamily: "myfont-bold",
     fontSize: 16,
     marginLeft: 8,
   },
@@ -1349,9 +965,9 @@ const styles = StyleSheet.create({
     marginBottom: 5,
   },
   sortButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
     padding: 12,
     backgroundColor: Colors.WHITE,
     borderRadius: 8,
@@ -1360,13 +976,13 @@ const styles = StyleSheet.create({
   },
   sortButtonText: {
     fontSize: 16,
-    fontFamily: 'myfont-medium',
+    fontFamily: "myfont-medium",
     color: Colors.BLACK,
   },
   modalContainer: {
     flex: 1,
-    justifyContent: 'flex-end',
-    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: "flex-end",
+    backgroundColor: "rgba(0,0,0,0.5)",
   },
   pickerModalContent: {
     backgroundColor: Colors.WHITE,
@@ -1375,8 +991,8 @@ const styles = StyleSheet.create({
     paddingBottom: 20,
   },
   pickerHeader: {
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
+    flexDirection: "row",
+    justifyContent: "flex-end",
     padding: 12,
     borderBottomWidth: 1,
     borderBottomColor: Colors.LIGHT_GRAY,
@@ -1387,7 +1003,7 @@ const styles = StyleSheet.create({
   doneButtonText: {
     color: Colors.PRIMARY,
     fontSize: 16,
-    fontFamily: 'myfont-medium',
+    fontFamily: "myfont-medium",
   },
   progressContainer: {
     backgroundColor: Colors.WHITE,
@@ -1397,19 +1013,19 @@ const styles = StyleSheet.create({
     borderBottomColor: Colors.EXTRA_LIGHT_GRAY,
   },
   progressHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     marginBottom: 8,
   },
   progressText: {
     fontSize: 16,
-    fontFamily: 'myfont-bold',
+    fontFamily: "myfont-bold",
     color: Colors.BLACK,
   },
   progressPercentage: {
     fontSize: 16,
-    fontFamily: 'myfont-bold',
+    fontFamily: "myfont-bold",
     color: Colors.PRIMARY,
   },
   exceededText: {
@@ -1419,17 +1035,17 @@ const styles = StyleSheet.create({
     height: 8,
     backgroundColor: Colors.EXTRA_LIGHT_GRAY,
     borderRadius: 4,
-    overflow: 'hidden',
+    overflow: "hidden",
   },
   progressBar: {
-    height: '100%',
+    height: "100%",
     borderRadius: 4,
   },
   warningText: {
     fontSize: 12,
-    fontFamily: 'myfont-medium',
+    fontFamily: "myfont-medium",
     color: Colors.RED,
     marginTop: 4,
-    textAlign: 'right',
+    textAlign: "right",
   },
 });

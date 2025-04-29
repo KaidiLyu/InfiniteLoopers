@@ -1,6 +1,6 @@
 /**
  * Sign Up Screen Component
- * 
+ *
  * This component provides a user interface for the sign-up functionality
  * using Firebase Authentication with email and password.
  * It includes form validation, error handling, and navigation between screens.
@@ -16,7 +16,7 @@ import {
   TouchableWithoutFeedback,
   Keyboard,
   ScrollView,
-  ToastAndroid,
+  Platform,
 } from "react-native";
 
 import React, { useEffect, useState } from "react";
@@ -27,7 +27,7 @@ import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 
 import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { auth } from "../../../configs/FirebaseConfig.js";
-import { usePlatform } from "../../../contexts/PlatformContext.jsx";
+import { getFriendlyAuthErrorMessage } from "../../../src/utils/authUtils";
 
 export default function SignUp() {
   // Hide the header when component mounts
@@ -44,75 +44,51 @@ export default function SignUp() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
-
-  // Get platform-specific information from context
-  const { isWeb, isIOS, isAndroid, isMacos, platform } = usePlatform();
+  const [error, setError] = useState("");
 
   /**
    * Handle user account creation with Firebase authentication
-   * 
+   *
    * Validates user inputs, attempts to create a new account with Firebase,
    * updates the user profile with display name, and handles platform-specific error messages.
    */
-  const CreateAccount = () => {
-    // Validate that all fields are not empty
+  const handleCreateAccount = () => {
+    setError("");
     if (!email || !password || !name) {
-      if (isAndroid)
-        ToastAndroid.show("Please fill all the fields", ToastAndroid.BOTTOM);
-      if (isWeb) console.log("Please fill all the fields");
-      if (isIOS) alert("Please fill all the fields");
-      if (isMacos) alert("Please fill all the fields");
+      setError("Please fill in all fields.");
       return;
     }
-    // Attempt to create a new user with Firebase
+    if (password.length < 6) {
+      setError("Password must be at least 6 characters long.");
+      return;
+    }
+
     createUserWithEmailAndPassword(auth, email, password)
       .then((userCredential) => {
-        // Signed up
         const user = userCredential.user;
-        // Update display name
-        return updateProfile(user, {
-          displayName: name,
-        }).then(() => {
-          console.log("Display name set successfully");
-          router.replace("/SearchFood");
-        });
+        updateProfile(user, { displayName: name })
+          .then(() => {
+            console.log("Display name set successfully for:", user.email);
+            router.replace("/(tabs)/SearchFood");
+          })
+          .catch((profileError) => {
+            // console.error("Error setting display name:", profileError);
+            setError("Account created, but failed to set display name.");
+          });
       })
-      .catch((error) => {
-        const errorCode = error.code;
-        const errorMessage = error.message;
-        console.log(errorCode);
-        // Handle specific Firebase error codes with platform-specific messages
-        if (errorCode === "auth/weak-password") {
-          if (isAndroid)
-            ToastAndroid.show("Weak password", ToastAndroid.BOTTOM);
-          if (isWeb) console.log("Weak password");
-          if (isIOS) alert("Weak password");
-          if (isMacos) alert("Weak password");
-          return;
-        }
-        if (errorCode === "auth/invalid-email") {
-          if (isAndroid)
-            ToastAndroid.show("Invalid email", ToastAndroid.BOTTOM);
-          if (isWeb) console.log("Invalid email");
-          if (isIOS) alert("Invalid email");
-          if (isMacos) alert("Invalid email");
-          return;
-        }
-        if (errorCode === "auth/email-already-in-use") {
-          if (isAndroid)
-            ToastAndroid.show("Email already in use", ToastAndroid.BOTTOM);
-          if (isWeb) console.log("Email already in use");
-          if (isIOS) alert("Email already in use");
-          if (isMacos) alert("Email already in use");
-          return;
-        }
-        // ..
+      .catch((err) => {
+        const friendlyError = getFriendlyAuthErrorMessage(err);
+        setError(friendlyError);
+        // console.error("Sign Up Error:", err);
       });
   };
 
   return (
     // KeyboardAvoidingView adjusts layout when keyboard appears
-    <KeyboardAvoidingView behavior="height" style={{ flex: 1 }}>
+    <KeyboardAvoidingView
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      style={{ flex: 1 }}
+      keyboardVerticalOffset={Platform.OS === "ios" ? 64 : 0}>
       {/* Dismiss keyboard when tapping outside input fields */}
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <ScrollView
@@ -129,19 +105,19 @@ export default function SignUp() {
                 height: "50%",
                 position: "absolute",
                 transform: [{ rotate: "90deg" }],
-                top: -40,
-                right: 10,
+                top: -50,
+                right: -30,
                 zIndex: 0,
               }}
             />
             {/* Back button to sign-in screen */}
-            <TouchableOpacity onPress={() => router.replace("auth/sign-in")}>
+            <TouchableOpacity onPress={() => router.replace("/auth/sign-in")}>
               <FontAwesome6
                 name="circle-arrow-left"
                 size={30}
                 color="black"
                 style={{
-                  position: "relative",
+                  position: "absolute",
                   padding: 20,
                   marginTop: 20,
                 }}
@@ -189,7 +165,14 @@ export default function SignUp() {
                   value={password}
                   onChangeText={(value) => setPassword(value)}
                 />
-                <Text style={{ fontFamily: "myfont-medium", fontSize: 12, color: Colors.GRAY, marginLeft: 10, marginTop: 4}}>
+                <Text
+                  style={{
+                    fontFamily: "myfont-medium",
+                    fontSize: 12,
+                    color: Colors.GRAY,
+                    marginLeft: 10,
+                    marginTop: 4,
+                  }}>
                   Password must be a minimum of 6 characters
                 </Text>
               </View>
@@ -204,6 +187,8 @@ export default function SignUp() {
                   onChangeText={(value) => setName(value)}
                 />
               </View>
+              {/* Error Message Display */}
+              {error ? <Text style={styles.errorText}>{error}</Text> : null}
               {/* Create Account button */}
               <TouchableOpacity
                 style={{
@@ -215,7 +200,7 @@ export default function SignUp() {
                   justifyContent: "center",
                   alignItems: "center",
                 }}
-                onPress={CreateAccount}>
+                onPress={handleCreateAccount}>
                 <Text
                   style={{
                     fontSize: 18,
@@ -281,5 +266,13 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     fontFamily: "myfont",
     marginTop: 10,
+  },
+  errorText: {
+    color: Colors.RED,
+    fontFamily: "myfont-medium",
+    marginTop: 5,
+    marginBottom: 10,
+    textAlign: "center",
+    fontSize: 14,
   },
 });

@@ -23,9 +23,9 @@ import { db, auth } from "../../configs/FirebaseConfig";
 
 /**
  * NutrientRow Component
- * 
+ *
  * A reusable component to display a nutrient name and its value
- * 
+ *
  * @param {string} label - The name of the nutrient
  * @param {number|string} value - The value of the nutrient
  * @param {string} unit - The unit of measurement (e.g., "g", "mg")
@@ -45,7 +45,7 @@ const NutrientRow = ({ label, value, unit, indent = false }) => {
 
 /**
  * NutritionInfo Component
- * 
+ *
  * Displays detailed nutritional information for a food item
  * Supports different data sources (barcode scan, item search)
  * Allows deletion of saved items
@@ -55,7 +55,19 @@ export default function NutritionInfo() {
   const navigation = useNavigation();
   // Get parameters passed from previous screen
   const params = useLocalSearchParams();
-  const { source, id, title, name, image, apiResult } = params;
+  // Destructure ALL parameters used in the effect HERE
+  const {
+    source,
+    id,
+    title,
+    name,
+    image,
+    apiResult,
+    calories,
+    protein,
+    fat,
+    carbs,
+  } = params;
 
   // Component state
   const [loading, setLoading] = useState(false);
@@ -74,6 +86,21 @@ export default function NutritionInfo() {
       headerShown: false,
     });
 
+    // Reset state before processing new params to avoid showing old data briefly
+    // setItemData(null); // Optional: consider if needed based on UX
+    // setError(null); // Optional: consider if needed
+
+    console.log("Processing params in NutritionInfo effect:", {
+      source,
+      apiResult,
+      name,
+      image,
+      calories,
+      protein,
+      fat,
+      carbs,
+    }); // Log the dependencies
+
     // Process data from barcode scan source
     if (source === "barcode" && apiResult) {
       try {
@@ -83,34 +110,42 @@ export default function NutritionInfo() {
         console.error("Failed to parse barcode API result:", e);
         setError("Error displaying scanned item data.");
       }
-    } 
+    }
     // Process data from item search source
-    else if (source === "itemSearch" && apiResult) {
-      try {
-        console.log("Item Search Data (from params):", apiResult);
-        // Format the data into a consistent structure for rendering
-        setItemData({
-          food_name: name,
-          photo: { thumb: image },
-          nf_calories: params.calories || "N/A",
-          nf_protein: params.protein || "N/A",
-          nf_total_fat: params.fat || "N/A",
-          nf_total_carbohydrate: params.carbs || "N/A",
-        });
-      } catch (e) {
-        console.error("Failed to process item search data:", e);
-        setError("Error displaying item data.");
-      }
-    } 
+    else if (source === "itemSearch") {
+      // Check source first
+      // Need to reconstruct the object structure expected by rendering logic
+      // Ensure you handle cases where nutrition details might be missing
+      setItemData({
+        food_name: name || "N/A", // Use destructured 'name'
+        photo: { thumb: image }, // Use destructured 'image'
+        nf_calories: calories || "N/A", // Use destructured 'calories'
+        nf_protein: protein || "N/A", // Use destructured 'protein'
+        nf_total_fat: fat || "N/A", // Use destructured 'fat'
+        nf_total_carbohydrate: carbs || "N/A", // Use destructured 'carbs'
+        // Add other fields if needed, ensuring they default gracefully
+      });
+    }
     // Handle unexpected or missing data
     else {
       console.warn(
         "NutritionInfo loaded with unexpected source or missing data:",
-        params
+        { source, apiResult, name } // Log relevant parts
       );
       setError("Could not load nutrition information.");
     }
-  }, [params]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    source,
+    apiResult,
+    name,
+    image,
+    calories,
+    protein,
+    fat,
+    carbs,
+    navigation,
+  ]); // Use specific primitive dependencies + navigation
 
   /**
    * Handles deletion of a food item from the database
@@ -212,13 +247,10 @@ export default function NutritionInfo() {
   // Extract nutrition data from the item
   const itemName = itemData.food_name || name || "Unknown Item";
   const itemImageUri = itemData.photo?.thumb || image;
-  const calories = itemData.nf_calories;
-  const protein = itemData.nf_protein;
   const totalFat = itemData.nf_total_fat;
   const satFat = itemData.nf_saturated_fat;
   const cholesterol = itemData.nf_cholesterol;
   const sodium = itemData.nf_sodium;
-  const carbs = itemData.nf_total_carbohydrate;
   const fiber = itemData.nf_dietary_fiber;
   const sugars = itemData.nf_sugars;
   const potassium = itemData.nf_potassium;
@@ -360,7 +392,7 @@ export default function NutritionInfo() {
 
 /**
  * Component styles for the NutritionInfo screen
- * 
+ *
  * Includes styling for:
  * - Container layout
  * - Header and navigation elements

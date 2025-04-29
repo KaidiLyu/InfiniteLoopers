@@ -18,7 +18,7 @@ import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 
 /**
  * Profile Component
- * 
+ *
  * Displays the user's profile information and statistics.
  * Features:
  * - Profile picture management
@@ -70,7 +70,7 @@ export default function Profile() {
    * Fetches user statistics from Firestore
    * Includes goal achievements, days logged, and meals saved
    * Also retrieves the user's calorie goal and today's intake
-   * 
+   *
    * @param {string} userId - The user's Firebase UID
    */
   const fetchUserStats = async (userId) => {
@@ -84,36 +84,36 @@ export default function Profile() {
       const productsSnapshot = await getDocs(
         query(collection(db, "mealsSaved"), where("userId", "==", userId))
       );
-      
+
       // Get the latest calorie goal data
       const userGoalDocRef = query(
-        collection(db, "userCalorieGoals"), 
+        collection(db, "userCalorieGoals"),
         where("userId", "==", userId)
       );
       const userGoalSnapshot = await getDocs(userGoalDocRef);
-      
+
       let calorieGoal = 2000; // default value
       if (!userGoalSnapshot.empty) {
         const goalData = userGoalSnapshot.docs[0].data();
         calorieGoal = goalData.calorieGoal || 2000;
       }
-      
+
       // Get today's date string
       const today = new Date();
       const year = today.getFullYear();
       const month = String(today.getMonth() + 1).padStart(2, "0");
       const day = String(today.getDate()).padStart(2, "0");
       const todayString = `${year}-${month}-${day}`;
-      
+
       // Check your calorie intake today
       const todayTrackerQuery = query(
         collection(db, "dailyTracker"),
         where("userId", "==", userId),
         where("date", "==", todayString)
       );
-      
+
       const todayTrackerSnapshot = await getDocs(todayTrackerQuery);
-      
+
       // Calculate total calories for today
       let todayTotalCalories = 0;
       todayTrackerSnapshot.forEach((doc) => {
@@ -121,7 +121,7 @@ export default function Profile() {
         const servingQty = item.servingQty || 0;
         todayTotalCalories += (item.calories || 0) * servingQty;
       });
-      
+
       setStats({
         savedFoods: savedFoodsSnapshot.size,
         recipes: recipesSnapshot.size,
@@ -129,7 +129,7 @@ export default function Profile() {
         todayCalories: todayTotalCalories,
         calorieGoal: calorieGoal,
       });
-      
+
       console.log("Stats updated, meals saved count:", productsSnapshot.size);
     } catch (error) {
       console.error("Error fetching user stats:", error);
@@ -152,26 +152,29 @@ export default function Profile() {
 
       if (!result.canceled && result.assets && result.assets.length > 0) {
         const selectedImageUri = result.assets[0].uri;
-        
+
         // Create a unique file path for storage
-        const fileRef = ref(storage, `profileImages/${auth.currentUser.uid}/${Date.now()}.jpg`);
-        
+        const fileRef = ref(
+          storage,
+          `profileImages/${auth.currentUser.uid}/${Date.now()}.jpg`
+        );
+
         // Get image data
         const response = await fetch(selectedImageUri);
         const blob = await response.blob();
-        
+
         // Uploading to Firebase Storage
         await uploadBytes(fileRef, blob);
-        
+
         // Get the download URL
         const downloadURL = await getDownloadURL(fileRef);
-        
+
         // Update User Profile
         await updateProfile(auth.currentUser, { photoURL: downloadURL });
-        
+
         // Update local status
         setUser({ ...user, photoURL: downloadURL });
-        
+
         Alert.alert("success", "Profile picture updated");
       }
     } catch (error) {
@@ -253,26 +256,33 @@ export default function Profile() {
             <Text style={styles.statLabel}>Meals saved</Text>
           </View>
         </View>
-        
+
         {stats.todayCalories > 0 && (
           <View style={styles.calorieStatus}>
             <Text style={styles.calorieStatusText}>
-            Ingested today: {stats.todayCalories.toFixed(0)} Calories
+              Ingested today: {stats.todayCalories.toFixed(0)} Calories
             </Text>
-            <Text style={[
-              styles.calorieStatusGoal,
-              stats.todayCalories <= stats.calorieGoal 
-                ? styles.calorieStatusGood 
-                : styles.calorieStatusBad
-            ]}>
-              {stats.todayCalories <= stats.calorieGoal 
-                ? `Distance to target ${(stats.calorieGoal - stats.todayCalories).toFixed(0)} Calories` 
-                : `Exceeding Target ${(stats.todayCalories - stats.calorieGoal).toFixed(0)} Calories!`}
+            <Text
+              style={[
+                styles.calorieStatusGoal,
+                stats.todayCalories <= stats.calorieGoal
+                  ? styles.calorieStatusGood
+                  : styles.calorieStatusBad,
+              ]}>
+              {stats.todayCalories <= stats.calorieGoal
+                ? `Distance to target ${(
+                    stats.calorieGoal - stats.todayCalories
+                  ).toFixed(0)} Calories`
+                : `Exceeding Target ${(
+                    stats.todayCalories - stats.calorieGoal
+                  ).toFixed(0)} Calories!`}
             </Text>
           </View>
         )}
-        
-        <TouchableOpacity style={styles.goalButton} onPress={() => router.push("/CalorieGoal")}>
+
+        <TouchableOpacity
+          style={styles.goalButton}
+          onPress={() => router.push("/CalorieGoal")}>
           <MaterialCommunityIcons name="target" size={24} color="#fff" />
           <Text style={styles.goalText}>Set Calorie Goal</Text>
         </TouchableOpacity>
@@ -448,7 +458,7 @@ const styles = StyleSheet.create({
   noteText: {
     textAlign: "center",
     color: Colors.GRAY,
-    marginTop: 40,
+    marginTop: "10%",
     fontSize: 12,
   },
   poweredText: {

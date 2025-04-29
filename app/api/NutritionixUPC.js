@@ -38,11 +38,13 @@ const nutritionixApi = axios.create({
 export const getProductByUPC = async (upc) => {
   try {
     // Query the Nutritionix API with the provided UPC
+    console.log("-.-.-.-.-.-.-.-.-.-.-.-.-.-." + upc + "-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-")
     const response = await nutritionixApi.get("/search/item", {
       params: {
         upc: upc,
       },
     });
+    console.log(response);
     return response.data;
   } catch (error) {
     // Log detailed error information for debugging purposes
@@ -53,5 +55,4 @@ export const getProductByUPC = async (upc) => {
     throw error;
   }
 };
-
 

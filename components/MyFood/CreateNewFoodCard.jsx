@@ -1,11 +1,15 @@
+// Import necessary React Native components and libraries
 import { View, Text, TouchableOpacity } from "react-native";
 import React from "react";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { Colors } from "../../constants/Colors";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import { useRouter } from "expo-router";
+
+// Define CreateNewFoodCard component
 export default function CreateNewFoodCard() {
-  const router = useRouter();
+  const router = useRouter(); // Hook to handle navigation
+
   return (
     <View
       style={{
@@ -14,7 +18,9 @@ export default function CreateNewFoodCard() {
         alignItems: "center",
         justifyContent: "center",
         flex: 1,
-      }}>
+      }}
+    >
+      {/* Icon at the top */}
       <View
         style={{
           display: "flex",
@@ -22,22 +28,28 @@ export default function CreateNewFoodCard() {
           gap: "10%",
           marginTop: "15%",
           justifyContent: "center",
-        }}>
+        }}
+      >
         <MaterialCommunityIcons
           name="food-off"
           size={40}
           color={Colors.BLACK}
         />
       </View>
+
+      {/* Main title */}
       <Text
         style={{
           fontFamily: "myfont-medium",
           fontSize: 30,
           textAlign: "center",
           marginTop: "2%",
-        }}>
+        }}
+      >
         Empty food history
       </Text>
+
+      {/* Description text */}
       <Text
         style={{
           color: Colors.GRAY,
@@ -45,10 +57,13 @@ export default function CreateNewFoodCard() {
           fontSize: 23,
           textAlign: "center",
           marginTop: "5%",
-        }}>
+        }}
+      >
         Uh oh... you have nothing saved. Click the button below to find
         nutritional information about your food!
       </Text>
+
+      {/* Button to navigate to the SearchFood page */}
       <TouchableOpacity
         onPress={() => router.push("/SearchFood")}
         style={{
@@ -61,13 +76,15 @@ export default function CreateNewFoodCard() {
           alignItems: "center",
           display: "flex",
           flexDirection: "row",
-        }}>
+        }}
+      >
         <Text
           style={{
             fontSize: 18,
             fontFamily: "myfont-medium",
             color: Colors.WHITE,
-          }}>
+          }}
+        >
           Search nutrition info{" "}
         </Text>
         <AntDesign

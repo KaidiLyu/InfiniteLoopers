@@ -1,3 +1,4 @@
+// Import necessary React Native components and libraries
 import {
   View,
   Text,
@@ -16,9 +17,11 @@ import { Feather } from "@expo/vector-icons";
 import { deleteDoc, doc } from "firebase/firestore";
 import { db } from "../../configs/FirebaseConfig";
 
+// Define MyFoodCards component
 export default function MyFoodCards({ title, data, isExpanded, onDelete }) {
-  const router = useRouter();
+  const router = useRouter(); // Hook to handle navigation
 
+  // Function to handle item deletion with confirmation alert
   const handleDelete = async (item) => {
     Alert.alert(
       "Delete Item",
@@ -33,8 +36,8 @@ export default function MyFoodCards({ title, data, isExpanded, onDelete }) {
           style: "destructive",
           onPress: async () => {
             try {
-              await deleteDoc(doc(db, title, item.id));
-              onDelete && onDelete();
+              await deleteDoc(doc(db, title, item.id)); // Delete document from Firestore
+              onDelete && onDelete(); // Refresh list if onDelete callback is provided
               Alert.alert("Success", "Item deleted successfully");
             } catch (error) {
               console.error("Error deleting item:", error);
@@ -46,6 +49,7 @@ export default function MyFoodCards({ title, data, isExpanded, onDelete }) {
     );
   };
 
+  // Function to determine the image URL based on the item type
   const getImageUrl = (item) => {
     if (title === "Ingredients") {
       return `https://spoonacular.com/cdn/ingredients_100x100/${item.results.image}`;
@@ -53,14 +57,18 @@ export default function MyFoodCards({ title, data, isExpanded, onDelete }) {
     return item.results.image;
   };
 
+  // Render function for each food item card
   const renderItem = ({ item }) => (
     <View style={styles.cardContainer}>
+      {/* Delete button */}
       <TouchableOpacity
         style={styles.deleteButton}
-        onPress={() => handleDelete(item)}>
+        onPress={() => handleDelete(item)}
+      >
         <Feather name="trash-2" size={16} color="black" />
       </TouchableOpacity>
 
+      {/* Card content with navigation to detailed view */}
       <TouchableOpacity
         onPress={() =>
           router.push({
@@ -72,8 +80,10 @@ export default function MyFoodCards({ title, data, isExpanded, onDelete }) {
               image: getImageUrl(item),
             },
           })
-        }>
+        }
+      >
         <View style={styles.card}>
+          {/* Show placeholder icon if no image available */}
           {title === "Products" ? (
             <MaterialCommunityIcons
               name="image-off-outline"
@@ -88,6 +98,7 @@ export default function MyFoodCards({ title, data, isExpanded, onDelete }) {
               resizeMode="cover"
             />
           )}
+          {/* Food name */}
           <Text style={styles.text} numberOfLines={1}>
             {item.results.name}
           </Text>
@@ -97,6 +108,7 @@ export default function MyFoodCards({ title, data, isExpanded, onDelete }) {
   );
 
   return (
+    // FlatList to efficiently render a grid of food cards
     <FlatList
       data={data}
       renderItem={renderItem}
@@ -112,6 +124,7 @@ export default function MyFoodCards({ title, data, isExpanded, onDelete }) {
   );
 }
 
+// Styles for the component
 const styles = StyleSheet.create({
   cardContainer: {
     position: "relative",

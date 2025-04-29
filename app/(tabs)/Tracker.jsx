@@ -10,6 +10,8 @@ import {
   Alert,
   Platform,
   SafeAreaView,
+  Modal,
+  ScrollView,
 } from "react-native";
 import { Colors } from "../../constants/Colors";
 import { auth, db } from "../../configs/FirebaseConfig";
@@ -75,6 +77,7 @@ export default function Tracker() {
   const [sortOption, setSortOption] = useState("addedAt_desc");
   const [calorieGoal, setCalorieGoal] = useState(2000); // Default Target
   const [goalChecked, setGoalChecked] = useState(false);
+  const [isPickerVisible, setIsPickerVisible] = useState(false);
 
   // Memoized date values used for filtering
   const today = useMemo(() => new Date(), []);
@@ -615,6 +618,49 @@ export default function Tracker() {
     ]);
   };
 
+  /**
+   * Delete all items for the current date
+   */
+  const deleteAllItems = async () => {
+    if (!user?.uid) return;
+    
+    Alert.alert(
+      "Delete All Items",
+      "Are you sure you want to delete all items for today? This action cannot be undone.",
+      [
+        {
+          text: "Cancel",
+          style: "cancel"
+        },
+        {
+          text: "Delete All",
+          style: "destructive",
+          onPress: async () => {
+            try {
+              const batch = writeBatch(db);
+              const q = query(
+                collection(db, "dailyTracker"),
+                where("userId", "==", user.uid),
+                where("date", "==", currentDateString)
+              );
+              
+              const querySnapshot = await getDocs(q);
+              querySnapshot.forEach((doc) => {
+                batch.delete(doc.ref);
+              });
+              
+              await batch.commit();
+              Alert.alert("Success", "All items have been deleted.");
+            } catch (error) {
+              console.error("Error deleting all items:", error);
+              Alert.alert("Error", "Could not delete all items.");
+            }
+          }
+        }
+      ]
+    );
+  };
+
   const renderItem = ({ item }) => (
     <View style={styles.itemRow}>
       <Image
@@ -696,6 +742,117 @@ export default function Tracker() {
     </View>
   );
 
+  const renderCustomPicker = () => {
+    if (Platform.OS === 'ios') {
+      return (
+        <>
+          <TouchableOpacity
+            style={styles.sortButton}
+            onPress={() => setIsPickerVisible(true)}>
+            <Text style={styles.sortButtonText}>
+              {getSortOptionLabel(sortOption)}
+            </Text>
+            <MaterialCommunityIcons
+              name="chevron-down"
+              size={24}
+              color={Colors.PRIMARY}
+            />
+          </TouchableOpacity>
+
+          <Modal
+            visible={isPickerVisible}
+            transparent={true}
+            animationType="slide">
+            <View style={styles.modalContainer}>
+              <View style={styles.pickerModalContent}>
+                <View style={styles.pickerHeader}>
+                  <TouchableOpacity
+                    onPress={() => setIsPickerVisible(false)}
+                    style={styles.doneButton}>
+                    <Text style={styles.doneButtonText}>Done</Text>
+                  </TouchableOpacity>
+                </View>
+                <Picker
+                  selectedValue={sortOption}
+                  onValueChange={(itemValue) => {
+                    setSortOption(itemValue);
+                    setIsPickerVisible(false);
+                  }}>
+                  <Picker.Item
+                    label="Sort by: Added (Newest)"
+                    value="addedAt_desc"
+                  />
+                  <Picker.Item
+                    label="Sort by: Added (Oldest)"
+                    value="addedAt_asc"
+                  />
+                  <Picker.Item
+                    label="Sort by: Calories (High-Low)"
+                    value="calories_desc"
+                  />
+                  <Picker.Item
+                    label="Sort by: Calories (Low-High)"
+                    value="calories_asc"
+                  />
+                  <Picker.Item label="Sort by: Name (A-Z)" value="name_asc" />
+                  <Picker.Item label="Sort by: Name (Z-A)" value="name_desc" />
+                </Picker>
+              </View>
+            </View>
+          </Modal>
+        </>
+      );
+    }
+
+    return (
+      <View style={styles.pickerContainer}>
+        <Picker
+          selectedValue={sortOption}
+          onValueChange={(itemValue) => setSortOption(itemValue)}
+          style={styles.picker}
+          dropdownIconColor={Colors.PRIMARY}>
+          <Picker.Item
+            label="Sort by: Added (Newest)"
+            value="addedAt_desc"
+          />
+          <Picker.Item
+            label="Sort by: Added (Oldest)"
+            value="addedAt_asc"
+          />
+          <Picker.Item
+            label="Sort by: Calories (High-Low)"
+            value="calories_desc"
+          />
+          <Picker.Item
+            label="Sort by: Calories (Low-High)"
+            value="calories_asc"
+          />
+          <Picker.Item label="Sort by: Name (A-Z)" value="name_asc" />
+          <Picker.Item label="Sort by: Name (Z-A)" value="name_desc" />
+        </Picker>
+      </View>
+    );
+  };
+
+  const getSortOptionLabel = (value) => {
+    switch (value) {
+      case "addedAt_desc":
+        return "Sort by: Added (Newest)";
+      case "addedAt_asc":
+        return "Sort by: Added (Oldest)";
+      case "calories_desc":
+        return "Sort by: Calories (High-Low)";
+      case "calories_asc":
+        return "Sort by: Calories (Low-High)";
+      case "name_asc":
+        return "Sort by: Name (A-Z)";
+      case "name_desc":
+        return "Sort by: Name (Z-A)";
+      default:
+        return "Sort by";
+    }
+  };
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
@@ -732,69 +889,58 @@ export default function Tracker() {
         </View>
 
         {!loading && !error && trackedItems.length > 0 && (
-          <View style={styles.pickerContainer}>
-            <Picker
-              selectedValue={sortOption}
-              onValueChange={(itemValue) => setSortOption(itemValue)}
-              style={styles.picker}
-              dropdownIconColor={Colors.PRIMARY}>
-              <Picker.Item
-                label="Sort by: Added (Newest)"
-                value="addedAt_desc"
-              />
-              <Picker.Item
-                label="Sort by: Added (Oldest)"
-                value="addedAt_asc"
-              />
-              <Picker.Item
-                label="Sort by: Calories (High-Low)"
-                value="calories_desc"
-              />
-              <Picker.Item
-                label="Sort by: Calories (Low-High)"
-                value="calories_asc"
-              />
-              <Picker.Item label="Sort by: Name (A-Z)" value="name_asc" />
-              <Picker.Item label="Sort by: Name (Z-A)" value="name_desc" />
-            </Picker>
+          <View style={styles.sortContainer}>
+            {renderCustomPicker()}
           </View>
         )}
 
         <View style={styles.contentArea}>
-          {loading && (
+          {loading ? (
             <View style={styles.centerMessage}>
               <ActivityIndicator size="large" color={Colors.PRIMARY} />
             </View>
-          )}
-
-          {!loading && error && (
+          ) : error ? (
             <View style={styles.centerMessage}>
               <Text style={styles.errorText}>{error}</Text>
             </View>
-          )}
-
-          {!loading && !error && trackedItems.length === 0 && (
+          ) : trackedItems.length === 0 ? (
             <View style={styles.centerMessage}>
               <Text style={styles.emptyText}>
                 No items tracked for this day.
               </Text>
             </View>
-          )}
-
-          {!loading && !error && trackedItems.length > 0 && (
-            <FlatList
-              data={sortedTrackedItems}
-              renderItem={renderItem}
-              keyExtractor={(item) => item.id}
-              style={styles.list}
-              contentContainerStyle={{ paddingBottom: 80 }}
-            />
+          ) : (
+            <ScrollView 
+              style={styles.scrollView}
+              contentContainerStyle={styles.scrollViewContent}
+              showsVerticalScrollIndicator={false}>
+              <FlatList
+                data={sortedTrackedItems}
+                renderItem={renderItem}
+                keyExtractor={(item) => item.id}
+                style={styles.list}
+                contentContainerStyle={styles.listContent}
+                showsVerticalScrollIndicator={false}
+                scrollEnabled={false}
+              />
+              {renderNutritionLabel()}
+            </ScrollView>
           )}
         </View>
 
         {!loading && !error && trackedItems.length > 0 && (
           <View style={styles.footerContainer}>
-            {renderNutritionLabel()}
+            <TouchableOpacity
+              style={styles.deleteAllButton}
+              onPress={deleteAllItems}>
+              <MaterialCommunityIcons
+                name="delete-sweep"
+                size={24}
+                color={Colors.WHITE}
+              />
+              <Text style={styles.deleteAllButtonText}>Delete All Items</Text>
+            </TouchableOpacity>
+            
             <View style={styles.calorieStats}>
               <View style={styles.calorieStat}>
                 <Text style={styles.calorieStatLabel}>Total Calories:</Text>
@@ -853,24 +999,37 @@ const styles = StyleSheet.create({
     color: Colors.DARK_GRAY,
   },
   pickerContainer: {
-    marginHorizontal: 15,
-    marginTop: 10,
-    marginBottom: 5,
     borderWidth: 1,
     borderColor: Colors.LIGHT_GRAY,
     borderRadius: 8,
     backgroundColor: Colors.WHITE,
-    height: Platform.OS === "ios" ? 150 : 50,
+    height: 50,
     justifyContent: "center",
-    overflow: Platform.OS === "ios" ? "hidden" : "visible",
+    overflow: "hidden",
   },
   picker: {
-    height: Platform.OS === "ios" ? 150 : 50,
+    height: 50,
     width: "100%",
     color: Colors.BLACK,
   },
   contentArea: {
     flex: 1,
+    backgroundColor: Colors.BACKGROUND_COLOR || Colors.WHITE,
+  },
+  scrollView: {
+    flex: 1,
+  },
+  scrollViewContent: {
+    flexGrow: 1,
+    paddingBottom: Platform.OS === 'ios' ? 20 : 0,
+  },
+  list: {
+    flexGrow: 0,
+  },
+  listContent: {
+    paddingHorizontal: 10,
+    paddingTop: 10,
+    paddingBottom: 10,
   },
   centerMessage: {
     flex: 1,
@@ -889,9 +1048,6 @@ const styles = StyleSheet.create({
     color: Colors.DARK_GRAY,
     textAlign: "center",
     fontFamily: "myfont-medium",
-  },
-  list: {
-    flex: 1,
   },
   itemRow: {
     flexDirection: "row",
@@ -960,8 +1116,9 @@ const styles = StyleSheet.create({
     padding: 8,
   },
   footerContainer: {
-    paddingVertical: 15,
+    paddingVertical: Platform.OS === 'ios' ? 15 : 10,
     paddingHorizontal: 20,
+    paddingBottom: Platform.OS === 'ios' ? 30 : 15,
     backgroundColor: Colors.WHITE,
     borderTopWidth: 1,
     borderTopColor: Colors.EXTRA_LIGHT_GRAY,
@@ -971,7 +1128,8 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.EXTRA_LIGHT_GRAY,
     borderRadius: 8,
     padding: 15,
-    marginTop: 15,
+    marginTop: 10,
+    width: '100%',
   },
   calorieStat: {
     flexDirection: "row",
@@ -1006,12 +1164,12 @@ const styles = StyleSheet.create({
     color: Colors.RED,
   },
   nutritionContainer: {
-    padding: 10,
+    margin: 10,
+    padding: 15,
     backgroundColor: Colors.WHITE,
     borderWidth: 1,
     borderColor: Colors.BLACK,
-    borderRadius: 5,
-    marginBottom: 15,
+    borderRadius: 8,
   },
   nutritionTitle: {
     fontSize: 20,
@@ -1139,5 +1297,66 @@ const styles = StyleSheet.create({
   },
   qtyButtonTextAdd: {
     color: Colors.WHITE,
+  },
+  deleteAllButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: Colors.RED,
+    padding: 10,
+    borderRadius: 8,
+    marginBottom: 15,
+  },
+  deleteAllButtonText: {
+    color: Colors.WHITE,
+    fontFamily: 'myfont-bold',
+    fontSize: 16,
+    marginLeft: 8,
+  },
+  sortContainer: {
+    marginHorizontal: 15,
+    marginTop: 10,
+    marginBottom: 5,
+  },
+  sortButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    padding: 12,
+    backgroundColor: Colors.WHITE,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: Colors.LIGHT_GRAY,
+  },
+  sortButtonText: {
+    fontSize: 16,
+    fontFamily: 'myfont-medium',
+    color: Colors.BLACK,
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'flex-end',
+    backgroundColor: 'rgba(0,0,0,0.5)',
+  },
+  pickerModalContent: {
+    backgroundColor: Colors.WHITE,
+    borderTopLeftRadius: 12,
+    borderTopRightRadius: 12,
+    paddingBottom: 20,
+  },
+  pickerHeader: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    padding: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: Colors.LIGHT_GRAY,
+  },
+  doneButton: {
+    padding: 8,
+  },
+  doneButtonText: {
+    color: Colors.PRIMARY,
+    fontSize: 16,
+    fontFamily: 'myfont-medium',
   },
 });
